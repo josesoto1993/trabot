@@ -1,5 +1,6 @@
 const { open } = require("./services/browserService");
 const { attackFarms } = require("./services/attackFarmsService");
+const { login } = require("./services/loginService");
 
 const START_TIMER = 30 * 1000;
 const INTERVAL = 1 * 60 * 1000;
@@ -8,6 +9,7 @@ let page;
 
 const mainLoop = async () => {
   await initializeBrowser();
+  await login();
 
   while (true) {
     await runAttackFarms();

@@ -1,5 +1,4 @@
 const puppeteer = require("puppeteer");
-const { TRAVIAN_BASE } = require("../config/constants");
 
 let browser;
 let page;
@@ -8,7 +7,6 @@ const open = async () => {
   if (!browser) {
     browser = await puppeteer.launch({ headless: false });
     page = await browser.newPage();
-    await goPage(TRAVIAN_BASE);
   }
   return page;
 };
