@@ -11,13 +11,11 @@ if (!USERNAME || !PASSWORD) {
 const login = async (page) => {
   try {
     await goPage(TRAVIAN_BASE);
-    await new Promise((resolve) => setTimeout(resolve, 10 * 1000));
 
     await writeUser(page);
     await writePassword(page);
     await submit(page);
 
-    await new Promise((resolve) => setTimeout(resolve, 15 * 1000));
     console.log("Login process completed.");
   } catch (error) {
     console.error("Error during login:", error);
