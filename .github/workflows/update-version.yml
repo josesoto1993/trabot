@@ -1,0 +1,42 @@
+name: Update version on PR merge
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  update-version:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Increment version
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        CURRENT_VERSION=$(jq -r '.version' package.json)
+        BASE_VERSION=$(echo $CURRENT_VERSION | cut -d. -f1,2)
+        MINOR_VERSION=$(echo $CURRENT_VERSION | cut -d. -f3)
+        NEW_VERSION="$BASE_VERSION.$((MINOR_VERSION + 1))"
+        jq ".version = \"$NEW_VERSION\"" package.json > package.json.tmp && mv package.json.tmp package.json
+        git add package.json
+        git commit -m "Increment version to $NEW_VERSION"
+        git push origin HEAD:main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Create a tag
+      run: |
+        NEW_VERSION=$(jq -r '.version' package.json)
+        git tag -a "v$NEW_VERSION" -m "Version $NEW_VERSION"
+        git push origin --tags
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,49 @@
+{
+  "name": "trabot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "pretty": "prettier --write \"./**/*.{js,jsx,ts,html,json}\"",
+    "precommit": "lint-staged",
+    "postinstall": "npx husky install"
+  },
+  "lint-staged": {
+    "*.json": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.{js,ts,jsx,tsx}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.{css,scss}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.html": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josesoto1993/trabot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/josesoto1993/trabot/issues"
+  },
+  "homepage": "https://github.com/josesoto1993/trabot#readme",
+  "dependencies": {
+    "puppeteer": "^22.14.0"
+  },
+  "devDependencies": {
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.7",
+    "prettier": "^3.3.3"
+  }
+}
