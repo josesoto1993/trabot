@@ -6,6 +6,7 @@ let randomInterval = 0;
 let trainCount = 0;
 const MIN_TRAIN_INTERVAL = 60 * 60 * 1000;
 const RANDOM_INTERVAL_VARIATION = 10 * 60 * 1000;
+const MAX_TRAIN_TIME = 4 * 60 * 60;
 
 const trainTroops = async (page) => {
   const currentTime = Date.now();
@@ -33,8 +34,18 @@ const performTrain = async (page) => {
   try {
     await goPage(TARVIAN_MAIN_BARRACKS);
 
-    await writeInputValueToMax(page);
-    await submit(page);
+    let remainingTime = await getRemainingTime(page);
+    if (remainingTime < MAX_TRAIN_TIME) {
+      console.log(
+        `Need train, remainingTime=${remainingTime} is lower than MAX_TRAIN_TIME=${MAX_TRAIN_TIME}`
+      );
+      await writeInputValueToMax(page);
+      await submit(page);
+    } else {
+      console.log(
+        `No need train, there is enough units in training, remainingTime=${remainingTime}`
+      );
+    }
 
     updateNextTrainTime();
     console.log(
@@ -42,6 +53,21 @@ const performTrain = async (page) => {
     );
   } catch (error) {
     console.log("Error during attack:", error);
+  }
+};
+
+const getRemainingTime = async (page) => {
+  try {
+    await page.waitForSelector("td.dur span.timer");
+    const remainingTimes = await page.$$eval("td.dur span.timer", (spans) =>
+      spans.map((span) => parseInt(span.getAttribute("value"), 10))
+    );
+    const maxRemainingTime = Math.max(...remainingTimes);
+    console.log(`Maximum remaining time: ${maxRemainingTime}`);
+    return maxRemainingTime;
+  } catch (error) {
+    console.log("Error getting remaining time:", error);
+    return 0;
   }
 };
 
