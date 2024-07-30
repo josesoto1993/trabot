@@ -8,7 +8,7 @@ if (!USERNAME || !PASSWORD) {
   throw new Error("Environment variables USERNAME and PASSWORD must be set.");
 }
 
-const login = async () => {
+const login = async (page) => {
   try {
     await goPage(TRAVIAN_BASE);
 
@@ -22,7 +22,7 @@ const login = async () => {
   }
 };
 
-const writeUser = async () => {
+const writeUser = async (page) => {
   try {
     await page.waitForSelector('div.fromV2 input[name="name"]');
     await page.type('div.fromV2 input[name="name"]', USERNAME);
@@ -32,7 +32,7 @@ const writeUser = async () => {
   }
 };
 
-const writePassword = async () => {
+const writePassword = async (page) => {
   try {
     await page.waitForSelector('div.fromV2 input[name="password"]');
     await page.type('div.fromV2 input[name="password"]', PASSWORD);
@@ -42,7 +42,7 @@ const writePassword = async () => {
   }
 };
 
-const submit = async () => {
+const submit = async (page) => {
   try {
     await page.click('button[type="submit"]');
     console.log("Login form submitted.");

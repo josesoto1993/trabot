@@ -4,17 +4,14 @@ const { open } = require("./services/browserService");
 const { attackFarms } = require("./services/attackFarmsService");
 const { login } = require("./services/loginService");
 
-const START_TIMER = 30 * 1000;
 const INTERVAL = 1 * 60 * 1000;
 
-let page;
-
 const mainLoop = async () => {
-  await initializeBrowser();
-  await login();
+  let page = await initializeBrowser();
+  await login(page);
 
   while (true) {
-    await runAttackFarms();
+    await runAttackFarms(page);
 
     console.log(
       `Waiting for ${INTERVAL / 1000 / 60} minutes before next run...`
@@ -25,18 +22,14 @@ const mainLoop = async () => {
 
 const initializeBrowser = async () => {
   try {
-    page = await open();
-    console.log(
-      `Browser opened ${START_TIMER / 1000}s to login and configure it`
-    );
-    await new Promise((resolve) => setTimeout(resolve, START_TIMER));
+    return await open();
   } catch (error) {
     console.error("Error opening browser:", error);
     process.exit(1);
   }
 };
 
-const runAttackFarms = async () => {
+const runAttackFarms = async (page) => {
   try {
     await attackFarms(page);
   } catch (error) {
