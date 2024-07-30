@@ -1,8 +1,9 @@
 const { goPage } = require("./browserService");
 const { TRAVIAN_BASE } = require("../config/constants");
 
-const USERNAME = process.env.USERNAME;
-const PASSWORD = process.env.PASSWORD;
+const USERNAME = process.env.TARVIAN_USERNAME;
+const PASSWORD = process.env.TARVIAN_PASSWORD;
+const START_DELAY = 15 * 1000;
 
 if (!USERNAME || !PASSWORD) {
   throw new Error("Environment variables USERNAME and PASSWORD must be set.");
@@ -16,6 +17,8 @@ const login = async (page) => {
     await writePassword(page);
     await submit(page);
 
+    console.log(`Waiting for ${START_DELAY / 1000}s before start...`);
+    await new Promise((resolve) => setTimeout(resolve, START_DELAY));
     console.log("Login process completed.");
   } catch (error) {
     console.error("Error during login:", error);
