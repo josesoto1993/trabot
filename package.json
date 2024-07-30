@@ -2,9 +2,9 @@
   "name": "trabot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node src/index.js",
     "pretty": "prettier --write \"./**/*.{js,jsx,ts,html,json}\"",
     "precommit": "lint-staged",
     "postinstall": "npx husky install"
@@ -39,6 +39,7 @@
   },
   "homepage": "https://github.com/josesoto1993/trabot#readme",
   "dependencies": {
+    "dotenv": "^16.4.5",
     "puppeteer": "^22.14.0"
   },
   "devDependencies": {
