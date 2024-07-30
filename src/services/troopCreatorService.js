@@ -3,6 +3,7 @@ const { TARVIAN_MAIN_BARRACKS } = require("../config/constants");
 
 let lastTrainTime = 0;
 let randomInterval = 0;
+let trainCount = 0;
 const MIN_TRAIN_INTERVAL = 60 * 60 * 1000;
 const RANDOM_INTERVAL_VARIATION = 10 * 60 * 1000;
 
@@ -25,6 +26,7 @@ const hasEnoughTimePassed = (currentTime) => {
 const updateNextTrainTime = () => {
   randomInterval = Math.floor(Math.random() * RANDOM_INTERVAL_VARIATION);
   lastTrainTime = Date.now();
+  attackCount = trainCount + 1;
 };
 
 const performTrain = async (page) => {
@@ -35,9 +37,11 @@ const performTrain = async (page) => {
     await submit(page);
 
     updateNextTrainTime();
-    console.log("Train completed successfully.");
+    console.log(
+      `Train completed successfully. Total trains done ${attackCount}`
+    );
   } catch (error) {
-    console.error("Error during attack:", error);
+    console.log("Error during attack:", error);
   }
 };
 
@@ -47,7 +51,7 @@ const writeInputValueToMax = async (page) => {
     await page.type('input[name="t1"]', "999", { delay: 100 });
     console.log("Input entered.");
   } catch (error) {
-    console.error("Error entering value for train troops:", error);
+    console.log("Error entering value for train troops:", error);
   }
 };
 
@@ -56,7 +60,7 @@ const submit = async (page) => {
     await page.click('button[type="submit"]');
     console.log("Train troops submitted.");
   } catch (error) {
-    console.error("Error submitting train troops form:", error);
+    console.log("Error submitting train troops form:", error);
   }
 };
 

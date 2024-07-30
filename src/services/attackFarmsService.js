@@ -3,6 +3,7 @@ const { TRAVIAN_FARM_LIST } = require("../config/constants");
 
 let lastAttackTime = 0;
 let randomInterval = 0;
+let attackCount = 0;
 const MIN_ATTACK_INTERVAL = 4 * 60 * 1000;
 const RANDOM_INTERVAL_VARIATION = 2 * 60 * 1000;
 const MIN_CLICK_INTERVAL = 3 * 1000;
@@ -25,6 +26,7 @@ const hasEnoughTimePassed = (currentTime) => {
 const updateNextAttackTime = () => {
   randomInterval = Math.floor(Math.random() * RANDOM_INTERVAL_VARIATION);
   lastAttackTime = Date.now();
+  attackCount = attackCount + 1;
 };
 
 const performAttack = async (page) => {
@@ -35,7 +37,9 @@ const performAttack = async (page) => {
     await clickButtons(page);
 
     updateNextAttackTime();
-    console.log("Attack completed successfully.");
+    console.log(
+      `Attack completed successfully. Total attacks done ${attackCount}`
+    );
   } catch (error) {
     console.error("Error during attack:", error);
   }
