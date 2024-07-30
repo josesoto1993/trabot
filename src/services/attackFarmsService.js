@@ -43,13 +43,16 @@ const performAttack = async (page) => {
 
 const waitForButtonsToLoad = async (page) => {
   await page.waitForSelector("button.startFarmList");
+  console.log("Buttons load successfully.");
 };
 
 const clickButtons = async (page) => {
   const buttons = await page.$$("button.startFarmList:not(.disabled)");
 
+  console.log(`There are ${buttons.length} buttons`);
   for (const button of buttons) {
     await button.click();
+    console.log("Click button successfully.");
     await waitRandomTime(MIN_CLICK_INTERVAL, MAX_CLICK_INTERVAL);
   }
 };
