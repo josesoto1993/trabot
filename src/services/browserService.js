@@ -8,7 +8,7 @@ const open = async () => {
   if (!browser) {
     browser = await puppeteer.launch({ headless: false });
     page = await browser.newPage();
-    goPage(TRAVIAN_BASE);
+    await goPage(TRAVIAN_BASE);
   }
   return page;
 };
@@ -33,7 +33,7 @@ const waitRandomTime = async (min, max) => {
     throw new Error("Min value cannot be greater than max value");
   }
   const randomTime = Math.floor(Math.random() * (max - min + 1)) + min;
-  await page.waitForTimeout(randomTime);
+  await new Promise((resolve) => setTimeout(resolve, randomTime));
 };
 
 module.exports = {
