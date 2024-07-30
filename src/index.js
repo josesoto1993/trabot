@@ -35,7 +35,7 @@ const runAttackFarms = async (page) => {
   try {
     await attackFarms(page);
   } catch (error) {
-    console.error("Error during attack:", error);
+    console.error("Error during attack task:", error);
   }
 };
 
@@ -43,7 +43,7 @@ const runTrainTroops = async (page) => {
   try {
     await trainTroops(page);
   } catch (error) {
-    console.error("Error during attack:", error);
+    console.error("Error during train task:", error);
   }
 };
 

@@ -37,22 +37,22 @@ const performTrain = async (page) => {
     let remainingTime = await getRemainingTime(page);
     if (remainingTime < MAX_TRAIN_TIME) {
       console.log(
-        `Need train, remainingTime=${remainingTime} is lower than MAX_TRAIN_TIME=${MAX_TRAIN_TIME}`
+        `Need to train, remaining time=${remainingTime} is lower than MAX_TRAIN_TIME=${MAX_TRAIN_TIME}`
       );
       await writeInputValueToMax(page);
       await submit(page);
     } else {
       console.log(
-        `No need train, there is enough units in training, remainingTime=${remainingTime}`
+        `No need to train, remaining time=${remainingTime} is higher than MAX_TRAIN_TIME=${MAX_TRAIN_TIME}`
       );
     }
 
     updateNextTrainTime();
     console.log(
-      `Train completed successfully. Total trains done ${attackCount}`
+      `Training completed successfully. Total trains done: ${attackCount}`
     );
   } catch (error) {
-    console.log("Error during attack:", error);
+    console.log("Error during train:", error);
   }
 };
 
