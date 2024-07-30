@@ -12,9 +12,9 @@ const login = async (page) => {
   try {
     await goPage(TRAVIAN_BASE);
 
-    await writeUser();
-    await writePassword();
-    await submit();
+    await writeUser(page);
+    await writePassword(page);
+    await submit(page);
 
     console.log("Login process completed.");
   } catch (error) {
@@ -24,8 +24,8 @@ const login = async (page) => {
 
 const writeUser = async (page) => {
   try {
-    await page.waitForSelector('div.fromV2 input[name="name"]');
-    await page.type('div.fromV2 input[name="name"]', USERNAME);
+    await page.waitForSelector('input[name="name"]');
+    await page.type('input[name="name"]', USERNAME);
     console.log("Username entered.");
   } catch (error) {
     console.error("Error entering username:", error);
@@ -34,8 +34,8 @@ const writeUser = async (page) => {
 
 const writePassword = async (page) => {
   try {
-    await page.waitForSelector('div.fromV2 input[name="password"]');
-    await page.type('div.fromV2 input[name="password"]', PASSWORD);
+    await page.waitForSelector('input[name="password"]');
+    await page.type('input[name="password"]', PASSWORD);
     console.log("Password entered.");
   } catch (error) {
     console.error("Error entering password:", error);
