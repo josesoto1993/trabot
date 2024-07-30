@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const { open } = require("./services/browserService");
 const { attackFarms } = require("./services/attackFarmsService");
+const { trainTroops } = require("./services/troopCreatorService");
 const { login } = require("./services/loginService");
 
 const INTERVAL = 1 * 60 * 1000;
@@ -12,6 +13,7 @@ const mainLoop = async () => {
 
   while (true) {
     await runAttackFarms(page);
+    await runTrainTroops(page);
 
     console.log(
       `Waiting for ${INTERVAL / 1000 / 60} minutes before next run...`
@@ -32,6 +34,14 @@ const initializeBrowser = async () => {
 const runAttackFarms = async (page) => {
   try {
     await attackFarms(page);
+  } catch (error) {
+    console.error("Error during attack:", error);
+  }
+};
+
+const runTrainTroops = async (page) => {
+  try {
+    await trainTroops(page);
   } catch (error) {
     console.error("Error during attack:", error);
   }
