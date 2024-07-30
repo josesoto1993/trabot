@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const { open } = require("./services/browserService");
 const { attackFarms } = require("./services/attackFarmsService");
 const { login } = require("./services/loginService");

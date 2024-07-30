@@ -39,6 +39,7 @@
   },
   "homepage": "https://github.com/josesoto1993/trabot#readme",
   "dependencies": {
+    "dotenv": "^16.4.5",
     "puppeteer": "^22.14.0"
   },
   "devDependencies": {
