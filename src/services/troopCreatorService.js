@@ -2,7 +2,7 @@ const { goPage } = require("./browserService");
 const { TARVIAN_MAIN_BARRACKS } = require("../config/constants");
 
 let lastTrainTime = 0;
-let randomInterval = 0;
+let randomTrainInterval = 0;
 let trainCount = 0;
 const MIN_TRAIN_INTERVAL = 60 * 60 * 1000;
 const RANDOM_INTERVAL_VARIATION = 10 * 60 * 1000;
@@ -21,13 +21,15 @@ const trainTroops = async (page) => {
 };
 
 const hasEnoughTimePassed = (currentTime) => {
-  return currentTime - lastTrainTime >= MIN_TRAIN_INTERVAL + randomInterval;
+  return (
+    currentTime - lastTrainTime >= MIN_TRAIN_INTERVAL + randomTrainInterval
+  );
 };
 
 const updateNextTrainTime = () => {
-  randomInterval = Math.floor(Math.random() * RANDOM_INTERVAL_VARIATION);
+  randomTrainInterval = Math.floor(Math.random() * RANDOM_INTERVAL_VARIATION);
   lastTrainTime = Date.now();
-  attackCount = trainCount + 1;
+  trainCount = trainCount + 1;
 };
 
 const performTrain = async (page) => {
@@ -49,7 +51,7 @@ const performTrain = async (page) => {
 
     updateNextTrainTime();
     console.log(
-      `Training completed successfully. Total trains done: ${attackCount}`
+      `Training completed successfully. Total trains done: ${trainCount}`
     );
   } catch (error) {
     console.log("Error during train:", error);
@@ -72,9 +74,10 @@ const getRemainingTime = async (page) => {
 };
 
 const writeInputValueToMax = async (page) => {
+  const inputName = 'input[name="t2"]';
   try {
-    await page.waitForSelector('input[name="t1"]');
-    await page.type('input[name="t1"]', "999", { delay: 100 });
+    await page.waitForSelector(inputName);
+    await page.type(inputName, "999", { delay: 100 });
     console.log("Input entered.");
   } catch (error) {
     console.log("Error entering value for train troops:", error);

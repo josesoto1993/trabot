@@ -2,7 +2,7 @@ const { waitRandomTime, goPage } = require("./browserService");
 const { TRAVIAN_FARM_LIST } = require("../config/constants");
 
 let lastAttackTime = 0;
-let randomInterval = 0;
+let randomAttackInterval = 0;
 let attackCount = 0;
 const MIN_ATTACK_INTERVAL = 5 * 60 * 1000;
 const RANDOM_INTERVAL_VARIATION = 0.5 * 60 * 1000;
@@ -20,11 +20,13 @@ const attackFarms = async (page) => {
 };
 
 const hasEnoughTimePassed = (currentTime) => {
-  return currentTime - lastAttackTime >= MIN_ATTACK_INTERVAL + randomInterval;
+  return (
+    currentTime - lastAttackTime >= MIN_ATTACK_INTERVAL + randomAttackInterval
+  );
 };
 
 const updateNextAttackTime = () => {
-  randomInterval = Math.floor(
+  randomAttackInterval = Math.floor(
     Math.random() * RANDOM_INTERVAL_VARIATION * 2 - RANDOM_INTERVAL_VARIATION
   );
   lastAttackTime = Date.now();
