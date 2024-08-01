@@ -1,9 +1,12 @@
 const { goPage } = require("./browserService");
-const { TARVIAN_MAIN_BARRACKS } = require("../config/constants");
+const { TARVIAN_MAIN_BARRACKS } = require("../constants/links");
+const Unit = require("../constants/units");
 
+const trainUnit = Unit.Swordsman;
 let lastTrainTime = 0;
 let randomTrainInterval = 0;
 let trainCount = 0;
+const UNITS_TO_TRAIN = "999";
 const MIN_TRAIN_INTERVAL = 60 * 60 * 1000;
 const RANDOM_INTERVAL_VARIATION = 10 * 60 * 1000;
 const MAX_TRAIN_TIME = 4 * 60 * 60;
@@ -74,10 +77,10 @@ const getRemainingTime = async (page) => {
 };
 
 const writeInputValueToMax = async (page) => {
-  const inputName = 'input[name="t2"]';
+  const inputName = `input[name="${trainUnit}"]`;
   try {
     await page.waitForSelector(inputName);
-    await page.type(inputName, "999", { delay: 100 });
+    await page.type(inputName, UNITS_TO_TRAIN, { delay: 100 });
     console.log("Input entered.");
   } catch (error) {
     console.log("Error entering value for train troops:", error);

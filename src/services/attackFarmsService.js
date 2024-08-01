@@ -1,5 +1,5 @@
 const { waitRandomTime, goPage } = require("./browserService");
-const { TRAVIAN_FARM_LIST } = require("../config/constants");
+const { TRAVIAN_FARM_LIST } = require("../constants/links");
 
 let lastAttackTime = 0;
 let randomAttackInterval = 0;
