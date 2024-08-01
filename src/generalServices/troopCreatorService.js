@@ -1,4 +1,4 @@
-const { goPage } = require("./browserService");
+const { goPage } = require("../browser/browserService");
 const { TARVIAN_MAIN_BARRACKS } = require("../constants/links");
 const Unit = require("../constants/units");
 

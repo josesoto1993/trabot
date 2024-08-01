@@ -1,4 +1,4 @@
-const { waitRandomTime, goPage } = require("./browserService");
+const { waitRandomTime, goPage } = require("../browser/browserService");
 const { TRAVIAN_FARM_LIST } = require("../constants/links");
 
 let lastAttackTime = 0;

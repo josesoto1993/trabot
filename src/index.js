@@ -1,9 +1,9 @@
 require("dotenv").config();
 
-const { open } = require("./services/browserService");
-const { attackFarms } = require("./services/attackFarmsService");
-const { trainTroops } = require("./services/troopCreatorService");
-const { login } = require("./services/loginService");
+const { open } = require("./browser/browserService");
+const { login } = require("./browser/loginService");
+const { attackFarms } = require("./generalServices/attackFarmsService");
+const { trainTroops } = require("./generalServices/troopCreatorService");
 
 const INTERVAL = 1 * 60 * 1000;
 
