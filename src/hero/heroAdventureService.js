@@ -6,8 +6,15 @@ const HeroStatus = require("../constants/heroStatus");
 
 const ADVENTURE_BUTTON_SELECTOR_TIMEOUT_MILLIS = 15000;
 const ADVENTURE_INTERVAL = 15 * 60;
+let lastAdventureTime = 0;
 
 const goAdventure = async (page) => {
+  const remaningTime = getRemaningTime();
+  if (remaningTime > 0) {
+    return remaningTime;
+  }
+  console.log("Enough time has passed since the last adventure, try go");
+
   const heroStatusClass = await getClassOfHeroIcon(page);
   const atHome = heroStatusClass === HeroStatus.home;
   if (!atHome) {
@@ -22,7 +29,18 @@ const goAdventure = async (page) => {
   );
 
   await performAdventure(page);
+  updateNextAdventureTime();
   return ADVENTURE_INTERVAL;
+};
+
+const getRemaningTime = () => {
+  const currentTime = Date.now();
+  const timePased = (currentTime - lastAdventureTime) / 1000;
+  return ADVENTURE_INTERVAL - timePased;
+};
+
+const updateNextAdventureTime = () => {
+  lastAdventureTime = Date.now();
 };
 
 const performAdventure = async (page) => {
