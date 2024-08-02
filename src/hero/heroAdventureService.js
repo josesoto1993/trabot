@@ -28,8 +28,11 @@ const goAdventure = async (page) => {
     "Hero is at home and there are adventures, trying to go for a new adventure!"
   );
 
-  await performAdventure(page);
-  updateNextAdventureTime();
+  const successfullyAdventure = await performAdventure(page);
+  if (successfullyAdventure) {
+    updateNextAdventureTime();
+  }
+
   return ADVENTURE_INTERVAL;
 };
 
@@ -47,8 +50,10 @@ const performAdventure = async (page) => {
   try {
     await goPage(TRAVIAN_HERO_ADVENTURES);
     await clickAdventureButton(page);
+    return true;
   } catch (error) {
     console.error("Error during adventure:", error);
+    return false;
   }
 };
 

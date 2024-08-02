@@ -22,6 +22,7 @@ const attackFarms = async (page) => {
   if (successfullyAttack) {
     updateNextAttackTime();
   }
+
   return getRemaningTime();
 };
 

@@ -22,10 +22,10 @@ const trainTroops = async (page) => {
   );
 
   const successfullyTrain = await performTrain(page);
-
   if (successfullyTrain) {
     updateNextTrainTime();
   }
+
   return getRemaningTime();
 };
 
