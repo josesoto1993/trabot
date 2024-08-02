@@ -5,10 +5,10 @@ const { formatTime } = require("./timePrintService");
 let lastAttackTime = 0;
 let randomAttackInterval = 0;
 let attackCount = 0;
-const MIN_ATTACK_INTERVAL = 5 * 60 * 1000;
-const RANDOM_INTERVAL_VARIATION = 0.5 * 60 * 1000;
-const MIN_CLICK_INTERVAL = 3 * 1000;
-const MAX_CLICK_INTERVAL = 5 * 1000;
+const MIN_ATTACK_INTERVAL = 5 * 60;
+const RANDOM_INTERVAL_VARIATION_MILLIS = 0.5 * 60 * 1000;
+const MIN_CLICK_INTERVAL_MILLIS = 3 * 1000;
+const MAX_CLICK_INTERVAL_MILLIS = 5 * 1000;
 
 const attackFarms = async (page) => {
   let remaningTime = getRemaningTime();
@@ -31,9 +31,11 @@ const getRemaningTime = () => {
 };
 
 const updateNextAttackTime = () => {
-  randomAttackInterval = Math.floor(
-    Math.random() * RANDOM_INTERVAL_VARIATION * 2 - RANDOM_INTERVAL_VARIATION
+  let randomAttackIntervalMillis = Math.floor(
+    Math.random() * RANDOM_INTERVAL_VARIATION_MILLIS * 2 -
+      RANDOM_INTERVAL_VARIATION_MILLIS
   );
+  randomAttackInterval = randomAttackIntervalMillis / 1000;
   console.log(
     `Next attack in ${formatTime(MIN_ATTACK_INTERVAL + randomAttackInterval)}`
   );
@@ -69,8 +71,9 @@ const clickButtons = async (page) => {
     await button.click();
     console.log("Click button successfully.");
     const randomTime =
-      Math.floor(Math.random() * (MAX_CLICK_INTERVAL - MIN_CLICK_INTERVAL)) +
-      MIN_CLICK_INTERVAL;
+      Math.floor(
+        Math.random() * (MAX_CLICK_INTERVAL_MILLIS - MIN_CLICK_INTERVAL_MILLIS)
+      ) + MIN_CLICK_INTERVAL_MILLIS;
     await new Promise((resolve) => setTimeout(resolve, randomTime));
   }
 };

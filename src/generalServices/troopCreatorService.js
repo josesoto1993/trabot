@@ -8,8 +8,8 @@ let lastTrainTime = 0;
 let randomTrainInterval = 0;
 let trainCount = 0;
 const UNITS_TO_TRAIN = "999";
-const MIN_TRAIN_INTERVAL = 60 * 60 * 1000;
-const RANDOM_INTERVAL_VARIATION = 10 * 60 * 1000;
+const MIN_TRAIN_INTERVAL = 60 * 60;
+const RANDOM_INTERVAL_VARIATION_MILLIS = 10 * 60 * 1000;
 const MAX_TRAIN_TIME = 4 * 60 * 60;
 
 const trainTroops = async (page) => {
@@ -29,13 +29,14 @@ const trainTroops = async (page) => {
 const getRemaningTime = () => {
   const currentTime = Date.now();
   const timePased = currentTime - lastTrainTime;
-  const remaningTime = MIN_TRAIN_INTERVAL + randomTrainInterval - timePased;
-  return remaningTime;
+  return MIN_TRAIN_INTERVAL + (randomTrainInterval - timePased) / 1000;
 };
 
 const updateNextTrainTime = () => {
-  randomTrainInterval =
-    Math.random() * RANDOM_INTERVAL_VARIATION * 2 - RANDOM_INTERVAL_VARIATION;
+  let randomTrainIntervalMillis =
+    Math.random() * RANDOM_INTERVAL_VARIATION_MILLIS * 2 -
+    RANDOM_INTERVAL_VARIATION_MILLIS;
+  randomTrainInterval = randomTrainIntervalMillis / 1000;
   console.log(
     `Next train in ${formatTime(MIN_TRAIN_INTERVAL + randomTrainInterval)}`
   );

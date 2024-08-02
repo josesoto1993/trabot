@@ -4,8 +4,8 @@ const { TRAVIAN_HERO_ADVENTURES } = require("../constants/links");
 const { formatTime } = require("../generalServices/timePrintService");
 const HeroStatus = require("../constants/heroStatus");
 
-const ADVENTURE_BUTTON_SELECTOR_TIMEOUT = 15000;
-const ADVENTURE_INTERVAL = 15 * 60 * 1000;
+const ADVENTURE_BUTTON_SELECTOR_TIMEOUT_MILLIS = 15000;
+const ADVENTURE_INTERVAL = 15 * 60;
 
 const goAdventure = async (page) => {
   const heroStatusClass = await getClassOfHeroIcon(page);
@@ -38,7 +38,7 @@ const clickAdventureButton = async (page) => {
   const adventureButtonSelector = ".adventureList tbody tr td .textButtonV2";
   try {
     await page.waitForSelector(adventureButtonSelector, {
-      timeout: ADVENTURE_BUTTON_SELECTOR_TIMEOUT,
+      timeout: ADVENTURE_BUTTON_SELECTOR_TIMEOUT_MILLIS,
     });
     const button = await page.$(adventureButtonSelector);
     if (button) {
