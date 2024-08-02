@@ -17,9 +17,11 @@ const attackFarms = async (page) => {
   }
   console.log("Enough time has passed since the last attack, go for attack!");
 
-  await performAttack(page);
+  const successfullyAttack = await performAttack(page);
 
-  updateNextAttackTime();
+  if (successfullyAttack) {
+    updateNextAttackTime();
+  }
   return getRemaningTime();
 };
 
@@ -52,8 +54,12 @@ const performAttack = async (page) => {
     console.log(
       `Attack completed successfully. Total attacks done ${attackCount}`
     );
+
+    return true;
   } catch (error) {
     console.error("Error during attack:", error);
+
+    return false;
   }
 };
 

@@ -21,8 +21,11 @@ const trainTroops = async (page) => {
     "Enough time has passed since the last training, go for more troops!"
   );
 
-  await performTrain(page);
-  updateNextTrainTime();
+  const successfullyTrain = await performTrain(page);
+
+  if (successfullyTrain) {
+    updateNextTrainTime();
+  }
   return getRemaningTime();
 };
 
@@ -64,8 +67,10 @@ const performTrain = async (page) => {
     console.log(
       `Training completed successfully. Total trains done: ${trainCount}`
     );
+    return true;
   } catch (error) {
     console.log("Error during train:", error);
+    return false;
   }
 };
 
