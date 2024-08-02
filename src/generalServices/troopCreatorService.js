@@ -26,8 +26,8 @@ const trainTroops = async (page) => {
 const hasEnoughTimePassed = (currentTime) => {
   const timePased = currentTime - lastTrainTime;
   const remaningTime = MIN_TRAIN_INTERVAL + randomTrainInterval - timePased;
-  console.log(`Time pased since last attack ${timePased / 1000}s`);
-  console.log(`Remaning time to attack farms ${remaningTime / 1000}s`);
+  console.log(`Time pased since last train ${timePased / 1000}s`);
+  console.log(`Remaning time to train ${remaningTime / 1000}s`);
   return remaningTime < 0;
 };
 
