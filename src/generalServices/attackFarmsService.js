@@ -1,5 +1,6 @@
 const { goPage } = require("../browser/browserService");
 const { TRAVIAN_FARM_LIST } = require("../constants/links");
+const { formatTime } = require("./timePrintService");
 
 let lastAttackTime = 0;
 let randomAttackInterval = 0;
@@ -34,7 +35,7 @@ const updateNextAttackTime = () => {
     Math.random() * RANDOM_INTERVAL_VARIATION * 2 - RANDOM_INTERVAL_VARIATION
   );
   console.log(
-    `Next attack in ${(MIN_ATTACK_INTERVAL + randomAttackInterval) / 1000}s`
+    `Next attack in ${formatTime(MIN_ATTACK_INTERVAL + randomAttackInterval)}`
   );
   lastAttackTime = Date.now();
   attackCount = attackCount + 1;

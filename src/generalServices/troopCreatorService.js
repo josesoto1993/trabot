@@ -1,5 +1,6 @@
 const { goPage } = require("../browser/browserService");
 const { TARVIAN_MAIN_BARRACKS } = require("../constants/links");
+const { formatTime } = require("./timePrintService");
 const Unit = require("../constants/units");
 
 const trainUnit = Unit.Swordsman;
@@ -36,7 +37,7 @@ const updateNextTrainTime = () => {
   randomTrainInterval =
     Math.random() * RANDOM_INTERVAL_VARIATION * 2 - RANDOM_INTERVAL_VARIATION;
   console.log(
-    `Next train in ${(MIN_TRAIN_INTERVAL + randomTrainInterval) / 1000}s`
+    `Next train in ${formatTime(MIN_TRAIN_INTERVAL + randomTrainInterval)}`
   );
   lastTrainTime = Date.now();
   trainCount = trainCount + 1;
@@ -49,13 +50,13 @@ const performTrain = async (page) => {
     let remainingTime = await getRemainingTime(page);
     if (remainingTime < MAX_TRAIN_TIME) {
       console.log(
-        `Need to train, remaining time=${remainingTime} is lower than MAX_TRAIN_TIME=${MAX_TRAIN_TIME}`
+        `Need to train, remaining time=${formatTime(remainingTime)} is lower than MAX_TRAIN_TIME=${formatTime(MAX_TRAIN_TIME)}`
       );
       await writeInputValueToMax(page);
       await submit(page);
     } else {
       console.log(
-        `No need to train, remaining time=${remainingTime} is higher than MAX_TRAIN_TIME=${MAX_TRAIN_TIME}`
+        `No need to train, remaining time=${formatTime(remainingTime)} is higher than MAX_TRAIN_TIME=${formatTime(MAX_TRAIN_TIME)}`
       );
     }
 
@@ -74,7 +75,7 @@ const getRemainingTime = async (page) => {
       spans.map((span) => parseInt(span.getAttribute("value"), 10))
     );
     const maxRemainingTime = Math.max(...remainingTimes);
-    console.log(`Maximum remaining time: ${maxRemainingTime}`);
+    console.log(`Maximum remaining time: ${formatTime(maxRemainingTime)}`);
     return maxRemainingTime;
   } catch (error) {
     console.log("Error getting remaining time:", error);

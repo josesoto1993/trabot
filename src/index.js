@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+const { formatTime } = require("./generalServices/timePrintService");
 const { open } = require("./browser/browserService");
 const { login } = require("./browser/loginService");
 const { attackFarms } = require("./generalServices/attackFarmsService");
@@ -21,9 +22,7 @@ const mainLoop = async () => {
     nextGoAdventure = await runGoAdventure(page);
     nextLoop = Math.min(nextAttackFarms, nextTrainTroops, nextGoAdventure);
 
-    console.log(
-      `Waiting for ${nextLoop / 1000 / 60} minutes before next run...`
-    );
+    console.log(`Waiting for ${formatTime(nextLoop)} before next run...`);
     await new Promise((resolve) => setTimeout(resolve, nextLoop));
   }
 };
