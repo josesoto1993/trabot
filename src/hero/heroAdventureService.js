@@ -4,15 +4,16 @@ const { TRAVIAN_HERO_ADVENTURES } = require("../constants/links");
 const { HeroStatus } = require("../constants/heroStatus");
 
 const ADVENTURE_BUTTON_SELECTOR_TIMEOUT = 15000;
+const ADVENTURE_INTERVAL = 15 * 60 * 1000;
 
 const goAdventure = async (page) => {
   const heroStatusClass = await getClassOfHeroIcon(page);
   const atHome = heroStatusClass === HeroStatus.home;
-  console.log("Hero heroStatusClass:", heroStatusClass);
-  console.log("Hero HeroStatus.home:", HeroStatus.home);
   if (!atHome) {
-    console.log("Hero is not at home or there are no adventures");
-    return;
+    console.log(
+      `Hero is not at home or there are no adventures, await ${ADVENTURE_INTERVAL}m`
+    );
+    return ADVENTURE_INTERVAL;
   }
 
   console.log(
@@ -20,6 +21,7 @@ const goAdventure = async (page) => {
   );
 
   await performAdventure(page);
+  return ADVENTURE_INTERVAL;
 };
 
 const performAdventure = async (page) => {

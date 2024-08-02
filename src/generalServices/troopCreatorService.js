@@ -12,23 +12,24 @@ const RANDOM_INTERVAL_VARIATION = 10 * 60 * 1000;
 const MAX_TRAIN_TIME = 4 * 60 * 60;
 
 const trainTroops = async (page) => {
-  const currentTime = Date.now();
-  if (!hasEnoughTimePassed(currentTime)) {
-    return;
+  let remaningTime = getRemaningTime();
+  if (remaningTime > 0) {
+    return remaningTime;
   }
   console.log(
     "Enough time has passed since the last training, go for more troops!"
   );
 
   await performTrain(page);
+  updateNextTrainTime();
+  return getRemaningTime();
 };
 
-const hasEnoughTimePassed = (currentTime) => {
+const getRemaningTime = () => {
+  const currentTime = Date.now();
   const timePased = currentTime - lastTrainTime;
   const remaningTime = MIN_TRAIN_INTERVAL + randomTrainInterval - timePased;
-  console.log(`Time pased since last train ${timePased / 1000}s`);
-  console.log(`Remaning time to train ${remaningTime / 1000}s`);
-  return remaningTime < 0;
+  return remaningTime;
 };
 
 const updateNextTrainTime = () => {
@@ -58,7 +59,6 @@ const performTrain = async (page) => {
       );
     }
 
-    updateNextTrainTime();
     console.log(
       `Training completed successfully. Total trains done: ${trainCount}`
     );
