@@ -35,7 +35,8 @@ const performAdventure = async (page) => {
 };
 
 const clickAdventureButton = async (page) => {
-  const adventureButtonSelector = ".adventureList tbody tr td .textButtonV2";
+  const adventureButtonSelector =
+    ".adventureList tbody tr td .textButtonV2:not(.disabled)";
   try {
     await page.waitForSelector(adventureButtonSelector, {
       timeout: ADVENTURE_BUTTON_SELECTOR_TIMEOUT_MILLIS,
