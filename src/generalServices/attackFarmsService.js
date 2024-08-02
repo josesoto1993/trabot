@@ -1,38 +1,42 @@
-const { waitRandomTime, goPage } = require("../browser/browserService");
+const { goPage } = require("../browser/browserService");
 const { TRAVIAN_FARM_LIST } = require("../constants/links");
+const { formatTime } = require("./timePrintService");
 
 let lastAttackTime = 0;
 let randomAttackInterval = 0;
-let attackCount = 0;
-const MIN_ATTACK_INTERVAL = 5 * 60 * 1000;
-const RANDOM_INTERVAL_VARIATION = 0.5 * 60 * 1000;
-const MIN_CLICK_INTERVAL = 3 * 1000;
-const MAX_CLICK_INTERVAL = 5 * 1000;
+let attackCount = 1;
+const MIN_ATTACK_INTERVAL = 5 * 60;
+const RANDOM_INTERVAL_VARIATION_MILLIS = 0.5 * 60 * 1000;
+const MIN_CLICK_INTERVAL_MILLIS = 3 * 1000;
+const MAX_CLICK_INTERVAL_MILLIS = 5 * 1000;
 
 const attackFarms = async (page) => {
-  const currentTime = Date.now();
-  if (!hasEnoughTimePassed(currentTime)) {
-    return;
+  const remaningTime = getRemaningTime();
+  if (remaningTime > 0) {
+    return remaningTime;
   }
   console.log("Enough time has passed since the last attack, go for attack!");
 
   await performAttack(page);
+
+  updateNextAttackTime();
+  return getRemaningTime();
 };
 
-const hasEnoughTimePassed = (currentTime) => {
-  const timePased = currentTime - lastAttackTime;
-  const remaningTime = MIN_ATTACK_INTERVAL + randomAttackInterval - timePased;
-  console.log(`Time pased since last attack ${timePased / 1000}s`);
-  console.log(`Remaning time to attack farms ${remaningTime / 1000}s`);
-  return remaningTime < 0;
+const getRemaningTime = () => {
+  const currentTime = Date.now();
+  const timePased = (currentTime - lastAttackTime) / 1000;
+  return MIN_ATTACK_INTERVAL + randomAttackInterval - timePased;
 };
 
 const updateNextAttackTime = () => {
-  randomAttackInterval = Math.floor(
-    Math.random() * RANDOM_INTERVAL_VARIATION * 2 - RANDOM_INTERVAL_VARIATION
+  let randomAttackIntervalMillis = Math.floor(
+    Math.random() * RANDOM_INTERVAL_VARIATION_MILLIS * 2 -
+      RANDOM_INTERVAL_VARIATION_MILLIS
   );
+  randomAttackInterval = randomAttackIntervalMillis / 1000;
   console.log(
-    `Next attack in ${(MIN_ATTACK_INTERVAL + randomAttackInterval) / 1000}s`
+    `Next attack in ${formatTime(MIN_ATTACK_INTERVAL + randomAttackInterval)}`
   );
   lastAttackTime = Date.now();
   attackCount = attackCount + 1;
@@ -45,7 +49,6 @@ const performAttack = async (page) => {
     await waitForButtonsToLoad(page);
     await clickButtons(page);
 
-    updateNextAttackTime();
     console.log(
       `Attack completed successfully. Total attacks done ${attackCount}`
     );
@@ -55,18 +58,22 @@ const performAttack = async (page) => {
 };
 
 const waitForButtonsToLoad = async (page) => {
-  await page.waitForSelector("button.startFarmList");
+  await page.waitForSelector("button.startAllFarmLists");
   console.log("Buttons load successfully.");
 };
 
 const clickButtons = async (page) => {
-  const buttons = await page.$$("button.startFarmList:not(.disabled)");
+  const buttons = await page.$$("button.startAllFarmLists:not(.disabled)");
 
   console.log(`There are ${buttons.length} buttons`);
   for (const button of buttons) {
     await button.click();
     console.log("Click button successfully.");
-    await waitRandomTime(MIN_CLICK_INTERVAL, MAX_CLICK_INTERVAL);
+    const randomTime =
+      Math.floor(
+        Math.random() * (MAX_CLICK_INTERVAL_MILLIS - MIN_CLICK_INTERVAL_MILLIS)
+      ) + MIN_CLICK_INTERVAL_MILLIS;
+    await new Promise((resolve) => setTimeout(resolve, randomTime));
   }
 };
 

@@ -1,18 +1,20 @@
 const { goPage } = require("../browser/browserService");
 const { getClassOfHeroIcon } = require("./heroStatusService");
 const { TRAVIAN_HERO_ADVENTURES } = require("../constants/links");
-const { HeroStatus } = require("../constants/heroStatus");
+const { formatTime } = require("../generalServices/timePrintService");
+const HeroStatus = require("../constants/heroStatus");
 
-const ADVENTURE_BUTTON_SELECTOR_TIMEOUT = 15000;
+const ADVENTURE_BUTTON_SELECTOR_TIMEOUT_MILLIS = 15000;
+const ADVENTURE_INTERVAL = 15 * 60;
 
 const goAdventure = async (page) => {
   const heroStatusClass = await getClassOfHeroIcon(page);
   const atHome = heroStatusClass === HeroStatus.home;
-  console.log("Hero heroStatusClass:", heroStatusClass);
-  console.log("Hero HeroStatus.home:", HeroStatus.home);
   if (!atHome) {
-    console.log("Hero is not at home or there are no adventures");
-    return;
+    console.log(
+      `Hero is not at home or there are no adventures, await ${formatTime(ADVENTURE_INTERVAL)}`
+    );
+    return ADVENTURE_INTERVAL;
   }
 
   console.log(
@@ -20,6 +22,7 @@ const goAdventure = async (page) => {
   );
 
   await performAdventure(page);
+  return ADVENTURE_INTERVAL;
 };
 
 const performAdventure = async (page) => {
@@ -32,10 +35,11 @@ const performAdventure = async (page) => {
 };
 
 const clickAdventureButton = async (page) => {
-  const adventureButtonSelector = ".adventureList tbody tr td .textButtonV2";
+  const adventureButtonSelector =
+    ".adventureList tbody tr td .textButtonV2:not(.disabled)";
   try {
     await page.waitForSelector(adventureButtonSelector, {
-      timeout: ADVENTURE_BUTTON_SELECTOR_TIMEOUT,
+      timeout: ADVENTURE_BUTTON_SELECTOR_TIMEOUT_MILLIS,
     });
     const button = await page.$(adventureButtonSelector);
     if (button) {

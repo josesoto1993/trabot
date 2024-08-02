@@ -1,26 +1,29 @@
 require("dotenv").config();
 
+const { formatTime } = require("./generalServices/timePrintService");
 const { open } = require("./browser/browserService");
 const { login } = require("./browser/loginService");
 const { attackFarms } = require("./generalServices/attackFarmsService");
 const { trainTroops } = require("./generalServices/troopCreatorService");
 const { goAdventure } = require("./hero/heroAdventureService");
 
-const INTERVAL = 1 * 60 * 1000;
-
 const mainLoop = async () => {
+  let nextAttackFarms = 0;
+  let nextTrainTroops = 0;
+  let nextGoAdventure = 0;
+  let nextLoop = 0;
+
   let page = await initializeBrowser();
   await login(page);
 
   while (true) {
-    await runAttackFarms(page);
-    await runTrainTroops(page);
-    await runGoAdventure(page);
+    nextAttackFarms = await runAttackFarms(page);
+    nextTrainTroops = await runTrainTroops(page);
+    nextGoAdventure = await runGoAdventure(page);
+    nextLoop = Math.min(nextAttackFarms, nextTrainTroops, nextGoAdventure);
 
-    console.log(
-      `Waiting for ${INTERVAL / 1000 / 60} minutes before next run...`
-    );
-    await new Promise((resolve) => setTimeout(resolve, INTERVAL));
+    console.log(`Waiting for ${formatTime(nextLoop)} before next run...`);
+    await new Promise((resolve) => setTimeout(resolve, nextLoop));
   }
 };
 
@@ -35,7 +38,7 @@ const initializeBrowser = async () => {
 
 const runAttackFarms = async (page) => {
   try {
-    await attackFarms(page);
+    return await attackFarms(page);
   } catch (error) {
     console.error("Error during attack task:", error);
   }
@@ -43,7 +46,7 @@ const runAttackFarms = async (page) => {
 
 const runTrainTroops = async (page) => {
   try {
-    await trainTroops(page);
+    return await trainTroops(page);
   } catch (error) {
     console.error("Error during train task:", error);
   }
@@ -51,7 +54,7 @@ const runTrainTroops = async (page) => {
 
 const runGoAdventure = async (page) => {
   try {
-    await goAdventure(page);
+    return await goAdventure(page);
   } catch (error) {
     console.error("Error during adventure task:", error);
   }

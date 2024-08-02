@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const { HeroStatus } = require("../constants/heroStatus");
+const HeroStatus = require("../constants/heroStatus");
 
 const getClassOfHeroIcon = async (page) => {
   const heroStatusSelector = ".heroStatus a i";
