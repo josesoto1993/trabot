@@ -4,7 +4,7 @@ const { formatTime } = require("./timePrintService");
 
 let lastAttackTime = 0;
 let randomAttackInterval = 0;
-let attackCount = 0;
+let attackCount = 1;
 const MIN_ATTACK_INTERVAL = 5 * 60;
 const RANDOM_INTERVAL_VARIATION_MILLIS = 0.5 * 60 * 1000;
 const MIN_CLICK_INTERVAL_MILLIS = 3 * 1000;
