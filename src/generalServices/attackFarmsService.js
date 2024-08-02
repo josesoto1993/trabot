@@ -22,8 +22,8 @@ const attackFarms = async (page) => {
 const hasEnoughTimePassed = (currentTime) => {
   const timePased = currentTime - lastAttackTime;
   const remaningTime = MIN_ATTACK_INTERVAL + randomAttackInterval - timePased;
-  console.log(`Time pased since last attack ${timePased}s`);
-  console.log(`Remaning time to attack farms ${remaningTime}s`);
+  console.log(`Time pased since last attack ${timePased / 1000}s`);
+  console.log(`Remaning time to attack farms ${remaningTime / 1000}s`);
   return remaningTime < 0;
 };
 
@@ -31,7 +31,9 @@ const updateNextAttackTime = () => {
   randomAttackInterval = Math.floor(
     Math.random() * RANDOM_INTERVAL_VARIATION * 2 - RANDOM_INTERVAL_VARIATION
   );
-  console.log(`Next attack in ${MIN_ATTACK_INTERVAL + randomAttackInterval}s`);
+  console.log(
+    `Next attack in ${(MIN_ATTACK_INTERVAL + randomAttackInterval) / 1000}s`
+  );
   lastAttackTime = Date.now();
   attackCount = attackCount + 1;
 };
