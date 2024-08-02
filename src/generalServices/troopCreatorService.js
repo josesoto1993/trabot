@@ -13,7 +13,7 @@ const RANDOM_INTERVAL_VARIATION_MILLIS = 10 * 60 * 1000;
 const MAX_TRAIN_TIME = 4 * 60 * 60;
 
 const trainTroops = async (page) => {
-  let remaningTime = getRemaningTime();
+  const remaningTime = getRemaningTime();
   if (remaningTime > 0) {
     return remaningTime;
   }
@@ -28,8 +28,8 @@ const trainTroops = async (page) => {
 
 const getRemaningTime = () => {
   const currentTime = Date.now();
-  const timePased = currentTime - lastTrainTime;
-  return MIN_TRAIN_INTERVAL + (randomTrainInterval - timePased) / 1000;
+  const timePased = (currentTime - lastTrainTime) / 1000;
+  return MIN_TRAIN_INTERVAL + randomTrainInterval - timePased;
 };
 
 const updateNextTrainTime = () => {

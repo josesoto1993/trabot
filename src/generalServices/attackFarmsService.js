@@ -11,7 +11,7 @@ const MIN_CLICK_INTERVAL_MILLIS = 3 * 1000;
 const MAX_CLICK_INTERVAL_MILLIS = 5 * 1000;
 
 const attackFarms = async (page) => {
-  let remaningTime = getRemaningTime();
+  const remaningTime = getRemaningTime();
   if (remaningTime > 0) {
     return remaningTime;
   }
@@ -25,9 +25,8 @@ const attackFarms = async (page) => {
 
 const getRemaningTime = () => {
   const currentTime = Date.now();
-  const timePased = currentTime - lastAttackTime;
-  const remaningTime = MIN_ATTACK_INTERVAL + randomAttackInterval - timePased;
-  return remaningTime;
+  const timePased = (currentTime - lastAttackTime) / 1000;
+  return MIN_ATTACK_INTERVAL + randomAttackInterval - timePased;
 };
 
 const updateNextAttackTime = () => {
@@ -59,12 +58,12 @@ const performAttack = async (page) => {
 };
 
 const waitForButtonsToLoad = async (page) => {
-  await page.waitForSelector("button.startFarmList");
+  await page.waitForSelector("button.startAllFarmLists");
   console.log("Buttons load successfully.");
 };
 
 const clickButtons = async (page) => {
-  const buttons = await page.$$("button.startFarmList:not(.disabled)");
+  const buttons = await page.$$("button.startAllFarmLists:not(.disabled)");
 
   console.log(`There are ${buttons.length} buttons`);
   for (const button of buttons) {
