@@ -1,4 +1,4 @@
-const { goPage } = require("./browserService");
+const { goPage } = require("../browser/browserService");
 const { TARVIAN_MAIN_BARRACKS } = require("../constants/links");
 const Unit = require("../constants/units");
 
@@ -24,13 +24,19 @@ const trainTroops = async (page) => {
 };
 
 const hasEnoughTimePassed = (currentTime) => {
-  return (
-    currentTime - lastTrainTime >= MIN_TRAIN_INTERVAL + randomTrainInterval
-  );
+  const timePased = currentTime - lastTrainTime;
+  const remaningTime = MIN_TRAIN_INTERVAL + randomTrainInterval - timePased;
+  console.log(`Time pased since last train ${timePased / 1000}s`);
+  console.log(`Remaning time to train ${remaningTime / 1000}s`);
+  return remaningTime < 0;
 };
 
 const updateNextTrainTime = () => {
-  randomTrainInterval = Math.floor(Math.random() * RANDOM_INTERVAL_VARIATION);
+  randomTrainInterval =
+    Math.random() * RANDOM_INTERVAL_VARIATION * 2 - RANDOM_INTERVAL_VARIATION;
+  console.log(
+    `Next train in ${(MIN_TRAIN_INTERVAL + randomTrainInterval) / 1000}s`
+  );
   lastTrainTime = Date.now();
   trainCount = trainCount + 1;
 };
