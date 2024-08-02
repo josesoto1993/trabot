@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const HeroStatus = require("../constants/heroStatus");
+const { HeroStatus } = require("../constants/heroStatus");
 
 const getClassOfHeroIcon = async (page) => {
   const heroStatusSelector = ".heroStatus a i";
@@ -25,16 +25,16 @@ const parseClassOfHeroIcon = (classToFind) => {
 
   if (heroStatus) {
     console.log("Hero status found:", heroStatus);
-    return heroStatus;
+    return HeroStatus[heroStatus];
   } else {
     console.log("No matching hero status found for class:", classToFind);
     return addNewClassOfHeroIcon(classToFind);
   }
 };
 
-const addNewClassOfHeroIcon = (classToFind) => {
-  const newStatus = `Status${Object.keys(HeroStatus).length + 1}`;
-  HeroStatus[newStatus] = classToFind;
+const addNewClassOfHeroIcon = (newStatusValue) => {
+  const newStatusKey = `Status${Object.keys(HeroStatus).length + 1}`;
+  HeroStatus[newStatusKey] = newStatusValue;
 
   const heroStatusPath = path.resolve(__dirname, "../constants/heroStatus.js");
 
@@ -44,8 +44,10 @@ const addNewClassOfHeroIcon = (classToFind) => {
 
   fs.writeFileSync(heroStatusPath, updatedContent, "utf8");
 
-  console.log(`Added new hero status: ${newStatus} with class: ${classToFind}`);
-  return newStatus;
+  console.log(
+    `Added new hero status: ${newStatusKey} with class: ${newStatusValue}`
+  );
+  return newStatusKey;
 };
 
 module.exports = {

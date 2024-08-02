@@ -8,6 +8,8 @@ const ADVENTURE_BUTTON_SELECTOR_TIMEOUT = 15000;
 const goAdventure = async (page) => {
   const heroStatusClass = await getClassOfHeroIcon(page);
   const atHome = heroStatusClass === HeroStatus.home;
+  console.log("Hero heroStatusClass:", heroStatusClass);
+  console.log("Hero HeroStatus.home:", HeroStatus.home);
   if (!atHome) {
     console.log("Hero is not at home or there are no adventures");
     return;
