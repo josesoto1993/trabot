@@ -26,17 +26,8 @@ const goPage = async (url) => {
   await page.goto(url);
 };
 
-const waitRandomTime = async (min, max) => {
-  if (min > max) {
-    throw new Error("Min value cannot be greater than max value");
-  }
-  const randomTime = Math.floor(Math.random() * (max - min + 1)) + min;
-  await new Promise((resolve) => setTimeout(resolve, randomTime));
-};
-
 module.exports = {
   open,
   close,
   goPage,
-  waitRandomTime,
 };

@@ -1,4 +1,4 @@
-const { waitRandomTime, goPage } = require("../browser/browserService");
+const { goPage } = require("../browser/browserService");
 const { TRAVIAN_FARM_LIST } = require("../constants/links");
 
 let lastAttackTime = 0;
@@ -67,7 +67,10 @@ const clickButtons = async (page) => {
   for (const button of buttons) {
     await button.click();
     console.log("Click button successfully.");
-    await waitRandomTime(MIN_CLICK_INTERVAL, MAX_CLICK_INTERVAL);
+    const randomTime =
+      Math.floor(Math.random() * (MAX_CLICK_INTERVAL - MIN_CLICK_INTERVAL)) +
+      MIN_CLICK_INTERVAL;
+    await new Promise((resolve) => setTimeout(resolve, randomTime));
   }
 };
 
