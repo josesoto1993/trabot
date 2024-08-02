@@ -40,7 +40,7 @@ const addNewClassOfHeroIcon = (classToFind) => {
 
   const updatedContent = `const HeroStatus = ${JSON.stringify(HeroStatus, null, 2)};
   
-  module.exports = HeroStatus;`;
+  module.exports = { HeroStatus };`;
 
   fs.writeFileSync(heroStatusPath, updatedContent, "utf8");
 

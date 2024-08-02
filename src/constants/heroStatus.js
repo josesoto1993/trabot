@@ -3,4 +3,4 @@ const HeroStatus = {
   home: "heroHome",
 };
 
-module.exports = HeroStatus;
+module.exports = { HeroStatus };
