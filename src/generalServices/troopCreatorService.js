@@ -10,7 +10,8 @@ let trainCount = 1;
 const UNITS_TO_TRAIN = "999";
 const MIN_TRAIN_INTERVAL = 60 * 60;
 const RANDOM_INTERVAL_VARIATION_MILLIS = 10 * 60 * 1000;
-const MAX_TRAIN_TIME = 4 * 60 * 60;
+const TROOPS_TIMEOUT_MILLIS = 5 * 1000;
+const MAX_TRAIN_TIME = 24 * 60 * 60;
 
 const trainTroops = async (page) => {
   const remaningTime = getRemaningTime();
@@ -21,8 +22,11 @@ const trainTroops = async (page) => {
     "Enough time has passed since the last training, go for more troops!"
   );
 
-  await performTrain(page);
-  updateNextTrainTime();
+  const successfullyTrain = await performTrain(page);
+  if (successfullyTrain) {
+    updateNextTrainTime();
+  }
+
   return getRemaningTime();
 };
 
@@ -64,14 +68,18 @@ const performTrain = async (page) => {
     console.log(
       `Training completed successfully. Total trains done: ${trainCount}`
     );
+    return true;
   } catch (error) {
     console.log("Error during train:", error);
+    return false;
   }
 };
 
 const getRemainingTime = async (page) => {
   try {
-    await page.waitForSelector("td.dur span.timer");
+    await page.waitForSelector("td.dur span.timer", {
+      timeout: TROOPS_TIMEOUT_MILLIS,
+    });
     const remainingTimes = await page.$$eval("td.dur span.timer", (spans) =>
       spans.map((span) => parseInt(span.getAttribute("value"), 10))
     );
@@ -79,8 +87,13 @@ const getRemainingTime = async (page) => {
     console.log(`Maximum remaining time: ${formatTime(maxRemainingTime)}`);
     return maxRemainingTime;
   } catch (error) {
-    console.log("Error getting remaining time:", error);
-    return 0;
+    if (error.name === "TimeoutError") {
+      console.log("No troops are currently being trained.");
+      return 0;
+    } else {
+      console.log("Error getting remaining time:", error);
+      return -1;
+    }
   }
 };
 

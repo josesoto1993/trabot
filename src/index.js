@@ -23,7 +23,7 @@ const mainLoop = async () => {
     nextLoop = Math.min(nextAttackFarms, nextTrainTroops, nextGoAdventure);
 
     console.log(`Waiting for ${formatTime(nextLoop)} before next run...`);
-    await new Promise((resolve) => setTimeout(resolve, nextLoop));
+    await new Promise((resolve) => setTimeout(resolve, nextLoop * 1000));
   }
 };
 
