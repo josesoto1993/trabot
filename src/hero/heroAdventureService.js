@@ -1,5 +1,8 @@
 const { goPage } = require("../browser/browserService");
-const { getClassOfHeroIcon } = require("./heroStatusService");
+const {
+  getClassOfHeroIcon,
+  getHeroAdventures,
+} = require("./heroStatusService");
 const { TRAVIAN_HERO_ADVENTURES } = require("../constants/links");
 const { formatTime } = require("../generalServices/timePrintService");
 const HeroStatus = require("../constants/heroStatus");
@@ -16,10 +19,11 @@ const goAdventure = async (page) => {
   console.log("Enough time has passed since the last adventure, try go");
 
   const heroStatusClass = await getClassOfHeroIcon(page);
+  const heroAdventures = await getHeroAdventures(page);
   const atHome = heroStatusClass === HeroStatus.home;
-  if (!atHome) {
+  if (!atHome || heroAdventures <= 0) {
     console.log(
-      `Hero is not at home or there are no adventures, await ${formatTime(ADVENTURE_INTERVAL)}`
+      `Hero is not at home (${heroStatusClass}) or there are no adventures (${heroAdventures}), await ${formatTime(ADVENTURE_INTERVAL)}`
     );
     return ADVENTURE_INTERVAL;
   }
