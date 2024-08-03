@@ -11,7 +11,7 @@ const UNITS_TO_TRAIN = "999";
 const MIN_TRAIN_INTERVAL = 60 * 60;
 const RANDOM_INTERVAL_VARIATION_MILLIS = 10 * 60 * 1000;
 const TROOPS_TIMEOUT_MILLIS = 5 * 1000;
-const MAX_TRAIN_TIME = 4 * 60 * 60;
+const MAX_TRAIN_TIME = 24 * 60 * 60;
 
 const trainTroops = async (page) => {
   const remaningTime = getRemaningTime();
