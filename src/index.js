@@ -1,10 +1,10 @@
 require("dotenv").config();
 
-const { formatTime } = require("./generalServices/timePrintService");
+const { formatTime } = require("./util/timePrintService");
 const { open } = require("./browser/browserService");
 const { login } = require("./browser/loginService");
-const { attackFarms } = require("./generalServices/attackFarmsService");
-const { trainTroops } = require("./generalServices/troopCreatorService");
+const { attackFarms } = require("./attackFarms/attackFarmsService");
+const { trainTroops } = require("./createTroops/troopCreatorService");
 const { goAdventure } = require("./hero/heroAdventureService");
 
 const mainLoop = async () => {
