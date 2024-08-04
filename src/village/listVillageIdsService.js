@@ -52,41 +52,70 @@ const getMaxVillages = async (page) => {
   }
 };
 
-const getVillagesInfo = async (page) => {
+const waitForVillageList = async (page) => {
   try {
     await page.waitForSelector(
       "#sidebarBoxVillagelist div.content div.villageList div.villageList div.dropContainer"
     );
+  } catch (error) {
+    console.error("Error waiting for village list:", error);
+    throw error;
+  }
+};
 
-    const villages = await page.$$eval(
-      "#sidebarBoxVillagelist div.content div.villageList div.villageList div.dropContainer",
-      (containers) => {
-        return containers.map((container) => {
-          const listEntry = container.querySelector("div.listEntry");
-          const coordinatesGrid = container.querySelector(
-            "span.coordinatesGrid"
-          );
+const extractVillagesFromContainers = (containers) => {
+  return containers.map((container) => {
+    const listEntry = container.querySelector("div.listEntry");
+    const coordinatesGrid = container.querySelector("span.coordinatesGrid");
 
-          if (!listEntry || !coordinatesGrid) {
-            throw new Error("Required elements not found.");
-          }
+    if (!listEntry || !coordinatesGrid) {
+      throw new Error("Required elements not found.");
+    }
 
-          const id = coordinatesGrid.getAttribute("data-did");
-          const name = coordinatesGrid.getAttribute("data-villagename");
-          const coordinateX = parseInt(
-            coordinatesGrid.getAttribute("data-x"),
-            10
-          );
-          const coordinateY = parseInt(
-            coordinatesGrid.getAttribute("data-y"),
-            10
-          );
-          const active = listEntry.classList.contains("active");
+    const id = coordinatesGrid.getAttribute("data-did");
+    const name = coordinatesGrid.getAttribute("data-villagename");
+    const coordinateX = parseInt(coordinatesGrid.getAttribute("data-x"), 10);
+    const coordinateY = parseInt(coordinatesGrid.getAttribute("data-y"), 10);
+    const active = listEntry.classList.contains("active");
 
-          return new Village(id, name, coordinateX, coordinateY, active);
-        });
-      }
+    return new Village(id, name, coordinateX, coordinateY, active);
+  });
+};
+
+const getVillagesFromPage = async (page) => {
+  try {
+    const containers = await page.$$(
+      "#sidebarBoxVillagelist div.content div.villageList div.villageList div.dropContainer"
     );
+    return extractVillagesFromContainers(containers);
+  } catch (error) {
+    console.error("Error extracting villages from page:", error);
+    throw error;
+  }
+};
+
+const validateActiveVillages = (villages) => {
+  const activeVillages = villages.filter((village) => village.active);
+  if (activeVillages.length !== 1) {
+    throw new Error("There should be exactly one active village.");
+  }
+};
+
+const validateVillageCount = async (page, villages) => {
+  const expectedVillagesCount = await getVillages(page);
+  if (villages.length !== expectedVillagesCount) {
+    throw new Error("Mismatch in number of villages.");
+  }
+};
+
+const getVillagesInfo = async (page) => {
+  try {
+    await waitForVillageList(page);
+
+    const villages = await getVillagesFromPage(page);
+
+    validateActiveVillages(villages);
+    await validateVillageCount(page, villages);
 
     return villages;
   } catch (error) {
