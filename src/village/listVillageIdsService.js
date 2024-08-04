@@ -1,34 +1,6 @@
 const Village = require("../models/village");
 
-const getVillageSlotsInfo = async (page) => {
-  try {
-    await page.waitForSelector(
-      "#sidebarBoxVillagelist div.content div.expansionSlotInfo div.boxTitle span.slots"
-    );
-
-    const slotText = await page.$eval(
-      "#sidebarBoxVillagelist div.content div.expansionSlotInfo div.boxTitle span.slots",
-      (el) => el.textContent.trim()
-    );
-
-    return slotText;
-  } catch (error) {
-    console.error("Error getting village slots info:", error);
-    throw error;
-  }
-};
-
-const parseVillageSlots = (slotText) => {
-  const slotMatch = slotText.match(/(\d+)\s*\/\s*(\d+)/);
-  if (slotMatch) {
-    return {
-      villages: parseInt(slotMatch[1], 10),
-      maxVillages: parseInt(slotMatch[2], 10),
-    };
-  } else {
-    throw new Error("Slot text format does not match expected pattern.");
-  }
-};
+const VILLAGES_SIDEBAR = "div.villageList div.dropContainer";
 
 const getVillages = async (page) => {
   try {
@@ -52,42 +24,102 @@ const getMaxVillages = async (page) => {
   }
 };
 
-const waitForVillageList = async (page) => {
+const getVillageSlotsInfo = async (page) => {
   try {
     await page.waitForSelector(
-      "#sidebarBoxVillagelist div.content div.villageList div.villageList div.dropContainer"
+      "#sidebarBoxVillagelist div.content div.expansionSlotInfo div.boxTitle span.slots"
     );
+
+    const slotText = await page.$eval(
+      "#sidebarBoxVillagelist div.content div.expansionSlotInfo div.boxTitle span.slots",
+      (el) => el.textContent.trim()
+    );
+
+    return slotText;
+  } catch (error) {
+    console.error("Error getting village slots info:", error);
+    throw error;
+  }
+};
+
+const parseVillageSlots = (slotText) => {
+  const cleanedText = slotText.replace(/[^\d\/]/g, "");
+
+  const slotMatch = cleanedText.match(/(\d+)\/(\d+)/);
+  if (slotMatch) {
+    return {
+      villages: parseInt(slotMatch[1], 10),
+      maxVillages: parseInt(slotMatch[2], 10),
+    };
+  } else {
+    throw new Error(
+      `Slot text "${slotText}" format does not match expected pattern.`
+    );
+  }
+};
+
+const getVillagesInfo = async (page) => {
+  try {
+    await waitForVillageList(page);
+
+    const villages = await getVillagesFromPage(page);
+
+    validateActiveVillages(villages);
+    await validateVillagesCount(page, villages);
+
+    console.log(`Get valid villages = ${villages}`);
+    return villages;
+  } catch (error) {
+    console.error("Error getting villages info:", error);
+    throw error;
+  }
+};
+const waitForVillageList = async (page) => {
+  try {
+    await page.waitForSelector(VILLAGES_SIDEBAR);
   } catch (error) {
     console.error("Error waiting for village list:", error);
     throw error;
   }
 };
 
-const extractVillagesFromContainers = (containers) => {
-  return containers.map((container) => {
-    const listEntry = container.querySelector("div.listEntry");
-    const coordinatesGrid = container.querySelector("span.coordinatesGrid");
-
-    if (!listEntry || !coordinatesGrid) {
-      throw new Error("Required elements not found.");
-    }
-
-    const id = coordinatesGrid.getAttribute("data-did");
-    const name = coordinatesGrid.getAttribute("data-villagename");
-    const coordinateX = parseInt(coordinatesGrid.getAttribute("data-x"), 10);
-    const coordinateY = parseInt(coordinatesGrid.getAttribute("data-y"), 10);
-    const active = listEntry.classList.contains("active");
-
-    return new Village(id, name, coordinateX, coordinateY, active);
-  });
-};
-
 const getVillagesFromPage = async (page) => {
   try {
-    const containers = await page.$$(
-      "#sidebarBoxVillagelist div.content div.villageList div.villageList div.dropContainer"
+    const villagesData = await page.$$eval(VILLAGES_SIDEBAR, (nodes) => {
+      return nodes.map((node) => {
+        const listEntry = node.querySelector("div.listEntry");
+        const coordinatesGrid = node.querySelector("span.coordinatesGrid");
+
+        if (!listEntry || !coordinatesGrid) {
+          throw new Error("Required elements not found.");
+        }
+
+        const id = coordinatesGrid.getAttribute("data-did");
+        const name = coordinatesGrid.getAttribute("data-villagename");
+        const coordinateX = parseInt(
+          coordinatesGrid.getAttribute("data-x"),
+          10
+        );
+        const coordinateY = parseInt(
+          coordinatesGrid.getAttribute("data-y"),
+          10
+        );
+        const active = listEntry.classList.contains("active");
+
+        return { id, name, coordinateX, coordinateY, active };
+      });
+    });
+
+    return villagesData.map(
+      (villageData) =>
+        new Village(
+          villageData.id,
+          villageData.name,
+          villageData.coordinateX,
+          villageData.coordinateY,
+          villageData.active
+        )
     );
-    return extractVillagesFromContainers(containers);
   } catch (error) {
     console.error("Error extracting villages from page:", error);
     throw error;
@@ -101,26 +133,10 @@ const validateActiveVillages = (villages) => {
   }
 };
 
-const validateVillageCount = async (page, villages) => {
+const validateVillagesCount = async (page, villages) => {
   const expectedVillagesCount = await getVillages(page);
   if (villages.length !== expectedVillagesCount) {
     throw new Error("Mismatch in number of villages.");
-  }
-};
-
-const getVillagesInfo = async (page) => {
-  try {
-    await waitForVillageList(page);
-
-    const villages = await getVillagesFromPage(page);
-
-    validateActiveVillages(villages);
-    await validateVillageCount(page, villages);
-
-    return villages;
-  } catch (error) {
-    console.error("Error getting villages info:", error);
-    throw error;
   }
 };
 

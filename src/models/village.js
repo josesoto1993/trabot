@@ -6,6 +6,10 @@ class Village {
     this.coordinateY = coordinateY;
     this.active = active;
   }
+
+  toString() {
+    return `Village(id: ${this.id}, name: ${this.name}, coordX: ${this.coordinateX}, coordY: ${this.coordinateY}, active: ${this.active})`;
+  }
 }
 
 module.exports = Village;
