@@ -4,7 +4,7 @@ const {
   getHeroAdventures,
 } = require("./heroStatusService");
 const { TRAVIAN_HERO_ADVENTURES } = require("../constants/links");
-const { formatTime } = require("../util/timePrintService");
+const { formatTime } = require("../utils/timePrintService");
 const HeroStatus = require("../constants/heroStatus");
 
 const ADVENTURE_BUTTON_SELECTOR_TIMEOUT_MILLIS = 15000;

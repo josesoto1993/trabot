@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { formatTime } = require("./util/timePrintService");
+const { formatTime } = require("./utils/timePrintService");
 const { open } = require("./browser/browserService");
 const { login } = require("./browser/loginService");
 const { attackFarms } = require("./attackFarms/attackFarmsService");
