@@ -67,7 +67,6 @@ const getVillagesInfo = async (page) => {
     validateActiveVillages(villages);
     await validateVillagesCount(page, villages);
 
-    console.log(`Get valid villages = ${villages}`);
     return villages;
   } catch (error) {
     console.error("Error getting villages info:", error);

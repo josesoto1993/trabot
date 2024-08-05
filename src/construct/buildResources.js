@@ -1,25 +1,48 @@
 const { URL } = require("url");
 const { getVillagesInfo } = require("../village/listVillageIdsService");
 const { goPage } = require("../browser/browserService");
-const { TRAVIAN_RESOURCES_VIEW } = require("../constants/links");
+const {
+  TRAVIAN_RESOURCES_VIEW,
+  TRAVIAN_BUILD_VIEW,
+} = require("../constants/links");
 const ConstructionStatus = require("../constants/constructionStatus");
+const getResourceFieldsData = require("./resourceFieldsData");
 
 let upgradeResourceCount = 0;
 
 const selectResourceFieldToUpgrade = async (page) => {
-  await page.waitForSelector("#resourceFieldContainer");
+  const possibleResourcesToUpgrade = await getPossibleResourcesToUpgrade(page);
 
-  const resourceFieldLink = await page.$(
-    `#resourceFieldContainer a.${ConstructionStatus.readyToUpgrade}`
-  );
-  if (!resourceFieldLink) {
-    console.log("No resource fields to level found.");
+  if (possibleResourcesToUpgrade.length === 0) {
+    console.log("No resource fields ready for upgrade found.");
     return false;
   }
 
-  await resourceFieldLink.click();
-  console.log("Clicked on a resource field to level.");
+  await selectResourceToUpgrade(possibleResourcesToUpgrade);
   return true;
+};
+
+const getPossibleResourcesToUpgrade = async (page) => {
+  const resourceFields = await getResourceFieldsData(page);
+
+  const possibleResourcesToUpgrade = resourceFields.filter(
+    (field) =>
+      field.constructionStatus === ConstructionStatus.readyToUpgrade &&
+      field.level <= 10
+  );
+  possibleResourcesToUpgrade.sort((a, b) => b.level - a.level);
+
+  return possibleResourcesToUpgrade;
+};
+
+const selectResourceToUpgrade = async (possibleResourcesToUpgrade) => {
+  const selectedField = possibleResourcesToUpgrade[0];
+
+  const villageUrl = new URL(TRAVIAN_BUILD_VIEW);
+  villageUrl.searchParams.append("id", selectedField.id);
+  await goPage(villageUrl.toString());
+
+  console.log(`Clicked on a resource field to level: ${selectedField.id}`);
 };
 
 const upgradeSelectedResourceField = async (page) => {
