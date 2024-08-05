@@ -1,3 +1,4 @@
+const { URL } = require("url");
 const { getVillagesInfo } = require("../village/listVillageIdsService");
 const { goPage } = require("../browser/browserService");
 const { TRAVIAN_RESOURCES_VIEW } = require("../constants/links");
@@ -50,8 +51,10 @@ const upgradeResourceField = async (page) => {
 };
 
 const upgradeResourceFieldInVillage = async (page, village) => {
-  const villageUrl = `${TRAVIAN_RESOURCES_VIEW}?newdid=${village.id}&`;
-  await goPage(villageUrl);
+  const villageUrl = new URL(TRAVIAN_RESOURCES_VIEW);
+  villageUrl.searchParams.append("newdid", village.id);
+
+  await goPage(villageUrl.toString());
   console.log(`Navigated to village: ${village.name}`);
 
   const someUpgrade = await upgradeResourceField(page);
