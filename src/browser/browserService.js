@@ -24,11 +24,16 @@ const goPage = async (url) => {
   if (!page) {
     throw new Error("Browser is not open");
   }
-  await page.goto(url);
+  await page.goto(url, { waitUntil: "networkidle0" });
+};
+
+const typeInSelector = async (selector, text) => {
+  await page.type(selector, text, { delay: 100 });
 };
 
 module.exports = {
   open,
   close,
   goPage,
+  typeInSelector,
 };

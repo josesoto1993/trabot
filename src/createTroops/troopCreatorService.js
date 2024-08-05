@@ -1,4 +1,4 @@
-const { goPage } = require("../browser/browserService");
+const { goPage, typeInSelector } = require("../browser/browserService");
 const { TARVIAN_MAIN_BARRACKS } = require("../constants/links");
 const { formatTime } = require("../utils/timePrintService");
 const Unit = require("../constants/units");
@@ -101,7 +101,7 @@ const writeInputValueToMax = async (page) => {
   const inputName = `input[name="${trainUnit}"]`;
   try {
     await page.waitForSelector(inputName);
-    await page.type(inputName, UNITS_TO_TRAIN, { delay: 100 });
+    await typeInSelector(inputName, UNITS_TO_TRAIN);
     console.log("Input entered.");
   } catch (error) {
     console.log("Error entering value for train troops:", error);

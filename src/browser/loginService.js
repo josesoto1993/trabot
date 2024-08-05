@@ -1,4 +1,4 @@
-const { goPage } = require("./browserService");
+const { goPage, typeInSelector } = require("./browserService");
 const { TRAVIAN_BASE } = require("../constants/links");
 const { formatTime } = require("../utils/timePrintService");
 
@@ -29,7 +29,7 @@ const login = async (page) => {
 const writeUser = async (page) => {
   try {
     await page.waitForSelector('input[name="name"]');
-    await page.type('input[name="name"]', USERNAME, { delay: 100 });
+    await typeInSelector('input[name="name"]', USERNAME);
     console.log("Username entered.");
   } catch (error) {
     console.error("Error entering username:", error);
@@ -39,7 +39,7 @@ const writeUser = async (page) => {
 const writePassword = async (page) => {
   try {
     await page.waitForSelector('input[name="password"]');
-    await page.type('input[name="password"]', PASSWORD, { delay: 100 });
+    await typeInSelector('input[name="password"]', PASSWORD);
     console.log("Password entered.");
   } catch (error) {
     console.error("Error entering password:", error);
