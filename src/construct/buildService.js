@@ -1,9 +1,8 @@
 const buildResources = require("./buildResources");
 const { formatTime } = require("../utils/timePrintService");
 
-const BUILD_INTERVAL = 5 * 60;
-
 let lastBuildTime = 0;
+let buildDuration = 0;
 
 const build = async (page) => {
   const remainingTime = getRemainingTime();
@@ -13,20 +12,20 @@ const build = async (page) => {
 
   console.log("Time to build resources, starting the build process...");
 
-  await buildResources(page);
+  buildDuration = await buildResources(page);
 
-  updateNextBuildTime();
+  updateNextBuildTime(buildDuration);
   return getRemainingTime();
 };
 
 const getRemainingTime = () => {
   const currentTime = Date.now();
   const timePassed = (currentTime - lastBuildTime) / 1000;
-  return BUILD_INTERVAL - timePassed;
+  return buildDuration - timePassed;
 };
 
-const updateNextBuildTime = () => {
-  console.log(`Next build in ${formatTime(BUILD_INTERVAL)}`);
+const updateNextBuildTime = (buildDuration) => {
+  console.log(`Next build in ${formatTime(buildDuration)}`);
   lastBuildTime = Date.now();
 };
 
