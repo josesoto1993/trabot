@@ -69,7 +69,7 @@ const getPossibleResourcesToUpgrade = async (page, village) => {
   const possibleResourcesToUpgrade = resourceFields.filter(
     (field) =>
       field.constructionStatus === ConstructionStatus.readyToUpgrade &&
-      field.level <= 10
+      field.level < 10
   );
 
   possibleResourcesToUpgrade.sort(sortResources);
