@@ -68,19 +68,21 @@ const redeemTask = async (page) => {
 };
 
 const redeemAllFromVillage = async (page, village) => {
-  await openTask(TaskTabs.CityTab, village);
+  await openTask(TaskTabs.CityTab, village.id);
   return redeemAll(page);
 };
 
-const redeemAllFromUser = async (page, village) => {
-  await openTask(TaskTabs.PlayerTab, village);
+const redeemAllFromUser = async (page) => {
+  await openTask(TaskTabs.PlayerTab, null);
   return redeemAll(page);
 };
 
-const openTask = async (tab, village) => {
+const openTask = async (tab, villageId) => {
   const redeemUrl = new URL(TRAVIAN_TASK_VIEW);
   redeemUrl.searchParams.append(TaskTabs.QueryParamKey, tab);
-  redeemUrl.searchParams.append("newdid", village.id);
+  if (villageId) {
+    redeemUrl.searchParams.append("newdid", villageId);
+  }
   await goPage(redeemUrl.toString());
 };
 
