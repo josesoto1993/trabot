@@ -72,14 +72,26 @@ const getPossibleResourcesToUpgrade = async (page, village) => {
       field.level <= 10
   );
 
-  possibleResourcesToUpgrade.sort((a, b) => {
-    if (b.level !== a.level) {
-      return b.level - a.level;
-    }
-    return FieldTypePriority[a.fieldType] - FieldTypePriority[b.fieldType];
-  });
+  possibleResourcesToUpgrade.sort(sortResources);
 
   return possibleResourcesToUpgrade;
+};
+
+const sortResources = (a, b) => {
+  // Low level priority: Fields with level <= 3
+  const aLowLevel = a.level <= 3;
+  const bLowLevel = b.level <= 3;
+
+  if (aLowLevel && !bLowLevel) return -1;
+  if (!aLowLevel && bLowLevel) return 1;
+
+  // Higher level priority: Fields with levels > 3
+  if (b.level !== a.level) {
+    return b.level - a.level;
+  }
+
+  // Field type priority
+  return FieldTypePriority[a.fieldType] - FieldTypePriority[b.fieldType];
 };
 
 module.exports = buildResources;
