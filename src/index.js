@@ -7,12 +7,14 @@ const { attackFarms } = require("./attackFarms/attackFarmsService");
 const { trainTroops } = require("./createTroops/troopCreatorService");
 const { goAdventure } = require("./hero/heroAdventureService");
 const build = require("./construct/buildService");
+const redeem = require("./redeemTask/redeemTaskService");
 
 const mainLoop = async () => {
   let nextAttackFarms = 0;
   let nextTrainTroops = 0;
   let nextGoAdventure = 0;
   let nextBuild = 0;
+  let nextRedeem = 0;
   let nextLoop = 0;
 
   let page = await initializeBrowser();
@@ -23,11 +25,13 @@ const mainLoop = async () => {
     nextTrainTroops = await runTrainTroops(page);
     nextGoAdventure = await runGoAdventure(page);
     nextBuild = await runBuild(page);
+    nextRedeem = await runRedeem(page);
     nextLoop = Math.min(
       nextAttackFarms,
       nextTrainTroops,
       nextGoAdventure,
-      nextBuild
+      nextBuild,
+      nextRedeem
     );
 
     console.log(`Waiting for ${formatTime(nextLoop)} before next run...`);
@@ -73,6 +77,14 @@ const runBuild = async (page) => {
     return await build(page);
   } catch (error) {
     console.error("Error during build task:", error);
+  }
+};
+
+const runRedeem = async (page) => {
+  try {
+    return await redeem(page);
+  } catch (error) {
+    console.error("Error during redeemTask task:", error);
   }
 };
 

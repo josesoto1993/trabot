@@ -1,7 +1,6 @@
 const FieldType = require("../constants/fieldType");
 const ConstructionStatus = require("../constants/constructionStatus");
-const { goPage } = require("../browser/browserService");
-const { TRAVIAN_RESOURCES_VIEW } = require("../constants/links");
+const goVillage = require("../village/goVillageService");
 
 const ResourceField = require("../models/resourceField");
 
@@ -26,14 +25,6 @@ const getResourceFieldsData = async (page, village) => {
 
     return new ResourceField(fieldId, fieldLvl, constructionStatus, fieldType);
   });
-};
-
-const goVillage = async (village) => {
-  const villageUrl = new URL(TRAVIAN_RESOURCES_VIEW);
-  villageUrl.searchParams.append("newdid", village.id);
-
-  await goPage(villageUrl.toString());
-  console.log(`Navigated to village: ${village.name}`);
 };
 
 const getFieldId = (classes) => {
