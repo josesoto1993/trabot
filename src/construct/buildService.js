@@ -1,4 +1,4 @@
-const { buildResources } = require("./buildResources");
+const buildResources = require("./buildResources");
 const { formatTime } = require("../utils/timePrintService");
 
 const BUILD_INTERVAL = 5 * 60;
@@ -30,6 +30,4 @@ const updateNextBuildTime = () => {
   lastBuildTime = Date.now();
 };
 
-module.exports = {
-  build,
-};
+module.exports = build;

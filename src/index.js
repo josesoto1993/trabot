@@ -6,7 +6,7 @@ const { login } = require("./browser/loginService");
 const { attackFarms } = require("./attackFarms/attackFarmsService");
 const { trainTroops } = require("./createTroops/troopCreatorService");
 const { goAdventure } = require("./hero/heroAdventureService");
-const { build } = require("./construct/buildService");
+const build = require("./construct/buildService");
 
 const mainLoop = async () => {
   let nextAttackFarms = 0;
