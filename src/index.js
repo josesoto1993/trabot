@@ -1,16 +1,18 @@
 require("dotenv").config();
 
-const { formatTime } = require("./generalServices/timePrintService");
+const { formatTime } = require("./utils/timePrintService");
 const { open } = require("./browser/browserService");
 const { login } = require("./browser/loginService");
-const { attackFarms } = require("./generalServices/attackFarmsService");
-const { trainTroops } = require("./generalServices/troopCreatorService");
+const { attackFarms } = require("./attackFarms/attackFarmsService");
+const { trainTroops } = require("./createTroops/troopCreatorService");
 const { goAdventure } = require("./hero/heroAdventureService");
+const build = require("./construct/buildService");
 
 const mainLoop = async () => {
   let nextAttackFarms = 0;
   let nextTrainTroops = 0;
   let nextGoAdventure = 0;
+  let nextBuild = 0;
   let nextLoop = 0;
 
   let page = await initializeBrowser();
@@ -20,7 +22,13 @@ const mainLoop = async () => {
     nextAttackFarms = await runAttackFarms(page);
     nextTrainTroops = await runTrainTroops(page);
     nextGoAdventure = await runGoAdventure(page);
-    nextLoop = Math.min(nextAttackFarms, nextTrainTroops, nextGoAdventure);
+    nextBuild = await runBuild(page);
+    nextLoop = Math.min(
+      nextAttackFarms,
+      nextTrainTroops,
+      nextGoAdventure,
+      nextBuild
+    );
 
     console.log(`Waiting for ${formatTime(nextLoop)} before next run...`);
     await new Promise((resolve) => setTimeout(resolve, nextLoop * 1000));
@@ -57,6 +65,14 @@ const runGoAdventure = async (page) => {
     return await goAdventure(page);
   } catch (error) {
     console.error("Error during adventure task:", error);
+  }
+};
+
+const runBuild = async (page) => {
+  try {
+    return await build(page);
+  } catch (error) {
+    console.error("Error during build task:", error);
   }
 };
 

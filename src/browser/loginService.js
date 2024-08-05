@@ -1,6 +1,6 @@
 const { goPage } = require("./browserService");
 const { TRAVIAN_BASE } = require("../constants/links");
-const { formatTime } = require("../generalServices/timePrintService");
+const { formatTime } = require("../utils/timePrintService");
 
 const USERNAME = process.env.TARVIAN_USERNAME;
 const PASSWORD = process.env.TARVIAN_PASSWORD;

@@ -20,6 +20,7 @@ const close = async () => {
 };
 
 const goPage = async (url) => {
+  console.log(`Go to page ${url}`);
   if (!page) {
     throw new Error("Browser is not open");
   }
