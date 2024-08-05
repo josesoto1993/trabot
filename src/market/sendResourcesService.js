@@ -1,9 +1,12 @@
 const { URL } = require("url");
-const { TRAVIAN_BASE } = require("../constants/links");
+
 const goVillage = require("../village/goVillageService");
 const { formatTime } = require("../utils/timePrintService");
 const { goPage, typeInSelector } = require("../browser/browserService");
+
+const { TRAVIAN_BASE } = require("../constants/links");
 const MarketTabs = require("../constants/marketTabs");
+const Trade = require("../models/trade");
 
 const MARKET_SELECTOR = "div.buttonsWrapper a.market";
 
@@ -12,9 +15,9 @@ const sendResources = async (page, trade) => {
     `Start send resources from ${trade.from.name} to ${trade.to.name}`
   );
   try {
-    await goMarket(page, trade);
-    await setDestination(page, trade);
-    await setResources(page, trade);
+    await goMarket(page, trade.from);
+    await setDestination(page, trade.to);
+    await setResources(page, trade.ammount);
     const tradeDuration = await executeTrade(page);
 
     console.log(
@@ -26,9 +29,9 @@ const sendResources = async (page, trade) => {
   }
 };
 
-const goMarket = async (page, trade) => {
+const goMarket = async (page, from) => {
   console.log("go market");
-  await goVillage(trade.from);
+  await goVillage(from);
 
   await page.waitForSelector(MARKET_SELECTOR);
   const marketAnchor = await page.$(MARKET_SELECTOR);
@@ -49,31 +52,31 @@ const goMarket = async (page, trade) => {
     MarketTabs.QueryParamKey,
     MarketTabs.SendResources
   );
-  await goPage(marketUrl.toString());
+  await goPage(marketUrl);
 };
 
-const setDestination = async (page, trade) => {
+const setDestination = async (page, to) => {
   console.log("set destination");
   await page.waitForSelector("div.inputWrapper");
 
   await typeInSelector(
     "div.inputWrapper label.coordinateX input",
-    trade.to.coordinateX.toString()
+    to.coordinateX
   );
   await typeInSelector(
     "div.inputWrapper label.coordinateY input",
-    trade.to.coordinateY.toString()
+    to.coordinateY
   );
 };
 
-const setResources = async (page, trade) => {
+const setResources = async (page, ammount) => {
   console.log("set resources");
   await page.waitForSelector('input[name="lumber"]');
 
-  await typeInSelector('input[name="lumber"]', trade.lumber.toString());
-  await typeInSelector('input[name="clay"]', trade.clay.toString());
-  await typeInSelector('input[name="iron"]', trade.iron.toString());
-  await typeInSelector('input[name="crop"]', trade.crop.toString());
+  await typeInSelector('input[name="lumber"]', ammount.lumber);
+  await typeInSelector('input[name="clay"]', ammount.clay);
+  await typeInSelector('input[name="iron"]', ammount.iron);
+  await typeInSelector('input[name="crop"]', ammount.crop);
 };
 
 const executeTrade = async (page) => {

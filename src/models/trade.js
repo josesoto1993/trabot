@@ -1,15 +1,12 @@
 class Trade {
-  constructor(from, to, lumber, clay, iron, crop) {
+  constructor(from, to, ammount) {
     this.from = from;
     this.to = to;
-    this.lumber = lumber;
-    this.clay = clay;
-    this.iron = iron;
-    this.crop = crop;
+    this.ammount = ammount;
   }
 
   toString() {
-    return `Trade from ${this.from.name} to ${this.to.name}, resources: {${this.lumber}, ${this.clay}, ${this.iron}, ${this.iron}}`;
+    return `Trade from ${this.from.name} to ${this.to.name} with ${this.ammount}`;
   }
 }
 

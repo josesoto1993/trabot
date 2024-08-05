@@ -20,15 +20,16 @@ const close = async () => {
 };
 
 const goPage = async (url) => {
-  console.log(`Go to page ${url}`);
+  const urlString = url.toString();
+  console.log(`Go to page ${urlString}`);
   if (!page) {
     throw new Error("Browser is not open");
   }
-  await page.goto(url, { waitUntil: "networkidle0" });
+  await page.goto(urlString, { waitUntil: "networkidle0" });
 };
 
 const typeInSelector = async (selector, text) => {
-  await page.type(selector, text, { delay: 100 });
+  await page.type(selector, text.toString(), { delay: 100 });
 };
 
 module.exports = {

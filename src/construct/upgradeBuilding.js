@@ -11,7 +11,7 @@ const selectBuilding = async (village, buildingId) => {
   const villageUrl = new URL(TRAVIAN_BUILD_VIEW);
   villageUrl.searchParams.append("newdid", village.id);
   villageUrl.searchParams.append("id", buildingId);
-  await goPage(villageUrl.toString());
+  await goPage(villageUrl);
 
   console.log(`Clicked on city ${village.name} building ${buildingId}`);
 };

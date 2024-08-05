@@ -1,5 +1,5 @@
 const { URL } = require("url");
-const { getVillagesInfo } = require("../village/listVillageIdsService");
+const getVillagesInfo = require("../village/listVillageSimple");
 const { goPage } = require("../browser/browserService");
 const { formatTime } = require("../utils/timePrintService");
 const { TRAVIAN_TASK_VIEW } = require("../constants/links");
@@ -84,7 +84,7 @@ const openTask = async (tab, villageId) => {
   if (villageId) {
     redeemUrl.searchParams.append("newdid", villageId);
   }
-  await goPage(redeemUrl.toString());
+  await goPage(redeemUrl);
 };
 
 const redeemAll = async (page) => {
