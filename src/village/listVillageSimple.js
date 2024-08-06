@@ -1,5 +1,8 @@
 const Village = require("../models/village");
-const { getActualVillages } = require("./villageSlots");
+const {
+  validateActiveVillages,
+  validateVillagesCount,
+} = require("./villageSlots");
 
 const VILLAGES_SIDEBAR = "div.villageList div.dropContainer";
 
@@ -18,6 +21,7 @@ const getVillagesInfo = async (page) => {
     throw error;
   }
 };
+
 const waitForVillageList = async (page) => {
   try {
     await page.waitForSelector(VILLAGES_SIDEBAR);
@@ -67,20 +71,6 @@ const getVillagesFromPage = async (page) => {
   } catch (error) {
     console.error("Error extracting villages from page:", error);
     throw error;
-  }
-};
-
-const validateActiveVillages = (villages) => {
-  const activeVillages = villages.filter((village) => village.active);
-  if (activeVillages.length !== 1) {
-    throw new Error("There should be exactly one active village.");
-  }
-};
-
-const validateVillagesCount = async (page, villages) => {
-  const expectedVillagesCount = await getActualVillages(page);
-  if (villages.length !== expectedVillagesCount) {
-    throw new Error("Mismatch in number of villages.");
   }
 };
 

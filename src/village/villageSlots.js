@@ -54,7 +54,23 @@ const parseVillageSlots = (slotText) => {
   }
 };
 
+const validateActiveVillages = (villages) => {
+  const activeVillages = villages.filter((village) => village.active);
+  if (activeVillages.length !== 1) {
+    throw new Error("There should be exactly one active village.");
+  }
+};
+
+const validateVillagesCount = async (page, villages) => {
+  const expectedVillagesCount = await getActualVillages(page);
+  if (villages.length !== expectedVillagesCount) {
+    throw new Error("Mismatch in number of villages.");
+  }
+};
+
 module.exports = {
   getActualVillages,
   getMaxVillages,
+  validateActiveVillages,
+  validateVillagesCount,
 };
