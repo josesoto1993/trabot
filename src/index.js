@@ -9,6 +9,7 @@ const { goAdventure } = require("./hero/heroAdventureService");
 const build = require("./construct/build");
 const redeem = require("./redeemTask/redeemTaskService");
 const manageOverflow = require("./market/manageOverflow");
+const manageDeficit = require("./market/manageDeficit");
 
 const mainLoop = async () => {
   let nextLoop = 0;
@@ -23,7 +24,8 @@ const mainLoop = async () => {
       await runGoAdventure(page),
       await runBuild(page),
       await runRedeem(page),
-      await runManageOverflow(page)
+      await runManageOverflow(page),
+      await runManageDeficit(page)
     );
 
     console.log(`Waiting for ${formatTime(nextLoop)} before next run...`);
@@ -85,6 +87,14 @@ const runManageOverflow = async (page) => {
     return await manageOverflow(page);
   } catch (error) {
     console.error("Error during manageOverflow task:", error);
+  }
+};
+
+const runManageDeficit = async (page) => {
+  try {
+    return await manageDeficit(page);
+  } catch (error) {
+    console.error("Error during manageDeficit task:", error);
   }
 };
 
