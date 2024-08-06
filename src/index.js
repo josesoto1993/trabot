@@ -11,31 +11,19 @@ const redeem = require("./redeemTask/redeemTaskService");
 const manageOverflow = require("./market/manageOverflow");
 
 const mainLoop = async () => {
-  let nextAttackFarms = 0;
-  let nextTrainTroops = 0;
-  let nextGoAdventure = 0;
-  let nextBuild = 0;
-  let nextRedeem = 0;
-  let nextManageOverflow = 0;
   let nextLoop = 0;
 
   let page = await initializeBrowser();
   await login(page);
 
   while (true) {
-    nextAttackFarms = await runAttackFarms(page);
-    nextTrainTroops = await runTrainTroops(page);
-    nextGoAdventure = await runGoAdventure(page);
-    nextBuild = await runBuild(page);
-    nextRedeem = await runRedeem(page);
-    let nextManageOverflow = await runManageOverflow(page);
     nextLoop = Math.min(
-      nextAttackFarms,
-      nextTrainTroops,
-      nextGoAdventure,
-      nextBuild,
-      nextRedeem,
-      nextManageOverflow
+      await runAttackFarms(page),
+      await runTrainTroops(page),
+      await runGoAdventure(page),
+      await runBuild(page),
+      await runRedeem(page),
+      await runManageOverflow(page)
     );
 
     console.log(`Waiting for ${formatTime(nextLoop)} before next run...`);
