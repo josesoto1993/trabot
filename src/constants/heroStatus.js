@@ -3,6 +3,7 @@ const HeroStatus = {
   home: "heroHome",
   dead: "heroDead",
   reviving: "heroReviving",
+  reinforcing: "heroReinforcing",
 };
 
 module.exports = HeroStatus;

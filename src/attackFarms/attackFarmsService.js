@@ -11,9 +11,9 @@ const MIN_CLICK_INTERVAL_MILLIS = 3 * 1000;
 const MAX_CLICK_INTERVAL_MILLIS = 5 * 1000;
 
 const attackFarms = async (page) => {
-  const remaningTime = getRemaningTime();
-  if (remaningTime > 0) {
-    return remaningTime;
+  const remainingTime = getremainingTime();
+  if (remainingTime > 0) {
+    return remainingTime;
   }
   console.log("Enough time has passed since the last attack, go for attack!");
 
@@ -23,13 +23,13 @@ const attackFarms = async (page) => {
     updateNextAttackTime();
   }
 
-  return getRemaningTime();
+  return getremainingTime();
 };
 
-const getRemaningTime = () => {
+const getremainingTime = () => {
   const currentTime = Date.now();
-  const timePased = (currentTime - lastAttackTime) / 1000;
-  return MIN_ATTACK_INTERVAL + randomAttackInterval - timePased;
+  const timePassed = (currentTime - lastAttackTime) / 1000;
+  return MIN_ATTACK_INTERVAL + randomAttackInterval - timePassed;
 };
 
 const updateNextAttackTime = () => {

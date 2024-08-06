@@ -6,32 +6,26 @@ const { login } = require("./browser/loginService");
 const { attackFarms } = require("./attackFarms/attackFarmsService");
 const { trainTroops } = require("./createTroops/troopCreatorService");
 const { goAdventure } = require("./hero/heroAdventureService");
-const build = require("./construct/buildService");
+const build = require("./construct/build");
 const redeem = require("./redeemTask/redeemTaskService");
+const manageOverflow = require("./market/manageOverflow");
+const manageDeficit = require("./market/manageDeficit");
 
 const mainLoop = async () => {
-  let nextAttackFarms = 0;
-  let nextTrainTroops = 0;
-  let nextGoAdventure = 0;
-  let nextBuild = 0;
-  let nextRedeem = 0;
   let nextLoop = 0;
 
   let page = await initializeBrowser();
   await login(page);
 
   while (true) {
-    nextAttackFarms = await runAttackFarms(page);
-    nextTrainTroops = await runTrainTroops(page);
-    nextGoAdventure = await runGoAdventure(page);
-    nextBuild = await runBuild(page);
-    nextRedeem = await runRedeem(page);
     nextLoop = Math.min(
-      nextAttackFarms,
-      nextTrainTroops,
-      nextGoAdventure,
-      nextBuild,
-      nextRedeem
+      await runAttackFarms(page),
+      await runTrainTroops(page),
+      await runGoAdventure(page),
+      await runBuild(page),
+      await runRedeem(page),
+      await runManageOverflow(page),
+      await runManageDeficit(page)
     );
 
     console.log(`Waiting for ${formatTime(nextLoop)} before next run...`);
@@ -85,6 +79,22 @@ const runRedeem = async (page) => {
     return await redeem(page);
   } catch (error) {
     console.error("Error during redeemTask task:", error);
+  }
+};
+
+const runManageOverflow = async (page) => {
+  try {
+    return await manageOverflow(page);
+  } catch (error) {
+    console.error("Error during manageOverflow task:", error);
+  }
+};
+
+const runManageDeficit = async (page) => {
+  try {
+    return await manageDeficit(page);
+  } catch (error) {
+    console.error("Error during manageDeficit task:", error);
   }
 };
 

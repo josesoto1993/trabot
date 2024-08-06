@@ -1,6 +1,6 @@
 const FieldType = require("../constants/fieldType");
 const ConstructionStatus = require("../constants/constructionStatus");
-const goVillage = require("../village/goVillageService");
+const goVillage = require("../village/goVillage");
 
 const ResourceField = require("../models/resourceField");
 

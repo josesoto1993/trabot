@@ -1,7 +1,8 @@
-const { getVillagesInfo } = require("../village/listVillageIdsService");
-const ConstructionStatus = require("../constants/constructionStatus");
+const getVillagesInfo = require("../village/listVillageSimple");
 const getResourceFieldsData = require("./resourceFieldsData");
 const upgradeBuilding = require("./upgradeBuilding");
+
+const ConstructionStatus = require("../constants/constructionStatus");
 const FieldTypePriority = require("../constants/fieldTypePriority");
 
 let upgradeResourceCount = 0;
