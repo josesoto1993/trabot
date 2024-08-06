@@ -1,6 +1,6 @@
 const { goPage } = require("../browser/browserService");
 const { TRAVIAN_FARM_LIST } = require("../constants/links");
-const { formatTime } = require("../utils/timePrintService");
+const { formatTime } = require("../utils/timePrint");
 
 let lastAttackTime = 0;
 let randomAttackInterval = 0;

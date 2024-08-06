@@ -7,7 +7,7 @@ const DEFICIT_THRESHOLD = 0.4;
 const REQUEST_THRESHOLD = 0.6;
 const DONOR_SAFE_LEVEL = 0.5;
 const ROUNDING_SAFETY_FACTOR = 0.999;
-const DEFICIT_INTERVAL = 11 * 60;
+const DEFICIT_INTERVAL = 3 * 60;
 
 let lastDeficitTime = 0;
 

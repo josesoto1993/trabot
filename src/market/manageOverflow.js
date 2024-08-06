@@ -1,6 +1,6 @@
 const getVillagesDetailedInfo = require("../village/listVillageDetailed");
 const { sendResources, getMaxCargo } = require("./sendResources");
-const { formatTime } = require("../utils/timePrintService");
+const { formatTime } = require("../utils/timePrint");
 const Resources = require("../models/resources");
 const Trade = require("../models/trade");
 
@@ -8,7 +8,7 @@ const RESOURCE_THRESHOLD = 0.8;
 const RECEIVER_THRESHOLD = 0.7;
 const SAFE_LEVEL = 0.6;
 const ROUNDING_SAFETY_FACTOR = 0.999;
-const OVERFLOW_INTERVAL = 9 * 60;
+const OVERFLOW_INTERVAL = 4 * 60;
 
 let lastOverflowTime = 0;
 
