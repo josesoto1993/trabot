@@ -45,7 +45,7 @@ const getVillagesDetailedInfo = async (page) => {
       village.resources = resourcesTable[village.name];
       village.production = productionTable[village.name];
       village.capacity = capacityTable[village.name];
-      village.ongoinResources = getIncomingResources(village.name);
+      village.ongoingResources = getIncomingResources(village.name);
     }
 
     return villages;

@@ -11,15 +11,23 @@ const getTrades = () => {
 };
 
 const getIncomingResources = (villageName) => {
-  let initialValue = { lumber: 0, clay: 0, iron: 0, crop: 0 };
-  return getTrades()
-    .filter((record) => record.trade.to.name === villageName)
+  const initialValue = { lumber: 0, clay: 0, iron: 0, crop: 0 };
+
+  const trades = getTrades().filter(
+    (record) => record.trade.to.name === villageName
+  );
+
+  if (trades.length === 0) {
+    return initialValue;
+  }
+
+  return trades
     .map((record) => record.trade.ammount)
-    .reduce((acc, ammount) => {
-      acc.lumber += ammount.lumber;
-      acc.clay += ammount.clay;
-      acc.iron += ammount.iron;
-      acc.crop += ammount.crop;
+    .reduce((acc, amount) => {
+      acc.lumber += amount.lumber;
+      acc.clay += amount.clay;
+      acc.iron += amount.iron;
+      acc.crop += amount.crop;
       return acc;
     }, initialValue);
 };

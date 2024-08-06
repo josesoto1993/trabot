@@ -12,9 +12,9 @@ const ADVENTURE_INTERVAL = 15 * 60;
 let lastAdventureTime = 0;
 
 const goAdventure = async (page) => {
-  const remaningTime = getRemaningTime();
-  if (remaningTime > 0) {
-    return remaningTime;
+  const remainingTime = getremainingTime();
+  if (remainingTime > 0) {
+    return remainingTime;
   }
   console.log("Enough time has passed since the last adventure, try go");
 
@@ -42,10 +42,10 @@ const goAdventure = async (page) => {
   return ADVENTURE_INTERVAL;
 };
 
-const getRemaningTime = () => {
+const getremainingTime = () => {
   const currentTime = Date.now();
-  const timePased = (currentTime - lastAdventureTime) / 1000;
-  return ADVENTURE_INTERVAL - timePased;
+  const timePassed = (currentTime - lastAdventureTime) / 1000;
+  return ADVENTURE_INTERVAL - timePassed;
 };
 
 const updateNextAdventureTime = () => {

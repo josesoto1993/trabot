@@ -8,6 +8,7 @@ const { trainTroops } = require("./createTroops/troopCreatorService");
 const { goAdventure } = require("./hero/heroAdventureService");
 const build = require("./construct/build");
 const redeem = require("./redeemTask/redeemTaskService");
+const manageOverflow = require("./market/manageOverflow");
 
 const mainLoop = async () => {
   let nextAttackFarms = 0;
@@ -15,6 +16,7 @@ const mainLoop = async () => {
   let nextGoAdventure = 0;
   let nextBuild = 0;
   let nextRedeem = 0;
+  let nextManageOverflow = 0;
   let nextLoop = 0;
 
   let page = await initializeBrowser();
@@ -26,12 +28,14 @@ const mainLoop = async () => {
     nextGoAdventure = await runGoAdventure(page);
     nextBuild = await runBuild(page);
     nextRedeem = await runRedeem(page);
+    let nextManageOverflow = await runManageOverflow(page);
     nextLoop = Math.min(
       nextAttackFarms,
       nextTrainTroops,
       nextGoAdventure,
       nextBuild,
-      nextRedeem
+      nextRedeem,
+      nextManageOverflow
     );
 
     console.log(`Waiting for ${formatTime(nextLoop)} before next run...`);
@@ -85,6 +89,14 @@ const runRedeem = async (page) => {
     return await redeem(page);
   } catch (error) {
     console.error("Error during redeemTask task:", error);
+  }
+};
+
+const runManageOverflow = async (page) => {
+  try {
+    return await manageOverflow(page);
+  } catch (error) {
+    console.error("Error during manageOverflow task:", error);
   }
 };
 

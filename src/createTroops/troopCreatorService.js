@@ -14,9 +14,9 @@ const TROOPS_TIMEOUT_MILLIS = 5 * 1000;
 const MAX_TRAIN_TIME = 24 * 60 * 60;
 
 const trainTroops = async (page) => {
-  const remaningTime = getRemaningTime();
-  if (remaningTime > 0) {
-    return remaningTime;
+  const remainingTime = getremainingTime();
+  if (remainingTime > 0) {
+    return remainingTime;
   }
   console.log(
     "Enough time has passed since the last training, go for more troops!"
@@ -27,13 +27,13 @@ const trainTroops = async (page) => {
     updateNextTrainTime();
   }
 
-  return getRemaningTime();
+  return getremainingTime();
 };
 
-const getRemaningTime = () => {
+const getremainingTime = () => {
   const currentTime = Date.now();
-  const timePased = (currentTime - lastTrainTime) / 1000;
-  return MIN_TRAIN_INTERVAL + randomTrainInterval - timePased;
+  const timePassed = (currentTime - lastTrainTime) / 1000;
+  return MIN_TRAIN_INTERVAL + randomTrainInterval - timePassed;
 };
 
 const updateNextTrainTime = () => {

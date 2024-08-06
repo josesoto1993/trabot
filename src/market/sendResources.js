@@ -1,6 +1,6 @@
 const { URL } = require("url");
 
-const goVillage = require("../village/goVillageService");
+const goVillage = require("../village/goVillage");
 const { formatTime } = require("../utils/timePrintService");
 const { goPage, typeInSelector } = require("../browser/browserService");
 const { addTrade } = require("./ongoingTrades");
@@ -9,25 +9,55 @@ const { TRAVIAN_BASE } = require("../constants/links");
 const MarketTabs = require("../constants/marketTabs");
 
 const MARKET_SELECTOR = "div.buttonsWrapper a.market";
+const TRADE_DELAY = 3;
 
 const sendResources = async (page, trade) => {
   console.log(
     `Start send resources from ${trade.from.name} to ${trade.to.name}`
   );
   try {
-    await goMarket(page, trade.from);
+    await verifyCargo(page, trade.from, trade.ammount);
     await setDestination(page, trade.to);
     await setResources(page, trade.ammount);
     const tradeDuration = await executeTrade(page);
     addTrade(trade, tradeDuration);
 
     console.log(
-      `${trade}. Executed successfully. Will take ${formatTime(tradeDuration)}`
+      `${trade.toString()}. Executed successfully. Will take ${formatTime(tradeDuration)}`
     );
     return tradeDuration;
   } catch (error) {
     console.error("Error in sendResources:", error);
   }
+};
+
+const verifyCargo = async (page, from, cargo) => {
+  const maxCargo = getMaxCargo(page, from);
+  const totalCargo = cargo.getTotal();
+  if (totalCargo > maxCargo) {
+    throw new Error(
+      `Not enough capacity. Max cargo is ${maxCargo}, but trying to send ${totalCargo}.`
+    );
+  }
+};
+
+const getMaxCargo = async (page, from) => {
+  await goMarket(page, from);
+  const capacitySelector = "div.capacity span.value";
+  await page.waitForSelector(capacitySelector);
+  const capacityPerCart = await page.$eval(capacitySelector, (span) => {
+    return parseInt(span.textContent.trim().replace(/[^\d]/g, ""), 10);
+  });
+
+  const availableCartsSelector = "div.available span.value";
+  await page.waitForSelector(availableCartsSelector);
+  const availableCarts = await page.$eval(availableCartsSelector, (span) => {
+    const availableText = span.textContent.trim().replace(/[^\d/]/g, "");
+    const [available, _] = availableText.split("/").map(Number);
+    return available;
+  });
+
+  return availableCarts * capacityPerCart;
 };
 
 const goMarket = async (page, from) => {
@@ -87,6 +117,7 @@ const executeTrade = async (page) => {
   if (sendButton) {
     const durationValue = await getTradeDuration(page);
     await sendButton.click();
+    await new Promise((resolve) => setTimeout(resolve, TRADE_DELAY * 1000));
     return durationValue;
   } else {
     throw new Error("Send button not found.");
@@ -103,4 +134,4 @@ const getTradeDuration = async (page) => {
   });
 };
 
-module.exports = sendResources;
+module.exports = { sendResources, getMaxCargo };
