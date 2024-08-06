@@ -3,10 +3,10 @@ const { URL } = require("url");
 const goVillage = require("../village/goVillageService");
 const { formatTime } = require("../utils/timePrintService");
 const { goPage, typeInSelector } = require("../browser/browserService");
+const { addTrade } = require("./ongoingTrades");
 
 const { TRAVIAN_BASE } = require("../constants/links");
 const MarketTabs = require("../constants/marketTabs");
-const Trade = require("../models/trade");
 
 const MARKET_SELECTOR = "div.buttonsWrapper a.market";
 
@@ -19,6 +19,7 @@ const sendResources = async (page, trade) => {
     await setDestination(page, trade.to);
     await setResources(page, trade.ammount);
     const tradeDuration = await executeTrade(page);
+    addTrade(trade, tradeDuration);
 
     console.log(
       `${trade}. Executed successfully. Will take ${formatTime(tradeDuration)}`

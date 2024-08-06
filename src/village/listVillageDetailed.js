@@ -1,5 +1,6 @@
 const { goPage } = require("../browser/browserService");
 const getVillagesInfo = require("./listVillageSimple");
+const { getIncomingResources } = require("../market/ongoingTrades");
 
 const OverviewTabs = require("../constants/overviewTabs");
 const Resources = require("../models/resources");
@@ -39,10 +40,12 @@ const getVillagesDetailedInfo = async (page) => {
     );
 
     const villages = await getVillagesInfo(page);
+
     for (const village of villages) {
       village.resources = resourcesTable[village.name];
       village.production = productionTable[village.name];
       village.capacity = capacityTable[village.name];
+      village.ongoinResources = getIncomingResources(village.name);
     }
 
     return villages;
