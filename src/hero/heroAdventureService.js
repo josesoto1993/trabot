@@ -19,18 +19,20 @@ const goAdventure = async (page) => {
   console.log("Enough time has passed since the last adventure, try go");
 
   const heroStatusClass = await getClassOfHeroIcon(page);
-  const heroAdventures = await getHeroAdventures(page);
   const atHome = heroStatusClass === HeroStatus.home;
-  if (!atHome || heroAdventures <= 0) {
+  if (!atHome) {
     console.log(
-      `Hero is not at home (${heroStatusClass}) or there are no adventures (${heroAdventures}), await ${formatTime(ADVENTURE_INTERVAL)}`
+      `Hero is not at home (${heroStatusClass}), await ${formatTime(ADVENTURE_INTERVAL)}`
     );
     return ADVENTURE_INTERVAL;
   }
-
-  console.log(
-    "Hero is at home and there are adventures, trying to go for a new adventure!"
-  );
+  const heroAdventures = await getHeroAdventures(page);
+  if (heroAdventures <= 0) {
+    console.log(
+      `There are no adventures (${heroAdventures}), await ${formatTime(ADVENTURE_INTERVAL)}`
+    );
+    return ADVENTURE_INTERVAL;
+  }
 
   const successfullyAdventure = await performAdventure(page);
   if (successfullyAdventure) {
