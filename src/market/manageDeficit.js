@@ -4,8 +4,10 @@ const Resources = require("../models/resources");
 const Trade = require("../models/trade");
 
 const DEFICIT_THRESHOLD = 0.4;
+const DEFICIT_MAX_VALUE = 35000;
 const REQUEST_THRESHOLD = 0.6;
 const DONOR_SAFE_LEVEL = 0.5;
+const DONOR_SAFE_VALUE = 40000;
 const ROUNDING_SAFETY_FACTOR = 0.999;
 const DEFICIT_INTERVAL = 3 * 60;
 
@@ -64,8 +66,12 @@ const getDeficitResources = (resources, capacity) => {
   Resources.getKeys().forEach((resourceType) => {
     const actual = resources[resourceType];
     const maxCapacity = capacity[resourceType];
+    const thresholdValue = Math.min(
+      maxCapacity * DEFICIT_THRESHOLD,
+      DEFICIT_MAX_VALUE
+    );
 
-    if (actual < maxCapacity * DEFICIT_THRESHOLD) {
+    if (actual < thresholdValue) {
       deficitResources[resourceType] = maxCapacity * REQUEST_THRESHOLD - actual;
     }
   });
@@ -136,11 +142,14 @@ const findDonorVillage = (villages, resourcesToRequest) => {
 
 const canDonateResources = (resources, capacity, resourcesToDonate) => {
   return Resources.getKeys().every((resourceType) => {
-    const actual = resources[resourceType];
-    const maxCapacity = capacity[resourceType];
-    const deficit = resourcesToDonate[resourceType];
+    const resourceAfterDonation =
+      resources[resourceType] - resourcesToDonate[resourceType];
+    const keepOnStorage = Math.min(
+      capacity[resourceType] * DONOR_SAFE_LEVEL,
+      DONOR_SAFE_VALUE
+    );
 
-    return actual - deficit >= maxCapacity * DONOR_SAFE_LEVEL;
+    return resourceAfterDonation >= keepOnStorage;
   });
 };
 
