@@ -1,5 +1,5 @@
 const buildResources = require("./buildResources");
-const { formatTime } = require("../utils/timePrintService");
+const { formatTime } = require("../utils/timePrint");
 
 let lastBuildTime = 0;
 let buildDuration = 0;

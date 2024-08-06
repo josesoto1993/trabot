@@ -1,6 +1,6 @@
 const { goPage, typeInSelector } = require("../browser/browserService");
 const { TARVIAN_MAIN_BARRACKS } = require("../constants/links");
-const { formatTime } = require("../utils/timePrintService");
+const { formatTime } = require("../utils/timePrint");
 const Unit = require("../constants/units");
 
 const trainUnit = Unit.Swordsman;

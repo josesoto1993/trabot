@@ -1,13 +1,13 @@
 require("dotenv").config();
 
-const { formatTime } = require("./utils/timePrintService");
+const { formatTime } = require("./utils/timePrint");
 const { open } = require("./browser/browserService");
 const { login } = require("./browser/loginService");
-const { attackFarms } = require("./attackFarms/attackFarmsService");
-const { trainTroops } = require("./createTroops/troopCreatorService");
-const { goAdventure } = require("./hero/heroAdventureService");
+const { attackFarms } = require("./attackFarms/attackFarms");
+const { trainTroops } = require("./createTroops/troopCreator");
+const { goAdventure } = require("./hero/heroAdventure");
 const build = require("./construct/build");
-const redeem = require("./redeemTask/redeemTaskService");
+const redeem = require("./redeemTask/redeemTask");
 const manageOverflow = require("./market/manageOverflow");
 const manageDeficit = require("./market/manageDeficit");
 

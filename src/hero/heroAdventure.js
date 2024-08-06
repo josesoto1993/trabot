@@ -1,10 +1,7 @@
 const { goPage } = require("../browser/browserService");
-const {
-  getClassOfHeroIcon,
-  getHeroAdventures,
-} = require("./heroStatusService");
+const { getClassOfHeroIcon, getHeroAdventures } = require("./heroStatus");
 const { TRAVIAN_HERO_ADVENTURES } = require("../constants/links");
-const { formatTime } = require("../utils/timePrintService");
+const { formatTime } = require("../utils/timePrint");
 const HeroStatus = require("../constants/heroStatus");
 
 const ADVENTURE_BUTTON_SELECTOR_TIMEOUT_MILLIS = 15000;

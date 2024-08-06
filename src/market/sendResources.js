@@ -1,7 +1,7 @@
 const { URL } = require("url");
 
 const goVillage = require("../village/goVillage");
-const { formatTime } = require("../utils/timePrintService");
+const { formatTime } = require("../utils/timePrint");
 const { goPage, typeInSelector } = require("../browser/browserService");
 const { addTrade } = require("./ongoingTrades");
 
