@@ -7,7 +7,7 @@ let buildDuration = 0;
 const build = async (page) => {
   const remainingTime = getRemainingTime();
   if (remainingTime > 0) {
-    return remainingTime;
+    return { nextExecutionTime: remainingTime, skip: true };
   }
 
   console.log("Time to build resources, starting the build process...");
@@ -15,7 +15,7 @@ const build = async (page) => {
   buildDuration = await buildResources(page);
 
   updateNextBuildTime(buildDuration);
-  return getRemainingTime();
+  return { nextExecutionTime: getRemainingTime(), skip: false };
 };
 
 const getRemainingTime = () => {

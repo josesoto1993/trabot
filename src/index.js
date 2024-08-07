@@ -26,8 +26,7 @@ const mainLoop = async (page) => {
     let nextLoop = 0;
     while (true) {
       loopNumber += 1;
-      console.log("\n\n");
-      console.log(`---------------- loop ${loopNumber} ----------------`);
+      console.log(`\n\n\n---------------- loop ${loopNumber} ----------------`);
 
       nextLoop = Math.min(
         await runTaskWithTimer("Attack Farms", () => attackFarms(page)),
@@ -62,26 +61,31 @@ const runTaskWithTimer = async (taskName, task) => {
     taskStats[taskName] = { totalDuration: 0, count: 0 };
   }
 
-  const startTime = Date.now();
   try {
-    const result = await task();
-    return result;
-  } catch (error) {
-    console.error(`Error during ${taskName} task:`, error);
-    return 0;
-  } finally {
+    console.log(`\n---------------- ${taskName} start ----------------`);
+    const startTime = Date.now();
+    const { nextExecutionTime, skip } = await task();
+
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    taskStats[taskName].totalDuration += duration;
-    taskStats[taskName].count += 1;
+    if (!skip) {
+      taskStats[taskName].totalDuration += duration;
+      taskStats[taskName].count += 1;
+    }
+
     const averageDuration =
-      taskStats[taskName].totalDuration / taskStats[taskName].count;
+      taskStats[taskName].totalDuration / (taskStats[taskName].count || 1);
 
     console.log(`${taskName} ended, took ${formatTimeMillis(duration)}`);
     console.log(
       `Average duration of ${taskName}: ${formatTimeMillis(averageDuration)}`
     );
+
+    return nextExecutionTime;
+  } catch (error) {
+    console.error(`Error during ${taskName} task:`, error);
+    return { nextExecutionTime: 0, skip: true };
   }
 };
 

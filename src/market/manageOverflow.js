@@ -16,7 +16,7 @@ let lastOverflowTime = 0;
 const manageOverflow = async (page) => {
   const remainingTime = getRemainingTime();
   if (remainingTime > 0) {
-    return remainingTime;
+    return { nextExecutionTime: remainingTime, skip: true };
   }
   console.log(
     "Enough time has passed since the last overflow check, let's check again."
@@ -28,7 +28,7 @@ const manageOverflow = async (page) => {
   console.log(
     `Manage Overflow finished. Next in ${formatTime(OVERFLOW_INTERVAL)}`
   );
-  return OVERFLOW_INTERVAL;
+  return { nextExecutionTime: OVERFLOW_INTERVAL, skip: false };
 };
 
 const getRemainingTime = () => {

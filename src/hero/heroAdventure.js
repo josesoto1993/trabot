@@ -11,7 +11,7 @@ let lastAdventureTime = 0;
 const goAdventure = async (page) => {
   const remainingTime = getremainingTime();
   if (remainingTime > 0) {
-    return remainingTime;
+    return { nextExecutionTime: remainingTime, skip: true };
   }
   console.log("Enough time has passed since the last adventure, try go");
 
@@ -21,14 +21,14 @@ const goAdventure = async (page) => {
     console.log(
       `Hero is not at home (${heroStatusClass}), await ${formatTime(ADVENTURE_INTERVAL)}`
     );
-    return ADVENTURE_INTERVAL;
+    return { nextExecutionTime: ADVENTURE_INTERVAL, skip: true };
   }
   const heroAdventures = await getHeroAdventures(page);
   if (heroAdventures <= 0) {
     console.log(
       `There are no adventures (${heroAdventures}), await ${formatTime(ADVENTURE_INTERVAL)}`
     );
-    return ADVENTURE_INTERVAL;
+    return { nextExecutionTime: ADVENTURE_INTERVAL, skip: true };
   }
 
   const successfullyAdventure = await performAdventure(page);
@@ -36,7 +36,7 @@ const goAdventure = async (page) => {
     updateNextAdventureTime();
   }
 
-  return ADVENTURE_INTERVAL;
+  return { nextExecutionTime: ADVENTURE_INTERVAL, skip: false };
 };
 
 const getremainingTime = () => {

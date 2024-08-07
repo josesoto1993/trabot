@@ -18,7 +18,7 @@ let lastDeficitTime = 0;
 const manageDeficit = async (page) => {
   const remainingTime = getRemainingTime();
   if (remainingTime > 0) {
-    return remainingTime;
+    return { nextExecutionTime: remainingTime, skip: true };
   }
   console.log(
     "Enough time has passed since the last deficit check, let's check again"
@@ -30,7 +30,7 @@ const manageDeficit = async (page) => {
   console.log(
     `Manage Deficit finished. Next in ${formatTime(DEFICIT_INTERVAL)}`
   );
-  return DEFICIT_INTERVAL;
+  return { nextExecutionTime: DEFICIT_INTERVAL, skip: false };
 };
 
 const getRemainingTime = () => {

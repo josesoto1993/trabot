@@ -16,7 +16,7 @@ const MAX_TRAIN_TIME = 24 * 60 * 60;
 const trainTroops = async (page) => {
   const remainingTime = getremainingTime();
   if (remainingTime > 0) {
-    return remainingTime;
+    return { nextExecutionTime: remainingTime, skip: true };
   }
   console.log(
     "Enough time has passed since the last training, go for more troops!"
@@ -27,7 +27,7 @@ const trainTroops = async (page) => {
     updateNextTrainTime();
   }
 
-  return getremainingTime();
+  return { nextExecutionTime: getremainingTime(), skip: false };
 };
 
 const getremainingTime = () => {
