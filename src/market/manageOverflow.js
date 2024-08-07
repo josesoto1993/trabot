@@ -125,31 +125,38 @@ const limitResourcesToMarket = (village, excessResources) => {
 };
 
 const findReceivingVillage = (villages, resourcesToSend) => {
-  for (const village of villages) {
-    const actualVillageResources = Resources.add(
-      village.resources,
-      village.ongoingResources
+  for (const receivingVillage of villages) {
+    const receivingVillageRes = Resources.add(
+      receivingVillage.resources,
+      receivingVillage.ongoingResources
     );
     if (
       canReceiveResources(
-        actualVillageResources,
-        village.capacity,
+        receivingVillageRes,
+        receivingVillage.capacity,
         resourcesToSend
       )
     ) {
-      return village;
+      return receivingVillage;
     }
   }
   return null;
 };
 
-const canReceiveResources = (resources, capacity, resourcesToReceive) => {
+const canReceiveResources = (
+  receoverResources,
+  receoverCapacity,
+  resourcesToReceive
+) => {
   return Resources.getKeys().every((resourceType) => {
-    const actual = resources[resourceType];
-    const maxCapacity = capacity[resourceType];
-    const excess = resourcesToReceive[resourceType];
+    const resourceAfterReceive =
+      receoverResources[resourceType] + resourcesToReceive[resourceType];
+    const maxOnStorage = receoverCapacity[resourceType] * RECEIVER_THRESHOLD;
 
-    return actual + excess <= maxCapacity * RECEIVER_THRESHOLD;
+    return (
+      resourceAfterReceive <= maxOnStorage ||
+      resourcesToReceive[resourceType] === 0
+    );
   });
 };
 

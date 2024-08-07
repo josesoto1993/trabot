@@ -129,34 +129,45 @@ const limitResourcesToMarket = (village, deficitResources) => {
 };
 
 const findDonorVillage = (villages, resourcesToRequest) => {
-  for (const village of villages) {
-    const actualVillageResources = Resources.add(
-      village.resources,
-      village.ongoingResources
+  for (const donorVillage of villages) {
+    const donorResources = Resources.add(
+      donorVillage.resources,
+      donorVillage.ongoingResources
     );
+    console.log("village ", donorVillage.name);
     if (
       canDonateResources(
-        actualVillageResources,
-        village.capacity,
+        donorResources,
+        donorVillage.capacity,
         resourcesToRequest
       )
     ) {
-      return village;
+      return donorVillage;
     }
   }
   return null;
 };
 
-const canDonateResources = (resources, capacity, resourcesToDonate) => {
+const canDonateResources = (
+  donorResources,
+  donorCapacity,
+  resourcesToDonate
+) => {
+  console.log("donorResources ", donorResources);
+  console.log("donorCapacity ", donorCapacity);
+  console.log("resourcesToDonate ", resourcesToDonate);
   return Resources.getKeys().every((resourceType) => {
     const resourceAfterDonation =
-      resources[resourceType] - resourcesToDonate[resourceType];
+      donorResources[resourceType] - resourcesToDonate[resourceType];
     const keepOnStorage = Math.min(
-      capacity[resourceType] * DONOR_SAFE_LEVEL,
+      donorCapacity[resourceType] * DONOR_SAFE_LEVEL,
       DONOR_SAFE_VALUE
     );
 
-    return resourceAfterDonation >= keepOnStorage;
+    return (
+      resourceAfterDonation >= keepOnStorage ||
+      resourcesToDonate[resourceType] === 0
+    );
   });
 };
 
