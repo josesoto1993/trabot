@@ -10,6 +10,7 @@ const MarketTabs = require("../constants/marketTabs");
 
 const MARKET_SELECTOR = "div.buttonsWrapper a.market";
 const TRADE_DELAY = 3;
+const MARKET_WAIT_POSSIBLE_ERROR = 1 * 1000;
 
 const sendResources = async (page, trade) => {
   console.log(
@@ -17,9 +18,9 @@ const sendResources = async (page, trade) => {
   );
   try {
     await goMarket(page, trade.from);
-    await verifyCargo(page, trade.from, trade.ammount);
     await setDestination(page, trade.to);
-    await setResources(page, trade.ammount);
+    await setResources(page, trade.resources);
+    await verify(page);
     const tradeDuration = await executeTrade(page);
     addTrade(trade, tradeDuration);
 
@@ -28,36 +29,12 @@ const sendResources = async (page, trade) => {
     );
     return tradeDuration;
   } catch (error) {
-    console.error("Error in sendResources:", error);
-  }
-};
-
-const verifyCargo = async (page, from, cargo) => {
-  const maxCargo = await getMaxCargo(page, from);
-  const totalCargo = cargo.getTotal();
-  if (totalCargo > maxCargo) {
-    throw new Error(
-      `Not enough capacity. Max cargo is ${maxCargo}, but trying to send ${totalCargo}.`
+    console.error(
+      `Error in sendResources for trade ${JSON.stringify(trade, null, 2)} :`,
+      error
     );
+    return -1;
   }
-};
-
-const getMaxCargo = async (page, from) => {
-  const capacitySelector = "div.capacity span.value";
-  await page.waitForSelector(capacitySelector);
-  const capacityPerCart = await page.$eval(capacitySelector, (span) => {
-    return parseInt(span.textContent.trim().replace(/[^\d]/g, ""), 10);
-  });
-
-  const availableCartsSelector = "div.available span.value";
-  await page.waitForSelector(availableCartsSelector);
-  const availableCarts = await page.$eval(availableCartsSelector, (span) => {
-    const availableText = span.textContent.trim().replace(/[^\d/]/g, "");
-    const [available, _] = availableText.split("/").map(Number);
-    return available;
-  });
-
-  return availableCarts * capacityPerCart;
 };
 
 const goMarket = async (page, from) => {
@@ -100,14 +77,35 @@ const setDestination = async (page, to) => {
   );
 };
 
-const setResources = async (page, ammount) => {
+const setResources = async (page, resources) => {
   console.log("set resources");
   await page.waitForSelector('input[name="lumber"]');
 
-  await typeInSelector('input[name="lumber"]', ammount.lumber);
-  await typeInSelector('input[name="clay"]', ammount.clay);
-  await typeInSelector('input[name="iron"]', ammount.iron);
-  await typeInSelector('input[name="crop"]', ammount.crop);
+  await typeInSelector('input[name="lumber"]', resources.lumber);
+  await typeInSelector('input[name="clay"]', resources.clay);
+  await typeInSelector('input[name="iron"]', resources.iron);
+  await typeInSelector('input[name="crop"]', resources.crop);
+};
+
+const verify = async (page) => {
+  await new Promise((resolve) =>
+    setTimeout(resolve, MARKET_WAIT_POSSIBLE_ERROR)
+  );
+
+  const errorDivsText = await page.evaluate(() => {
+    const divs = Array.from(document.querySelectorAll("div.error"));
+    return divs.map((div) => div.textContent);
+  });
+
+  const notEnoughMerchantsText = errorDivsText.find((text) =>
+    text.includes("Not enough merchants")
+  );
+
+  if (notEnoughMerchantsText) {
+    throw new Error(
+      `Not enough capacity. Show in screen: ${notEnoughMerchantsText}.`
+    );
+  }
 };
 
 const executeTrade = async (page) => {
