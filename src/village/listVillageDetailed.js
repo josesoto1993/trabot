@@ -80,10 +80,21 @@ const getOverviewMerchants = async (page) => {
 
       const merchantElement = row.querySelector("td.tra.lc a");
       if (merchantElement) {
+        console.log(
+          "village find merchantElement.textContent: ",
+          merchantElement.textContent
+        );
+        console.log(
+          "village find merchantElement.textContent.trim(): ",
+          merchantElement.textContent.trim()
+        );
         const availableText = merchantElement.textContent
           .trim()
-          .replace(/[^\d]/g, "");
+          .replace(/[^\d\/]/g, "");
+        console.log("village find availableText: ", availableText);
         const [available, max] = availableText.split("/").map(Number);
+        console.log("village find available: ", available);
+        console.log("village find max: ", max);
         result[villageName].availableMerchants = available ? available : 0;
         result[villageName].maxMerchants = max ? max : 0;
       }
@@ -91,6 +102,7 @@ const getOverviewMerchants = async (page) => {
     return result;
   }, ROW_SELECTOR);
 
+  await new Promise((resolve) => setTimeout(resolve, 10 * 1000));
   return merchantsRaw;
 };
 
