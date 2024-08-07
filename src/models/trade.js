@@ -1,12 +1,12 @@
 class Trade {
-  constructor(from, to, ammount) {
+  constructor(from, to, resources) {
     this.from = from;
     this.to = to;
-    this.ammount = ammount;
+    this.resources = resources;
   }
 
   toString() {
-    return `Trade from ${this.from.name} to ${this.to.name} with ${this.ammount}`;
+    return `Trade from ${this.from.name} to ${this.to.name} with ${this.resources}`;
   }
 }
 

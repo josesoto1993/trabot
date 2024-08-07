@@ -22,12 +22,12 @@ const getIncomingResources = (villageName) => {
   }
 
   return trades
-    .map((record) => record.trade.ammount)
-    .reduce((acc, amount) => {
-      acc.lumber += amount.lumber;
-      acc.clay += amount.clay;
-      acc.iron += amount.iron;
-      acc.crop += amount.crop;
+    .map((record) => record.trade.resources)
+    .reduce((acc, resources) => {
+      acc.lumber += resources.lumber;
+      acc.clay += resources.clay;
+      acc.iron += resources.iron;
+      acc.crop += resources.crop;
       return acc;
     }, initialValue);
 };

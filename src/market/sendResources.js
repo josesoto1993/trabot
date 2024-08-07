@@ -17,9 +17,9 @@ const sendResources = async (page, trade) => {
   );
   try {
     await goMarket(page, trade.from);
-    await verifyCargo(page, trade.from, trade.ammount);
+    await verifyCargo(page, trade.from, trade.resources);
     await setDestination(page, trade.to);
-    await setResources(page, trade.ammount);
+    await setResources(page, trade.resources);
     const tradeDuration = await executeTrade(page);
     addTrade(trade, tradeDuration);
 
@@ -28,7 +28,11 @@ const sendResources = async (page, trade) => {
     );
     return tradeDuration;
   } catch (error) {
-    console.error("Error in sendResources:", error);
+    console.error(
+      `Error in sendResources for trade ${JSON.stringify(trade, null, 2)} :`,
+      error
+    );
+    return -1;
   }
 };
 
@@ -100,14 +104,14 @@ const setDestination = async (page, to) => {
   );
 };
 
-const setResources = async (page, ammount) => {
+const setResources = async (page, resources) => {
   console.log("set resources");
   await page.waitForSelector('input[name="lumber"]');
 
-  await typeInSelector('input[name="lumber"]', ammount.lumber);
-  await typeInSelector('input[name="clay"]', ammount.clay);
-  await typeInSelector('input[name="iron"]', ammount.iron);
-  await typeInSelector('input[name="crop"]', ammount.crop);
+  await typeInSelector('input[name="lumber"]', resources.lumber);
+  await typeInSelector('input[name="clay"]', resources.clay);
+  await typeInSelector('input[name="iron"]', resources.iron);
+  await typeInSelector('input[name="crop"]', resources.crop);
 };
 
 const executeTrade = async (page) => {
