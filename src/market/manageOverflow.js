@@ -41,25 +41,31 @@ const updateNextOverflowTime = () => {
 };
 
 const checkVillagesOverflow = async (page) => {
-  const villages = await getVillagesDetailedInfo(page);
+  try {
+    const villages = await getVillagesDetailedInfo(page);
 
-  for (const village of villages) {
-    const actualVillageResources = Resources.add(
-      village.resources,
-      village.ongoingResources
-    );
-    const excessResources = getOverflowResources(
-      actualVillageResources,
-      village.capacity
-    );
-
-    if (excessResources.getTotal() > 0) {
-      await handleOverflowResources(page, villages, village, excessResources);
-    } else {
-      console.log(
-        `Village ${village.name} does not need to balance resources.`
-      );
+    for (const village of villages) {
+      await checkVillageOverflow(page, village, villages);
     }
+  } catch (error) {
+    console.error("Error during check overflow:", error);
+  }
+};
+
+const checkVillageOverflow = async (page, village, villages) => {
+  const actualVillageResources = Resources.add(
+    village.resources,
+    village.ongoingResources
+  );
+  const excessResources = getOverflowResources(
+    actualVillageResources,
+    village.capacity
+  );
+
+  if (excessResources.getTotal() > 0) {
+    await handleOverflowResources(page, villages, village, excessResources);
+  } else {
+    console.log(`Village ${village.name} does not need to balance resources.`);
   }
 };
 

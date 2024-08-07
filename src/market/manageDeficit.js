@@ -40,23 +40,31 @@ const updateNextDeficitTime = () => {
 };
 
 const checkVillagesDeficit = async (page) => {
-  const villages = await getVillagesDetailedInfo(page);
+  try {
+    const villages = await getVillagesDetailedInfo(page);
 
-  for (const village of villages) {
-    const actualVillageResources = Resources.add(
-      village.resources,
-      village.ongoingResources
-    );
-    const deficitResources = getDeficitResources(
-      actualVillageResources,
-      village.capacity
-    );
-
-    if (deficitResources.getTotal() > 0) {
-      await handleDeficitResources(page, villages, village, deficitResources);
-    } else {
-      console.log(`Village ${village.name} does not need resources`);
+    for (const village of villages) {
+      await checkVillageDeficit(page, village, villages);
     }
+  } catch (error) {
+    console.error("Error during check deficit:", error);
+  }
+};
+
+const checkVillageDeficit = async (page, village, villages) => {
+  const actualVillageResources = Resources.add(
+    village.resources,
+    village.ongoingResources
+  );
+  const deficitResources = getDeficitResources(
+    actualVillageResources,
+    village.capacity
+  );
+
+  if (deficitResources.getTotal() > 0) {
+    await handleDeficitResources(page, villages, village, deficitResources);
+  } else {
+    console.log(`Village ${village.name} does not need resources`);
   }
 };
 
