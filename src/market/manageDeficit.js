@@ -81,7 +81,11 @@ const getDeficitResources = (resources, capacity) => {
     );
 
     if (actual < thresholdValue) {
-      deficitResources[resourceType] = maxCapacity * REQUEST_THRESHOLD - actual;
+      const thresholdRequest = Math.min(
+        maxCapacity * REQUEST_THRESHOLD,
+        DEFICIT_MAX_VALUE
+      );
+      deficitResources[resourceType] = thresholdRequest - actual;
     }
   });
 
