@@ -96,17 +96,15 @@ const handleDeficitResources = async (
 ) => {
   console.log(`Village ${village.name} needs resources ${deficitResources}`);
 
-  const resourcesToRequest = limitResourcesToMarket(village, deficitResources);
-
-  const donorVillage = findDonorVillage(villages, resourcesToRequest);
+  const donorVillage = findDonorVillage(villages, deficitResources);
   if (donorVillage) {
     console.log(
-      `Village ${village.name} needs to request ${resourcesToRequest} from village ${donorVillage.name}`
+      `Village ${village.name} needs to request ${deficitResources} from village ${donorVillage.name}`
     );
-    await requestResources(page, donorVillage, village, resourcesToRequest);
-    updateVillageResources(donorVillage, village, resourcesToRequest);
+    await requestResources(page, donorVillage, village, deficitResources);
+    updateVillageResources(donorVillage, village, deficitResources);
   } else {
-    console.log("ERROR!! CANNOT FULFILL DEFICIT", resourcesToRequest);
+    console.log("ERROR!! CANNOT FULFILL DEFICIT", deficitResources);
   }
 };
 
@@ -159,7 +157,8 @@ const canDonateResources = (resources, capacity, resourcesToDonate) => {
 };
 
 const requestResources = async (page, fromVillage, toVillage, resources) => {
-  const trade = new Trade(fromVillage, toVillage, resources);
+  const resourcesToRequest = limitResourcesToMarket(fromVillage, resources);
+  const trade = new Trade(fromVillage, toVillage, resourcesToRequest);
   await sendResources(page, trade);
 };
 
