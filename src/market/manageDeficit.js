@@ -1,8 +1,9 @@
 const getVillagesDetailedInfo = require("../village/listVillageDetailed");
-const { sendResources, getMaxCargo } = require("./sendResources");
+const sendResources = require("./sendResources");
 const Resources = require("../models/resources");
 const Trade = require("../models/trade");
 
+const MERCHANTS_CAPACITY = process.env.MERCHANTS_CAPACITY;
 const DEFICIT_THRESHOLD = 0.4;
 const DEFICIT_MAX_VALUE = 35000;
 const REQUEST_THRESHOLD = 0.6;
@@ -95,11 +96,7 @@ const handleDeficitResources = async (
 ) => {
   console.log(`Village ${village.name} needs resources ${deficitResources}`);
 
-  const resourcesToRequest = await limitResourcesToMarket(
-    page,
-    village,
-    deficitResources
-  );
+  const resourcesToRequest = limitResourcesToMarket(village, deficitResources);
 
   const donorVillage = findDonorVillage(villages, resourcesToRequest);
   if (donorVillage) {
@@ -113,8 +110,8 @@ const handleDeficitResources = async (
   }
 };
 
-const limitResourcesToMarket = async (page, village, deficitResources) => {
-  const maxCargo = await getMaxCargo(page, village);
+const limitResourcesToMarket = (village, deficitResources) => {
+  const maxCargo = village.availableMerchants * MERCHANTS_CAPACITY;
   const totalDeficit = deficitResources.getTotal();
 
   if (totalDeficit <= maxCargo) {

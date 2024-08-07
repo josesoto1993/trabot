@@ -134,4 +134,4 @@ const getTradeDuration = async (page) => {
   });
 };
 
-module.exports = { sendResources, getMaxCargo };
+module.exports = sendResources;

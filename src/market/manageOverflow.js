@@ -1,9 +1,10 @@
 const getVillagesDetailedInfo = require("../village/listVillageDetailed");
-const { sendResources, getMaxCargo } = require("./sendResources");
+const sendResources = require("./sendResources");
 const { formatTime } = require("../utils/timePrint");
 const Resources = require("../models/resources");
 const Trade = require("../models/trade");
 
+const MERCHANTS_CAPACITY = process.env.MERCHANTS_CAPACITY;
 const RESOURCE_THRESHOLD = 0.8;
 const RECEIVER_THRESHOLD = 0.7;
 const SAFE_LEVEL = 0.6;
@@ -93,11 +94,7 @@ const handleOverflowResources = async (
   console.log(
     `Village ${village.name} needs to send overflow resources ${excessResources}.`
   );
-  const resourcesToSend = await limitResourcesToMarket(
-    page,
-    village,
-    excessResources
-  );
+  const resourcesToSend = limitResourcesToMarket(village, excessResources);
 
   const targetVillage = findReceivingVillage(villages, resourcesToSend);
   if (targetVillage) {
@@ -111,8 +108,8 @@ const handleOverflowResources = async (
   }
 };
 
-const limitResourcesToMarket = async (page, village, excessResources) => {
-  const maxCargo = await getMaxCargo(page, village);
+const limitResourcesToMarket = (village, excessResources) => {
+  const maxCargo = village.availableMerchants * MERCHANTS_CAPACITY;
   const totalExcess = excessResources.getTotal();
 
   if (totalExcess <= maxCargo) {
