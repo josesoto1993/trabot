@@ -4,6 +4,7 @@ const upgradeBuilding = require("./upgradeBuilding");
 
 const ConstructionStatus = require("../constants/constructionStatus");
 const FieldTypePriority = require("../constants/fieldTypePriority");
+const CAPITAL_FIELDS_ENABLE = process.env.CAPITAL_FIELDS_ENABLE === "true";
 
 let upgradeResourceCount = 0;
 const BUILD_RESOURCES_INTERVAL = 15 * 60;
@@ -70,7 +71,7 @@ const getPossibleResourcesToUpgrade = async (page, village) => {
   const possibleResourcesToUpgrade = resourceFields.filter(
     (field) =>
       field.constructionStatus === ConstructionStatus.readyToUpgrade &&
-      field.level < 10
+      (field.level < 10 || CAPITAL_FIELDS_ENABLE)
   );
 
   possibleResourcesToUpgrade.sort(sortResources);

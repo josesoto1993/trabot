@@ -23,6 +23,7 @@ const capacitySelectors = {
 
 const getVillagesDetailedInfo = async (page) => {
   try {
+    const merchantsTable = await getOverviewMerchants(page);
     const resourcesTable = await getOverviewResources(
       page,
       OverviewTabs.resResources,
@@ -46,6 +47,9 @@ const getVillagesDetailedInfo = async (page) => {
       village.production = productionTable[village.name];
       village.capacity = capacityTable[village.name];
       village.ongoingResources = getIncomingResources(village.name);
+      village.availableMerchants =
+        merchantsTable[village.name].availableMerchants;
+      village.maxMerchants = merchantsTable[village.name].maxMerchants;
     }
 
     return villages;
@@ -53,6 +57,41 @@ const getVillagesDetailedInfo = async (page) => {
     console.error("Error getting villages info:", error);
     throw error;
   }
+};
+
+const getOverviewMerchants = async (page) => {
+  await goPage(OverviewTabs.overview);
+  await page.waitForSelector(ROW_SELECTOR);
+
+  const merchantsRaw = await page.evaluate((rowSelector) => {
+    const rows = document.querySelectorAll(rowSelector);
+
+    const result = {};
+    rows.forEach((row) => {
+      const villageLink = row.querySelector("td.vil a");
+      if (!villageLink) {
+        return;
+      }
+
+      const villageName = villageLink.textContent.trim();
+      if (!result[villageName]) {
+        result[villageName] = {};
+      }
+
+      const merchantElement = row.querySelector("td.tra.lc a");
+      if (merchantElement) {
+        const availableText = merchantElement.textContent
+          .trim()
+          .replace(/[^\d]/g, "");
+        const [available, max] = availableText.split("/").map(Number);
+        result[villageName].availableMerchants = available ? available : 0;
+        result[villageName].maxMerchants = max ? max : 0;
+      }
+    });
+    return result;
+  }, ROW_SELECTOR);
+
+  return merchantsRaw;
 };
 
 const getOverviewResources = async (page, tableUrl, selectors) => {

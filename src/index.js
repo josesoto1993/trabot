@@ -37,6 +37,7 @@ const mainLoop = async (page) => {
     }
   } catch (error) {
     console.error("Error in main loop:", error);
+    await new Promise((resolve) => setTimeout(resolve, 10000));
   }
 };
 
@@ -54,6 +55,7 @@ const runAttackFarms = async (page) => {
     return await attackFarms(page);
   } catch (error) {
     console.error("Error during attack task:", error);
+    return 0;
   }
 };
 
@@ -62,6 +64,7 @@ const runTrainTroops = async (page) => {
     return await trainTroops(page);
   } catch (error) {
     console.error("Error during train task:", error);
+    return 0;
   }
 };
 
@@ -70,6 +73,7 @@ const runGoAdventure = async (page) => {
     return await goAdventure(page);
   } catch (error) {
     console.error("Error during adventure task:", error);
+    return 0;
   }
 };
 
@@ -78,6 +82,7 @@ const runBuild = async (page) => {
     return await build(page);
   } catch (error) {
     console.error("Error during build task:", error);
+    return 0;
   }
 };
 
@@ -86,6 +91,7 @@ const runRedeem = async (page) => {
     return await redeem(page);
   } catch (error) {
     console.error("Error during redeemTask task:", error);
+    return 0;
   }
 };
 
@@ -94,6 +100,7 @@ const runManageOverflow = async (page) => {
     return await manageOverflow(page);
   } catch (error) {
     console.error("Error during manageOverflow task:", error);
+    return 0;
   }
 };
 
@@ -102,6 +109,7 @@ const runManageDeficit = async (page) => {
     return await manageDeficit(page);
   } catch (error) {
     console.error("Error during manageDeficit task:", error);
+    return 0;
   }
 };
 

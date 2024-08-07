@@ -1,5 +1,6 @@
 const OverviewTabs = {
   mainUrl: "https://ts100.x10.asia.travian.com/village/statistics",
+  overview: "https://ts100.x10.asia.travian.com/village/statistics/overview",
   resResources:
     "https://ts100.x10.asia.travian.com/village/statistics/resources/resources",
   resWarehouse:

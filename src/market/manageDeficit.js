@@ -1,8 +1,9 @@
 const getVillagesDetailedInfo = require("../village/listVillageDetailed");
-const { sendResources, getMaxCargo } = require("./sendResources");
+const sendResources = require("./sendResources");
 const Resources = require("../models/resources");
 const Trade = require("../models/trade");
 
+const MERCHANTS_CAPACITY = process.env.MERCHANTS_CAPACITY;
 const DEFICIT_THRESHOLD = 0.4;
 const DEFICIT_MAX_VALUE = 35000;
 const REQUEST_THRESHOLD = 0.6;
@@ -25,7 +26,9 @@ const manageDeficit = async (page) => {
   await checkVillagesDeficit(page);
   updateNextDeficitTime();
 
-  console.log("Manage Deficit finished");
+  console.log(
+    `Manage Deficit finished. Next in ${formatTime(DEFICIT_INTERVAL)}`
+  );
   return DEFICIT_INTERVAL;
 };
 
@@ -80,7 +83,11 @@ const getDeficitResources = (resources, capacity) => {
     );
 
     if (actual < thresholdValue) {
-      deficitResources[resourceType] = maxCapacity * REQUEST_THRESHOLD - actual;
+      const thresholdRequest = Math.min(
+        maxCapacity * REQUEST_THRESHOLD,
+        DEFICIT_MAX_VALUE
+      );
+      deficitResources[resourceType] = thresholdRequest - actual;
     }
   });
 
@@ -95,26 +102,90 @@ const handleDeficitResources = async (
 ) => {
   console.log(`Village ${village.name} needs resources ${deficitResources}`);
 
-  const resourcesToRequest = await limitResourcesToMarket(
-    page,
-    village,
+  const [donorVillage, resourcesToSend] = findDonorVillageAndRes(
+    villages,
     deficitResources
   );
 
-  const donorVillage = findDonorVillage(villages, resourcesToRequest);
   if (donorVillage) {
     console.log(
-      `Village ${village.name} needs to request ${resourcesToRequest} from village ${donorVillage.name}`
+      `Village ${village.name} needs to request ${resourcesToSend} from village ${donorVillage.name}`
     );
-    await requestResources(page, donorVillage, village, resourcesToRequest);
-    updateVillageResources(donorVillage, village, resourcesToRequest);
+    await requestResources(page, donorVillage, village, resourcesToSend);
+    updateVillageResources(donorVillage, village, resourcesToSend);
   } else {
-    console.log("ERROR!! CANNOT FULFILL DEFICIT", resourcesToRequest);
+    console.log("ERROR!! CANNOT FULFILL DEFICIT", deficitResources);
   }
 };
 
-const limitResourcesToMarket = async (page, village, deficitResources) => {
-  const maxCargo = await getMaxCargo(page, village);
+const findDonorVillageAndRes = (villages, resourcesToRequest) => {
+  const potentialDonors = [];
+
+  for (const donorVillage of villages) {
+    const donorResources = Resources.add(
+      donorVillage.resources,
+      donorVillage.ongoingResources
+    );
+
+    const possibleDonation = calculatePossibleDonationForDeficit(
+      donorResources,
+      donorVillage.capacity,
+      resourcesToRequest
+    );
+
+    if (possibleDonation.getTotal() > 0) {
+      potentialDonors.push({
+        village: donorVillage,
+        res: possibleDonation,
+      });
+    }
+  }
+
+  if (potentialDonors.length === 0) {
+    return [null, null];
+  }
+
+  potentialDonors.sort((a, b) => b.res.getTotal() - a.res.getTotal());
+
+  return [potentialDonors[0].village, potentialDonors[0].res];
+};
+
+const calculatePossibleDonationForDeficit = (
+  donorResources,
+  donorCapacity,
+  resourcesToRequest
+) => {
+  const possibleDonation = new Resources(0, 0, 0, 0);
+
+  Resources.getKeys().forEach((resourceType) => {
+    const maxDonation =
+      donorResources[resourceType] -
+      Math.min(
+        donorCapacity[resourceType] * DONOR_SAFE_LEVEL,
+        DONOR_SAFE_VALUE
+      );
+
+    possibleDonation[resourceType] = Math.min(
+      resourcesToRequest[resourceType],
+      maxDonation
+    );
+
+    if (possibleDonation[resourceType] < 0) {
+      possibleDonation[resourceType] = 0;
+    }
+  });
+
+  return possibleDonation;
+};
+
+const requestResources = async (page, fromVillage, toVillage, resources) => {
+  const resourcesToRequest = limitResourcesToMarket(fromVillage, resources);
+  const trade = new Trade(fromVillage, toVillage, resourcesToRequest);
+  await sendResources(page, trade);
+};
+
+const limitResourcesToMarket = (village, deficitResources) => {
+  const maxCargo = village.availableMerchants * MERCHANTS_CAPACITY;
   const totalDeficit = deficitResources.getTotal();
 
   if (totalDeficit <= maxCargo) {
@@ -127,43 +198,6 @@ const limitResourcesToMarket = async (page, village, deficitResources) => {
     `Deficit ${totalDeficit} exceeds max cargo ${maxCargo}, scale to request ${realCargoToRequest}`
   );
   return realCargoToRequest;
-};
-
-const findDonorVillage = (villages, resourcesToRequest) => {
-  for (const village of villages) {
-    const actualVillageResources = Resources.add(
-      village.resources,
-      village.ongoingResources
-    );
-    if (
-      canDonateResources(
-        actualVillageResources,
-        village.capacity,
-        resourcesToRequest
-      )
-    ) {
-      return village;
-    }
-  }
-  return null;
-};
-
-const canDonateResources = (resources, capacity, resourcesToDonate) => {
-  return Resources.getKeys().every((resourceType) => {
-    const resourceAfterDonation =
-      resources[resourceType] - resourcesToDonate[resourceType];
-    const keepOnStorage = Math.min(
-      capacity[resourceType] * DONOR_SAFE_LEVEL,
-      DONOR_SAFE_VALUE
-    );
-
-    return resourceAfterDonation >= keepOnStorage;
-  });
-};
-
-const requestResources = async (page, fromVillage, toVillage, resources) => {
-  const trade = new Trade(fromVillage, toVillage, resources);
-  await sendResources(page, trade);
 };
 
 const updateVillageResources = (fromVillage, toVillage, resources) => {
