@@ -20,16 +20,21 @@ const main = async () => {
 
 const mainLoop = async (page) => {
   try {
+    let loopNumber = 0;
     let nextLoop = 0;
     while (true) {
+      loopNumber += 1;
+      console.log("\n\n");
+      console.log(`---------------- loop ${loopNumber} ----------------`);
+
       nextLoop = Math.min(
-        await runAttackFarms(page),
-        await runTrainTroops(page),
-        await runGoAdventure(page),
-        await runBuild(page),
-        await runRedeem(page),
-        await runManageOverflow(page),
-        await runManageDeficit(page)
+        await runTaskWithTimer("Attack Farms", () => attackFarms(page)),
+        await runTaskWithTimer("Train Troops", () => trainTroops(page)),
+        await runTaskWithTimer("Go Adventure", () => goAdventure(page)),
+        await runTaskWithTimer("Build", () => build(page)),
+        await runTaskWithTimer("Redeem", () => redeem(page)),
+        await runTaskWithTimer("Manage Overflow", () => manageOverflow(page)),
+        await runTaskWithTimer("Manage Deficit", () => manageDeficit(page))
       );
 
       console.log(`Waiting for ${formatTime(nextLoop)} before next run...`);
@@ -50,66 +55,18 @@ const initializeBrowser = async () => {
   }
 };
 
-const runAttackFarms = async (page) => {
+const runTaskWithTimer = async (taskName, task) => {
+  const startTime = Date.now();
   try {
-    return await attackFarms(page);
+    const result = await task();
+    return result;
   } catch (error) {
-    console.error("Error during attack task:", error);
+    console.error(`Error during ${taskName} task:`, error);
     return 0;
-  }
-};
-
-const runTrainTroops = async (page) => {
-  try {
-    return await trainTroops(page);
-  } catch (error) {
-    console.error("Error during train task:", error);
-    return 0;
-  }
-};
-
-const runGoAdventure = async (page) => {
-  try {
-    return await goAdventure(page);
-  } catch (error) {
-    console.error("Error during adventure task:", error);
-    return 0;
-  }
-};
-
-const runBuild = async (page) => {
-  try {
-    return await build(page);
-  } catch (error) {
-    console.error("Error during build task:", error);
-    return 0;
-  }
-};
-
-const runRedeem = async (page) => {
-  try {
-    return await redeem(page);
-  } catch (error) {
-    console.error("Error during redeemTask task:", error);
-    return 0;
-  }
-};
-
-const runManageOverflow = async (page) => {
-  try {
-    return await manageOverflow(page);
-  } catch (error) {
-    console.error("Error during manageOverflow task:", error);
-    return 0;
-  }
-};
-
-const runManageDeficit = async (page) => {
-  try {
-    return await manageDeficit(page);
-  } catch (error) {
-    console.error("Error during manageDeficit task:", error);
-    return 0;
+  } finally {
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    console.log(`${taskName} ended, took ${formatTime(duration)}`);
   }
 };
 
