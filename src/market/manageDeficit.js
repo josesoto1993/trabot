@@ -26,7 +26,9 @@ const manageDeficit = async (page) => {
   await checkVillagesDeficit(page);
   updateNextDeficitTime();
 
-  console.log("Manage Deficit finished");
+  console.log(
+    `Manage Deficit finished. Next in ${formatTime(DEFICIT_INTERVAL)}`
+  );
   return DEFICIT_INTERVAL;
 };
 
