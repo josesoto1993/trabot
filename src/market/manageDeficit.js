@@ -100,16 +100,86 @@ const handleDeficitResources = async (
 ) => {
   console.log(`Village ${village.name} needs resources ${deficitResources}`);
 
-  const donorVillage = findDonorVillage(villages, deficitResources);
+  const [donorVillage, resourcesToSend] = findDonorVillageAndRes(
+    villages,
+    deficitResources
+  );
+
   if (donorVillage) {
     console.log(
-      `Village ${village.name} needs to request ${deficitResources} from village ${donorVillage.name}`
+      `Village ${village.name} needs to request ${resourcesToSend} from village ${donorVillage.name}`
     );
-    await requestResources(page, donorVillage, village, deficitResources);
-    updateVillageResources(donorVillage, village, deficitResources);
+    await requestResources(page, donorVillage, village, resourcesToSend);
+    updateVillageResources(donorVillage, village, resourcesToSend);
   } else {
     console.log("ERROR!! CANNOT FULFILL DEFICIT", deficitResources);
   }
+};
+
+const findDonorVillageAndRes = (villages, resourcesToRequest) => {
+  const potentialDonors = [];
+
+  for (const donorVillage of villages) {
+    const donorResources = Resources.add(
+      donorVillage.resources,
+      donorVillage.ongoingResources
+    );
+
+    const possibleDonation = calculatePossibleDonationForDeficit(
+      donorResources,
+      donorVillage.capacity,
+      resourcesToRequest
+    );
+
+    if (possibleDonation.getTotal() > 0) {
+      potentialDonors.push({
+        village: donorVillage,
+        res: possibleDonation,
+      });
+    }
+  }
+
+  if (potentialDonors.length === 0) {
+    return [null, null];
+  }
+
+  potentialDonors.sort((a, b) => b.res.getTotal() - a.res.getTotal());
+
+  return [potentialDonors[0].village, potentialDonors[0].res];
+};
+
+const calculatePossibleDonationForDeficit = (
+  donorResources,
+  donorCapacity,
+  resourcesToRequest
+) => {
+  const possibleDonation = new Resources(0, 0, 0, 0);
+
+  Resources.getKeys().forEach((resourceType) => {
+    const maxDonation =
+      donorResources[resourceType] -
+      Math.min(
+        donorCapacity[resourceType] * DONOR_SAFE_LEVEL,
+        DONOR_SAFE_VALUE
+      );
+
+    possibleDonation[resourceType] = Math.min(
+      resourcesToRequest[resourceType],
+      maxDonation
+    );
+
+    if (possibleDonation[resourceType] < 0) {
+      possibleDonation[resourceType] = 0;
+    }
+  });
+
+  return possibleDonation;
+};
+
+const requestResources = async (page, fromVillage, toVillage, resources) => {
+  const resourcesToRequest = limitResourcesToMarket(fromVillage, resources);
+  const trade = new Trade(fromVillage, toVillage, resourcesToRequest);
+  await sendResources(page, trade);
 };
 
 const limitResourcesToMarket = (village, deficitResources) => {
@@ -126,55 +196,6 @@ const limitResourcesToMarket = (village, deficitResources) => {
     `Deficit ${totalDeficit} exceeds max cargo ${maxCargo}, scale to request ${realCargoToRequest}`
   );
   return realCargoToRequest;
-};
-
-const findDonorVillage = (villages, resourcesToRequest) => {
-  for (const donorVillage of villages) {
-    const donorResources = Resources.add(
-      donorVillage.resources,
-      donorVillage.ongoingResources
-    );
-    console.log("village ", donorVillage.name);
-    if (
-      canDonateResources(
-        donorResources,
-        donorVillage.capacity,
-        resourcesToRequest
-      )
-    ) {
-      return donorVillage;
-    }
-  }
-  return null;
-};
-
-const canDonateResources = (
-  donorResources,
-  donorCapacity,
-  resourcesToDonate
-) => {
-  console.log("donorResources ", donorResources);
-  console.log("donorCapacity ", donorCapacity);
-  console.log("resourcesToDonate ", resourcesToDonate);
-  return Resources.getKeys().every((resourceType) => {
-    const resourceAfterDonation =
-      donorResources[resourceType] - resourcesToDonate[resourceType];
-    const keepOnStorage = Math.min(
-      donorCapacity[resourceType] * DONOR_SAFE_LEVEL,
-      DONOR_SAFE_VALUE
-    );
-
-    return (
-      resourceAfterDonation >= keepOnStorage ||
-      resourcesToDonate[resourceType] === 0
-    );
-  });
-};
-
-const requestResources = async (page, fromVillage, toVillage, resources) => {
-  const resourcesToRequest = limitResourcesToMarket(fromVillage, resources);
-  const trade = new Trade(fromVillage, toVillage, resourcesToRequest);
-  await sendResources(page, trade);
 };
 
 const updateVillageResources = (fromVillage, toVillage, resources) => {

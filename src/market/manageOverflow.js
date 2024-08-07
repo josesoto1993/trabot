@@ -94,9 +94,13 @@ const handleOverflowResources = async (
   console.log(
     `Village ${village.name} needs to send overflow resources ${excessResources}.`
   );
-  const resourcesToSend = limitResourcesToMarket(village, excessResources);
+  const limitedResources = limitResourcesToMarket(village, excessResources);
 
-  const targetVillage = findReceivingVillage(villages, resourcesToSend);
+  const [targetVillage, resourcesToSend] = findReceivingVillageAndRes(
+    villages,
+    limitedResources
+  );
+
   if (targetVillage) {
     console.log(
       `Village ${village.name} will send ${resourcesToSend} to village ${targetVillage.name}.`
@@ -124,40 +128,59 @@ const limitResourcesToMarket = (village, excessResources) => {
   return realCargoToSend;
 };
 
-const findReceivingVillage = (villages, resourcesToSend) => {
+const findReceivingVillageAndRes = (villages, resourcesToSend) => {
+  const potentialRecipients = [];
+
   for (const receivingVillage of villages) {
     const receivingVillageRes = Resources.add(
       receivingVillage.resources,
       receivingVillage.ongoingResources
     );
-    if (
-      canReceiveResources(
-        receivingVillageRes,
-        receivingVillage.capacity,
-        resourcesToSend
-      )
-    ) {
-      return receivingVillage;
+
+    const possibleDonation = calculatePossibleDonation(
+      receivingVillageRes,
+      receivingVillage.capacity,
+      resourcesToSend
+    );
+
+    if (possibleDonation.getTotal() > 0) {
+      potentialRecipients.push({
+        village: receivingVillage,
+        res: possibleDonation,
+      });
     }
   }
-  return null;
+
+  if (potentialRecipients.length === 0) {
+    return [null, null];
+  }
+
+  potentialRecipients.sort((a, b) => b.res.getTotal() - a.res.getTotal());
+
+  return [potentialRecipients[0].village, potentialRecipients[0].res];
 };
 
-const canReceiveResources = (
-  receoverResources,
-  receoverCapacity,
+const calculatePossibleDonation = (
+  receiverResources,
+  receiverCapacity,
   resourcesToReceive
 ) => {
-  return Resources.getKeys().every((resourceType) => {
-    const resourceAfterReceive =
-      receoverResources[resourceType] + resourcesToReceive[resourceType];
-    const maxOnStorage = receoverCapacity[resourceType] * RECEIVER_THRESHOLD;
+  const possibleDonation = new Resources(0, 0, 0, 0);
 
-    return (
-      resourceAfterReceive <= maxOnStorage ||
-      resourcesToReceive[resourceType] === 0
+  Resources.getKeys().forEach((resourceType) => {
+    const maxOnStorage = receiverCapacity[resourceType] * RECEIVER_THRESHOLD;
+
+    possibleDonation[resourceType] = Math.min(
+      resourcesToReceive[resourceType],
+      maxOnStorage - receiverResources[resourceType]
     );
+
+    if (possibleDonation[resourceType] < 0) {
+      possibleDonation[resourceType] = 0;
+    }
   });
+
+  return possibleDonation;
 };
 
 const sendExcessResources = async (page, fromVillage, toVillage, resources) => {
