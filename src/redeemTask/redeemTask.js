@@ -16,14 +16,14 @@ const REDEEM_BUTTONS_SELECTOR = ".taskOverview .achieved .progress .collect";
 const redeem = async (page) => {
   const remainingTime = getRemainingTime();
   if (remainingTime > 0) {
-    return remainingTime;
+    return { nextExecutionTime: remainingTime, skip: true };
   }
   console.log("Enough time has passed since the redeem, try redeem new tasks");
 
   await redeemTask(page);
 
   updateNextBuildTime();
-  return getRemainingTime();
+  return { nextExecutionTime: getRemainingTime(), skip: false };
 };
 
 const getRemainingTime = () => {
