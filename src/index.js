@@ -11,25 +11,32 @@ const redeem = require("./redeemTask/redeemTask");
 const manageOverflow = require("./market/manageOverflow");
 const manageDeficit = require("./market/manageDeficit");
 
-const mainLoop = async () => {
-  let nextLoop = 0;
-
+const main = async () => {
   let page = await initializeBrowser();
   await login(page);
 
-  while (true) {
-    nextLoop = Math.min(
-      await runAttackFarms(page),
-      await runTrainTroops(page),
-      await runGoAdventure(page),
-      await runBuild(page),
-      await runRedeem(page),
-      await runManageOverflow(page),
-      await runManageDeficit(page)
-    );
+  await mainLoop(page);
+};
 
-    console.log(`Waiting for ${formatTime(nextLoop)} before next run...`);
-    await new Promise((resolve) => setTimeout(resolve, nextLoop * 1000));
+const mainLoop = async (page) => {
+  try {
+    let nextLoop = 0;
+    while (true) {
+      nextLoop = Math.min(
+        await runAttackFarms(page),
+        await runTrainTroops(page),
+        await runGoAdventure(page),
+        await runBuild(page),
+        await runRedeem(page),
+        await runManageOverflow(page),
+        await runManageDeficit(page)
+      );
+
+      console.log(`Waiting for ${formatTime(nextLoop)} before next run...`);
+      await new Promise((resolve) => setTimeout(resolve, nextLoop * 1000));
+    }
+  } catch (error) {
+    console.error("Error in main loop:", error);
   }
 };
 
@@ -98,4 +105,4 @@ const runManageDeficit = async (page) => {
   }
 };
 
-mainLoop();
+main();
