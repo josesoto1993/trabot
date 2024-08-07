@@ -25,7 +25,7 @@ const goPage = async (url) => {
   if (!page) {
     throw new Error("Browser is not open");
   }
-  await page.goto(urlString, { waitUntil: "networkidle0" });
+  await page.goto(urlString);
 };
 
 const typeInSelector = async (selector, text) => {

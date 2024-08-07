@@ -2,6 +2,7 @@ const getVillagesDetailedInfo = require("../village/listVillageDetailed");
 const sendResources = require("./sendResources");
 const Resources = require("../models/resources");
 const Trade = require("../models/trade");
+const { formatTime } = require("../utils/timePrint");
 
 const MERCHANTS_CAPACITY = process.env.MERCHANTS_CAPACITY;
 const DEFICIT_THRESHOLD = 0.4;
@@ -114,7 +115,7 @@ const handleDeficitResources = async (
     await requestResources(page, donorVillage, village, resourcesToSend);
     updateVillageResources(donorVillage, village, resourcesToSend);
   } else {
-    console.log("ERROR!! CANNOT FULFILL DEFICIT", deficitResources);
+    console.log(`No one can send resources to ${village.name}`);
   }
 };
 

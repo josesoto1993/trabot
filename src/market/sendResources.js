@@ -16,6 +16,7 @@ const sendResources = async (page, trade) => {
     `Start send resources from ${trade.from.name} to ${trade.to.name}`
   );
   try {
+    await goMarket(page, trade.from);
     await verifyCargo(page, trade.from, trade.ammount);
     await setDestination(page, trade.to);
     await setResources(page, trade.ammount);
@@ -32,7 +33,7 @@ const sendResources = async (page, trade) => {
 };
 
 const verifyCargo = async (page, from, cargo) => {
-  const maxCargo = getMaxCargo(page, from);
+  const maxCargo = await getMaxCargo(page, from);
   const totalCargo = cargo.getTotal();
   if (totalCargo > maxCargo) {
     throw new Error(
@@ -42,7 +43,6 @@ const verifyCargo = async (page, from, cargo) => {
 };
 
 const getMaxCargo = async (page, from) => {
-  await goMarket(page, from);
   const capacitySelector = "div.capacity span.value";
   await page.waitForSelector(capacitySelector);
   const capacityPerCart = await page.$eval(capacitySelector, (span) => {
