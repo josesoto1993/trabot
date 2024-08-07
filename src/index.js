@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { formatTime } = require("./utils/timePrint");
+const { formatTime, formatTimeMillis } = require("./utils/timePrint");
 const { open } = require("./browser/browserService");
 const { login } = require("./browser/loginService");
 const { attackFarms } = require("./attackFarms/attackFarms");
@@ -10,6 +10,8 @@ const build = require("./construct/build");
 const redeem = require("./redeemTask/redeemTask");
 const manageOverflow = require("./market/manageOverflow");
 const manageDeficit = require("./market/manageDeficit");
+
+const taskStats = {};
 
 const main = async () => {
   let page = await initializeBrowser();
@@ -56,6 +58,10 @@ const initializeBrowser = async () => {
 };
 
 const runTaskWithTimer = async (taskName, task) => {
+  if (!taskStats[taskName]) {
+    taskStats[taskName] = { totalDuration: 0, count: 0 };
+  }
+
   const startTime = Date.now();
   try {
     const result = await task();
@@ -66,7 +72,16 @@ const runTaskWithTimer = async (taskName, task) => {
   } finally {
     const endTime = Date.now();
     const duration = endTime - startTime;
-    console.log(`${taskName} ended, took ${formatTime(duration)}`);
+
+    taskStats[taskName].totalDuration += duration;
+    taskStats[taskName].count += 1;
+    const averageDuration =
+      taskStats[taskName].totalDuration / taskStats[taskName].count;
+
+    console.log(`${taskName} ended, took ${formatTimeMillis(duration)}`);
+    console.log(
+      `Average duration of ${taskName}: ${formatTimeMillis(averageDuration)}`
+    );
   }
 };
 
