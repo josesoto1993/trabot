@@ -1,5 +1,3 @@
-const { URL } = require("url");
-
 const { goMarket } = require("../village/goVillage");
 const { formatTime } = require("../utils/timePrint");
 const { typeInSelector } = require("../browser/browserService");

@@ -1,21 +1,32 @@
 const { goPage } = require("../browser/browserService");
-const { TRAVIAN_RESOURCES_VIEW } = require("../constants/links");
+const {
+  TRAVIAN_RESOURCES_VIEW,
+  TRAVIAN_BUILDING_VIEW,
+} = require("../constants/links");
 const { TRAVIAN_BASE } = require("../constants/links");
 
 const MarketTabs = require("../constants/marketTabs");
 const MARKET_SELECTOR = "div.buttonsWrapper a.market";
 
-const goVillage = async (village) => {
+const goVillageResView = async (village) => {
   const villageUrl = new URL(TRAVIAN_RESOURCES_VIEW);
   villageUrl.searchParams.append("newdid", village.id);
 
   await goPage(villageUrl);
-  console.log(`Navigated to village: ${village.name}`);
+  console.log(`Navigated to village resources view: ${village.name}`);
+};
+
+const goVillageBuildingView = async (village) => {
+  const villageUrl = new URL(TRAVIAN_BUILDING_VIEW);
+  villageUrl.searchParams.append("newdid", village.id);
+
+  await goPage(villageUrl);
+  console.log(`Navigated to village building view: ${village.name}`);
 };
 
 const goMarket = async (page, village) => {
   console.log("go market");
-  await goVillage(village);
+  await goVillageResView(village);
 
   await page.waitForSelector(MARKET_SELECTOR);
   const marketAnchor = await page.$(MARKET_SELECTOR);
@@ -39,4 +50,4 @@ const goMarket = async (page, village) => {
   await goPage(marketUrl);
 };
 
-module.exports = { goVillage, goMarket };
+module.exports = { goVillageResView, goVillageBuildingView, goMarket };

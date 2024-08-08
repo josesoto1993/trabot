@@ -1,11 +1,11 @@
 const FieldType = require("../constants/fieldType");
 const ConstructionStatus = require("../constants/constructionStatus");
-const { goVillage } = require("./goVillage");
+const { goVillageResView } = require("./goVillage");
 
 const ResourceField = require("../models/resourceField");
 
 const getResourceFieldsData = async (page, village) => {
-  await goVillage(village);
+  await goVillageResView(village);
   await page.waitForSelector("#resourceFieldContainer");
 
   const resourceFields = await getResourceFieldsRawData(page);
