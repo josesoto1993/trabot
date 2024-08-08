@@ -13,13 +13,17 @@ const getBuildingData = async (page, village) => {
 
 const getBuildingRawData = async (page) => {
   return await page.$$eval("#villageContent .buildingSlot", (nodes) => {
-    return nodes.map((node) => ({
-      aid: node.getAttribute("data-aid"),
-      gid: node.getAttribute("data-gid"),
-      name: node.getAttribute("data-name"),
-      anchorClasses: Array.from(node.querySelector("a.level").classList),
-      level: node.querySelector("a.level").getAttribute("data-level"),
-    }));
+    return nodes.map((node) => {
+      const anchor = node.querySelector("a.level, a.emptyBuildingSlot");
+
+      return {
+        aid: node.getAttribute("data-aid"),
+        gid: node.getAttribute("data-gid"),
+        name: node.getAttribute("data-name"),
+        level: anchor ? anchor.getAttribute("data-level") : 0,
+        anchorClasses: anchor ? Array.from(anchor.classList) : [],
+      };
+    });
   });
 };
 
