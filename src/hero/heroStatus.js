@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const HeroStatus = require("../constants/heroStatus");
+const HeroIconStatus = require("../constants/heroIconStatus");
 
 const getClassOfHeroIcon = async (page) => {
   const heroStatusSelector = ".heroStatus a i";
@@ -19,13 +19,13 @@ const getClassOfHeroIcon = async (page) => {
 };
 
 const parseClassOfHeroIcon = (classToFind) => {
-  const heroStatus = Object.keys(HeroStatus).find(
-    (key) => HeroStatus[key] === classToFind
+  const heroStatus = Object.keys(HeroIconStatus).find(
+    (key) => HeroIconStatus[key] === classToFind
   );
 
   if (heroStatus) {
     console.log("Hero status found:", heroStatus);
-    return HeroStatus[heroStatus];
+    return HeroIconStatus[heroStatus];
   } else {
     console.log("No matching hero status found for class:", classToFind);
     return addNewClassOfHeroIcon(classToFind);
@@ -33,12 +33,15 @@ const parseClassOfHeroIcon = (classToFind) => {
 };
 
 const addNewClassOfHeroIcon = (newStatusValue) => {
-  const newStatusKey = `Status${Object.keys(HeroStatus).length + 1}`;
-  HeroStatus[newStatusKey] = newStatusValue;
+  const newStatusKey = `Status${Object.keys(HeroIconStatus).length + 1}`;
+  HeroIconStatus[newStatusKey] = newStatusValue;
 
-  const heroStatusPath = path.resolve(__dirname, "../constants/heroStatus.js");
+  const heroStatusPath = path.resolve(
+    __dirname,
+    "../constants/heroIconStatus.js"
+  );
 
-  const updatedContent = `const HeroStatus = ${JSON.stringify(HeroStatus, null, 2)};
+  const updatedContent = `const HeroStatus = ${JSON.stringify(HeroIconStatus, null, 2)};
   
   module.exports = HeroStatus ;`;
 

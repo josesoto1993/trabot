@@ -108,7 +108,7 @@ const handleOverflowResources = async (
     await sendExcessResources(page, village, targetVillage, resourcesToSend);
     updateVillageResources(village, targetVillage, resourcesToSend);
   } else {
-    console.log("ERROR!! Cannot handle excess resources:", resourcesToSend);
+    console.log("ERROR!! Cannot handle excess resources:", limitedResources);
   }
 };
 
