@@ -14,7 +14,7 @@ const getBuildingData = async (page, village) => {
 const getBuildingRawData = async (page) => {
   return await page.$$eval("#villageContent .buildingSlot", (nodes) => {
     return nodes.map((node) => {
-      const anchor = node.querySelector("a.level, a.emptyBuildingSlot");
+      const anchor = node.querySelector("a.level");
 
       return {
         aid: node.getAttribute("data-aid"),
