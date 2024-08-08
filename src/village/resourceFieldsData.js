@@ -1,6 +1,6 @@
 const FieldType = require("../constants/fieldType");
 const ConstructionStatus = require("../constants/constructionStatus");
-const goVillage = require("../village/goVillage");
+const { goVillage } = require("./goVillage");
 
 const ResourceField = require("../models/resourceField");
 
@@ -8,16 +8,21 @@ const getResourceFieldsData = async (page, village) => {
   await goVillage(village);
   await page.waitForSelector("#resourceFieldContainer");
 
-  const resourceFields = await page.$$eval(
-    `#resourceFieldContainer a`,
-    (nodes) => {
-      return nodes
-        .filter((node) => !node.classList.contains("villageCenter"))
-        .map((node) => Array.from(node.classList));
-    }
-  );
+  const resourceFields = await getResourceFieldsRawData(page);
 
-  return resourceFields.map((classes) => {
+  return resourceFieldsRawToObject(resourceFields);
+};
+
+const getResourceFieldsRawData = async (page) => {
+  return await page.$$eval(`#resourceFieldContainer a`, (nodes) => {
+    return nodes
+      .filter((node) => !node.classList.contains("villageCenter"))
+      .map((node) => Array.from(node.classList));
+  });
+};
+
+const resourceFieldsRawToObject = (raw) => {
+  return raw.map((classes) => {
     const fieldId = getFieldId(classes);
     const fieldLvl = getFieldLevel(classes);
     const constructionStatus = getConstructionStatus(classes);
