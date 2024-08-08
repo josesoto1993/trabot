@@ -1,6 +1,9 @@
+const fs = require("fs");
+const path = require("path");
 const ConstructionStatus = require("../constants/constructionStatus");
 const { goVillageBuildingView } = require("./goVillage");
 const Building = require("../models/building");
+const BuildingTypes = require("../constants/buildingTypes");
 
 const getBuildingData = async (page, village) => {
   await goVillageBuildingView(village);
@@ -28,15 +31,30 @@ const getBuildingRawData = async (page) => {
 };
 
 const buildingsRawToObject = (raw) => {
-  return raw.map((data) => {
-    const citySlotId = parseInt(data.aid, 10);
+  const buildings = raw.map((data) => {
+    const slotId = parseInt(data.aid, 10);
     const id = parseInt(data.gid, 10);
     const name = data.name;
     const level = parseInt(data.level, 10);
     const constructionStatus = getConstructionStatus(data.anchorClasses);
 
-    return new Building(id, citySlotId, name, level, constructionStatus);
+    return new Building(id, slotId, name, level, constructionStatus);
   });
+
+  buildings
+    .filter(
+      (building) =>
+        !BuildingTypes.some(
+          (buildingType) =>
+            building.id === buildingType.id ||
+            building.name === buildingType.name
+        )
+    )
+    .forEach((building) => {
+      addNewBuildingType(building.id, building.name);
+    });
+
+  return buildings;
 };
 
 const getConstructionStatus = (classes) => {
@@ -48,6 +66,25 @@ const getConstructionStatus = (classes) => {
     return ConstructionStatus.readyToUpgrade;
   }
   return ConstructionStatus.notEnoughStorage;
+};
+
+const addNewBuildingType = (id, name) => {
+  BuildingTypes.push({ id, name, category: "TBD" });
+
+  BuildingTypes.sort((a, b) => a.name.localeCompare(b.name));
+
+  const buildingTypesPath = path.resolve(
+    __dirname,
+    "../constants/buildingTypes.js"
+  );
+
+  const updatedContent = `const BuildingTypes = ${JSON.stringify(BuildingTypes, null, 2)};
+    
+    module.exports = BuildingTypes;`;
+
+  fs.writeFileSync(buildingTypesPath, updatedContent, "utf8");
+
+  console.log(`Added new building type: ${name} with id: ${id}`);
 };
 
 module.exports = getBuildingData;

@@ -9,8 +9,8 @@ const updateVillages = async (page) => {
   const villages = await getVillagesOverviewInfo(page);
 
   for (const village of villages) {
-    village.resourceFields = await getBuildingData(page, village);
-    village.buildings = await getResourceFieldsData(page, village);
+    village.resourceFields = await getResourceFieldsData(page, village);
+    village.buildings = await getBuildingData(page, village);
   }
 
   player.villages = villages;

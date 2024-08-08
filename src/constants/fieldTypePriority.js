@@ -1,4 +1,4 @@
-const FieldType = require("../constants/fieldType");
+const FieldType = require("./fieldType");
 
 const FieldTypePriority = {
   [FieldType.clay]: 1,

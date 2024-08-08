@@ -2,18 +2,18 @@ const { URL } = require("url");
 const { goPage } = require("../browser/browserService");
 const { TRAVIAN_BUILD_VIEW } = require("../constants/links");
 
-const upgradeBuilding = async (page, villageId, buildingId) => {
-  await selectBuilding(villageId, buildingId);
+const upgradeBuilding = async (page, villageId, slotId) => {
+  await selectBuilding(villageId, slotId);
   return await upgradeSelectedBuilding(page);
 };
 
-const selectBuilding = async (village, buildingId) => {
+const selectBuilding = async (village, slotId) => {
   const villageUrl = new URL(TRAVIAN_BUILD_VIEW);
   villageUrl.searchParams.append("newdid", village.id);
-  villageUrl.searchParams.append("id", buildingId);
+  villageUrl.searchParams.append("id", slotId);
   await goPage(villageUrl);
 
-  console.log(`Clicked on city ${village.name} building ${buildingId}`);
+  console.log(`Clicked on city ${village.name} building ${slotId}`);
 };
 
 const upgradeSelectedBuilding = async (page) => {
