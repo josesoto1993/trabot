@@ -7,7 +7,7 @@ class ResourceField {
   }
 
   toString() {
-    return `Village(id: ${this.id}, level: ${this.level}, constructionStatus: ${this.constructionStatus}, fieldType: ${this.fieldType})`;
+    return `Field(id: ${this.id}, level: ${this.level}, constructionStatus: ${this.constructionStatus}, fieldType: ${this.fieldType})`;
   }
 }
 

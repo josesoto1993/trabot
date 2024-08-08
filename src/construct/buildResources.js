@@ -1,4 +1,4 @@
-const getVillagesInfo = require("../village/listVillageSimple");
+const getVillagesInfo = require("../village/listVillagesSimple");
 const getResourceFieldsData = require("./resourceFieldsData");
 const upgradeBuilding = require("./upgradeBuilding");
 

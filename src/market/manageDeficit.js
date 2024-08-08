@@ -1,4 +1,4 @@
-const getVillagesDetailedInfo = require("../village/listVillageDetailed");
+const getVillagesOverviewInfo = require("../village/listVillagesOverview");
 const sendResources = require("./sendResources");
 const Resources = require("../models/resources");
 const Trade = require("../models/trade");
@@ -45,7 +45,7 @@ const updateNextDeficitTime = () => {
 
 const checkVillagesDeficit = async (page) => {
   try {
-    const villages = await getVillagesDetailedInfo(page);
+    const villages = await getVillagesOverviewInfo(page);
 
     for (const village of villages) {
       await checkVillageDeficit(page, village, villages);

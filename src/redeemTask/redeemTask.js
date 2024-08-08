@@ -1,5 +1,5 @@
 const { URL } = require("url");
-const getVillagesInfo = require("../village/listVillageSimple");
+const getVillagesInfo = require("../village/listVillagesSimple");
 const { goPage } = require("../browser/browserService");
 const { formatTime } = require("../utils/timePrint");
 const { TRAVIAN_TASK_VIEW } = require("../constants/links");

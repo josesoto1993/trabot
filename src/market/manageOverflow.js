@@ -1,4 +1,4 @@
-const getVillagesDetailedInfo = require("../village/listVillageDetailed");
+const getVillagesOverviewInfo = require("../village/listVillagesOverview");
 const sendResources = require("./sendResources");
 const { formatTime } = require("../utils/timePrint");
 const Resources = require("../models/resources");
@@ -43,7 +43,7 @@ const updateNextOverflowTime = () => {
 
 const checkVillagesOverflow = async (page) => {
   try {
-    const villages = await getVillagesDetailedInfo(page);
+    const villages = await getVillagesOverviewInfo(page);
 
     for (const village of villages) {
       await checkVillageOverflow(page, village, villages);
