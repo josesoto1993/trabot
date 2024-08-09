@@ -12,7 +12,8 @@ class Village {
     availableMerchants,
     maxMerchants,
     resourceFields,
-    buildings
+    buildings,
+    buildFinishAt
   ) {
     this.id = id;
     this.name = name;
@@ -27,6 +28,7 @@ class Village {
     this.maxMerchants = maxMerchants;
     this.resourceFields = resourceFields;
     this.buildings = buildings;
+    this.buildFinishAt = buildFinishAt;
   }
 
   toString() {

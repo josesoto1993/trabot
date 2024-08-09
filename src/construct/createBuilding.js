@@ -1,7 +1,10 @@
 const { URL } = require("url");
 const { goPage } = require("../browser/browserService");
 const { TRAVIAN_BUILD_VIEW } = require("../constants/links");
-const { updatePlayerBuilding } = require("../player/playerHandler");
+const {
+  updatePlayerBuilding,
+  updatePlayerVillageBuildFinishAt,
+} = require("../player/playerHandler");
 const BuildingType = require("../constants/buildingTypes");
 
 const createBuilding = async (page, villageId, slotId, buildingName) => {
@@ -17,7 +20,8 @@ const createBuilding = async (page, villageId, slotId, buildingName) => {
     throw new Error(result.error);
   }
 
-  await updatePlayerBuilding(villageId, slotId, buildingType, 1);
+  updatePlayerBuilding(villageId, slotId, buildingType, 1);
+  await updatePlayerVillageBuildFinishAt(villageId, result.time);
   return result.time;
 };
 

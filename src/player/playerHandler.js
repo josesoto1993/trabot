@@ -4,6 +4,7 @@ const getVillagesOverviewInfo = require("../village/listVillagesOverview");
 const getBuildingData = require("../village/buildingsData");
 const getResourceFieldsData = require("../village/resourceFieldsData");
 const ConstructionStatus = require("../constants/constructionStatus");
+const { formatTimeMillis } = require("../utils/timePrint");
 
 let player = new Player([]);
 
@@ -52,8 +53,36 @@ const updatePlayerBuilding = (villageId, slotId, buildingType, level) => {
   );
 };
 
+const updatePlayerVillageBuildFinishAt = async (
+  page,
+  villageId,
+  durationInSeconds
+) => {
+  let village = player.villages.find((village) => village.id === villageId);
+
+  if (!village) {
+    console.log(`Village with ID ${villageId} not found. Updating villages...`);
+    await updateVillages(page);
+    village = player.villages.find((village) => village.id === villageId);
+
+    if (!village) {
+      throw new Error(
+        `Village with ID ${villageId} still not found after update.`
+      );
+    }
+  }
+
+  const actualFinishAt = Math.min(Date.now(), village.buildFinishAt);
+  village.buildFinishAt = actualFinishAt + durationInSeconds * 1000;
+
+  console.log(
+    `Village ${village.name} busy with building for the next ${formatTimeMillis(village.buildFinishAt - Date.now())}`
+  );
+};
+
 module.exports = {
   updateVillages,
   getPlayer,
   updatePlayerBuilding,
+  updatePlayerVillageBuildFinishAt,
 };

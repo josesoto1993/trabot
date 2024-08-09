@@ -1,10 +1,13 @@
 const { URL } = require("url");
 const { goPage } = require("../browser/browserService");
 const { TRAVIAN_BUILD_VIEW } = require("../constants/links");
+const { updatePlayerVillageBuildFinishAt } = require("../player/playerHandler");
 
 const upgradeExistingBuilding = async (page, villageId, slotId) => {
   await selectBuilding(villageId, slotId);
-  return await upgradeSelectedBuilding(page);
+  const duration = await upgradeSelectedBuilding(page);
+  await updatePlayerVillageBuildFinishAt(villageId, duration);
+  return duration;
 };
 
 const selectBuilding = async (villageId, slotId) => {
