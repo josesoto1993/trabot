@@ -31,11 +31,24 @@ const upgradeSelectedBuilding = async (page) => {
 };
 
 const getBuildButton = async (page) => {
-  const buildButtonSelector =
-    "#build .upgradeBuilding .upgradeButtonsContainer .section1 .build";
+  const buildSelector =
+    "#build .upgradeBuilding .upgradeButtonsContainer .section1";
+  const buildButtonSelector = buildSelector + " .build";
 
-  await page.waitForSelector(buildButtonSelector);
-  return await page.$(buildButtonSelector);
+  await page.waitForSelector(buildSelector);
+
+  const buildButton = await page.$(buildButtonSelector);
+  if (buildButton) {
+    const buttonText = await page.evaluate(
+      (button) => button.innerText,
+      buildButton
+    );
+    if (buttonText.includes("Upgrade to level")) {
+      return buildButton;
+    }
+  }
+
+  return null;
 };
 
 const getDurationValue = async (page) => {
