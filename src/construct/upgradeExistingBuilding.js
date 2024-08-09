@@ -2,7 +2,7 @@ const { URL } = require("url");
 const { goPage } = require("../browser/browserService");
 const { TRAVIAN_BUILD_VIEW } = require("../constants/links");
 
-const upgradeBuilding = async (page, villageId, slotId) => {
+const upgradeExistingBuilding = async (page, villageId, slotId) => {
   await selectBuilding(villageId, slotId);
   return await upgradeSelectedBuilding(page);
 };
@@ -51,4 +51,4 @@ const getDurationValue = async (page) => {
   return durationValue;
 };
 
-module.exports = upgradeBuilding;
+module.exports = upgradeExistingBuilding;

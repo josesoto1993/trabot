@@ -1,6 +1,6 @@
 const getVillagesInfo = require("../village/listVillagesSimple");
 const getResourceFieldsData = require("../village/resourceFieldsData");
-const upgradeBuilding = require("./upgradeBuilding");
+const upgradeExistingBuilding = require("./upgradeExistingBuilding");
 
 const ConstructionStatus = require("../constants/constructionStatus");
 const FieldTypePriority = require("../constants/fieldTypePriority");
@@ -23,7 +23,7 @@ const upgradeResources = async (page) => {
         continue;
       }
 
-      const upgradeTime = await upgradeBuilding(
+      const upgradeTime = await upgradeExistingBuilding(
         page,
         village,
         resourceToUpgrade.id
