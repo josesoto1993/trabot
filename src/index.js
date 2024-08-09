@@ -10,7 +10,7 @@ const build = require("./construct/build");
 const redeem = require("./redeemTask/redeemTask");
 const manageOverflow = require("./market/manageOverflow");
 const manageDeficit = require("./market/manageDeficit");
-const playerHandler = require("./player/playerHandler");
+const { updateVillages, getPlayer } = require("./player/playerHandler");
 
 const taskStats = {};
 
@@ -23,9 +23,9 @@ const main = async () => {
 };
 
 const initPlayer = async (page) => {
-  await playerHandler.updateVillages(page);
-  console.log(`Player loaded: ${playerHandler.getPlayer()}. Extended object:`);
-  console.log(`${JSON.stringify(playerHandler.getPlayer(), null, 2)}`);
+  await updateVillages(page);
+  console.log(`Player loaded: ${getPlayer()}. Extended object:`);
+  console.log(`${JSON.stringify(getPlayer(), null, 2)}`);
 };
 
 const mainLoop = async (page) => {

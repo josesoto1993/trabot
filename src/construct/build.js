@@ -1,36 +1,58 @@
+const {
+  getVillages,
+  getNextBuildFinishAt,
+} = require("../player/playerHandler");
+const createOrUpdateMainBuilding = require("./createOrUpdateMainBuilding");
 const upgradeResources = require("./upgradeResources");
-const { formatTime } = require("../utils/timePrint");
-const upgradeMainBuildings = require("./upgradeMainBuildings");
 
-let lastBuildTime = 0;
-let buildDuration = 0;
+const DEFAULT_INTERVAL = 15 * 60;
 
 const build = async (page) => {
-  const remainingTime = getRemainingTime();
-  if (remainingTime > 0) {
-    return { nextExecutionTime: remainingTime, skip: true };
+  const skipBuild = shouldSkipBuild();
+  if (skipBuild) {
+    return skipBuild;
   }
 
   console.log("Time to build, starting the build process...");
 
-  const mbDuration = await upgradeMainBuildings(page);
-  const resDuration = await upgradeResources(page);
+  await processVillagesBuild(page);
 
-  buildDuration = Math.min(mbDuration, resDuration);
-
-  updateNextBuildTime(buildDuration);
-  return { nextExecutionTime: getRemainingTime(buildDuration), skip: false };
+  return {
+    nextExecutionTime: getNextBuildFinishAt(),
+    skip: false,
+  };
 };
 
-const getRemainingTime = (buildDuration) => {
-  const currentTime = Date.now();
-  const timePassed = (currentTime - lastBuildTime) / 1000;
-  return buildDuration - timePassed;
+const shouldSkipBuild = () => {
+  const remainingTime = getNextBuildFinishAt();
+  return remainingTime > 0
+    ? { nextExecutionTime: remainingTime, skip: true }
+    : null;
 };
 
-const updateNextBuildTime = (buildDuration) => {
-  console.log(`Next build in ${formatTime(buildDuration)}`);
-  lastBuildTime = Date.now();
+const processVillagesBuild = async (page) => {
+  const villages = getVillages();
+  let minBuildDuration = Infinity;
+
+  for (const village of villages) {
+    const villageBuildDuration = await processVillageBuild(page, village);
+    if (villageBuildDuration !== null) {
+      minBuildDuration = Math.min(minBuildDuration, villageBuildDuration);
+    }
+  }
+
+  return minBuildDuration === Infinity ? DEFAULT_INTERVAL : minBuildDuration;
+};
+
+const processVillageBuild = async (page, village) => {
+  if (village.actualFinishAt >= Date.now()) {
+    return null;
+  }
+
+  const mbDuration = await createOrUpdateMainBuilding(page, village);
+  const resDuration = await upgradeResources(page, village);
+
+  return Math.min(mbDuration, resDuration);
 };
 
 module.exports = build;

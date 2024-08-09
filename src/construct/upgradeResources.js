@@ -1,4 +1,3 @@
-const getVillagesInfo = require("../village/listVillagesSimple");
 const getResourceFieldsData = require("../village/resourceFieldsData");
 const upgradeExistingBuilding = require("./upgradeExistingBuilding");
 
@@ -6,46 +5,16 @@ const ConstructionStatus = require("../constants/constructionStatus");
 const FieldTypePriority = require("../constants/fieldTypePriority");
 const CAPITAL_FIELDS_ENABLE = process.env.CAPITAL_FIELDS_ENABLE === "true";
 
-let upgradeResourceCount = 0;
 const BUILD_RESOURCES_INTERVAL = 15 * 60;
 
-const upgradeResources = async (page) => {
-  try {
-    const villages = await getVillagesInfo(page);
+const upgradeResources = async (page, village) => {
+  const resourceToUpgrade = await getResourceToUpgrade(page, village);
 
-    let upgradedThisRun = 0;
-    let minUpgradeTime = BUILD_RESOURCES_INTERVAL;
-
-    for (const village of villages) {
-      const resourceToUpgrade = await getResourceToUpgrade(page, village);
-
-      if (!resourceToUpgrade) {
-        continue;
-      }
-
-      const upgradeTime = await upgradeExistingBuilding(
-        page,
-        village.id,
-        resourceToUpgrade.id
-      );
-
-      minUpgradeTime = Math.min(minUpgradeTime, upgradeTime);
-      upgradedThisRun += 1;
-      upgradeResourceCount += 1;
-    }
-
-    if (upgradedThisRun > 0) {
-      console.log(`Upgrades done this time: ${upgradedThisRun}`);
-      console.log(`Total upgrades done: ${upgradeResourceCount}`);
-    } else {
-      console.log("Nothing to update");
-    }
-
-    return minUpgradeTime;
-  } catch (error) {
-    console.error("Error in upgradeResources:", error);
+  if (!resourceToUpgrade) {
     return BUILD_RESOURCES_INTERVAL;
   }
+
+  return await upgradeExistingBuilding(page, village.id, resourceToUpgrade.id);
 };
 
 const getResourceToUpgrade = async (page, village) => {

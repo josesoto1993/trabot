@@ -25,6 +25,10 @@ const getPlayer = () => {
   return player;
 };
 
+const getVillages = () => {
+  return player.villages;
+};
+
 const updatePlayerBuilding = (villageId, slotId, buildingType, level) => {
   const village = player.villages.find((village) => village.id === villageId);
   if (!village) {
@@ -80,9 +84,21 @@ const updatePlayerVillageBuildFinishAt = async (
   );
 };
 
+const getNextBuildFinishAt = () => {
+  const currentTime = Date.now();
+
+  const minBuildFinishAt = Math.min(
+    ...player.villages.map((village) => village.buildFinishAt)
+  );
+
+  return (minBuildFinishAt - currentTime) / 1000;
+};
+
 module.exports = {
   updateVillages,
   getPlayer,
+  getVillages,
   updatePlayerBuilding,
   updatePlayerVillageBuildFinishAt,
+  getNextBuildFinishAt,
 };

@@ -6,7 +6,7 @@ const { updatePlayerVillageBuildFinishAt } = require("../player/playerHandler");
 const upgradeExistingBuilding = async (page, villageId, slotId) => {
   await selectBuilding(villageId, slotId);
   const duration = await upgradeSelectedBuilding(page);
-  await updatePlayerVillageBuildFinishAt(villageId, duration);
+  await updatePlayerVillageBuildFinishAt(page, villageId, duration);
   return duration;
 };
 

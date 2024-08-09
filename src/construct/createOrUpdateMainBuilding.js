@@ -1,5 +1,5 @@
 const upgradeExistingBuilding = require("./upgradeExistingBuilding");
-const playerHandler = require("../player/playerHandler");
+const { updatePlayerBuilding } = require("../player/playerHandler");
 
 const BuildingTypes = require("../constants/buildingTypes");
 const createBuilding = require("./createBuilding");
@@ -7,20 +7,6 @@ const createBuilding = require("./createBuilding");
 const mainBuildingType = BuildingTypes["Main Building"];
 
 const BUILD_MB_INTERVAL = 15 * 60;
-
-const upgradeMainBuildings = async (page) => {
-  const villages = playerHandler.getPlayer().villages;
-
-  let minTime = BUILD_MB_INTERVAL;
-
-  for (const village of villages) {
-    const time = await createOrUpdateMainBuilding(page, village);
-
-    minTime = Math.min(minTime, time);
-  }
-
-  return minTime;
-};
 
 const createOrUpdateMainBuilding = async (page, village) => {
   const mainBuilding = village.buildings.find(
@@ -73,7 +59,7 @@ const upgradeMainBuilding = async (page, village, mainBuilding) => {
     return BUILD_MB_INTERVAL;
   }
 
-  playerHandler.updatePlayerBuilding(
+  updatePlayerBuilding(
     village.id,
     mainBuilding.slotId,
     mainBuildingType,
@@ -82,4 +68,4 @@ const upgradeMainBuilding = async (page, village, mainBuilding) => {
   return upgradeTime;
 };
 
-module.exports = upgradeMainBuildings;
+module.exports = createOrUpdateMainBuilding;
