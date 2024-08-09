@@ -64,7 +64,7 @@ const redeemTask = async (page) => {
       console.log("Nothing to update");
     }
   } catch (error) {
-    console.error("Error in buildResources:", error);
+    console.error("Error in redem task:", error);
   }
 };
 

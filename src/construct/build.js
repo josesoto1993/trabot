@@ -1,4 +1,4 @@
-const buildResources = require("./buildResources");
+const upgradeResources = require("./upgradeResources");
 const { formatTime } = require("../utils/timePrint");
 
 let lastBuildTime = 0;
@@ -12,7 +12,7 @@ const build = async (page) => {
 
   console.log("Time to build resources, starting the build process...");
 
-  buildDuration = await buildResources(page);
+  buildDuration = await upgradeResources(page);
 
   updateNextBuildTime(buildDuration);
   return { nextExecutionTime: getRemainingTime(), skip: false };

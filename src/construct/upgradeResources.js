@@ -9,7 +9,7 @@ const CAPITAL_FIELDS_ENABLE = process.env.CAPITAL_FIELDS_ENABLE === "true";
 let upgradeResourceCount = 0;
 const BUILD_RESOURCES_INTERVAL = 15 * 60;
 
-const buildResources = async (page) => {
+const upgradeResources = async (page) => {
   try {
     const villages = await getVillagesInfo(page);
 
@@ -43,7 +43,7 @@ const buildResources = async (page) => {
 
     return minUpgradeTime;
   } catch (error) {
-    console.error("Error in buildResources:", error);
+    console.error("Error in upgradeResources:", error);
     return BUILD_RESOURCES_INTERVAL;
   }
 };
@@ -96,4 +96,4 @@ const sortResources = (a, b) => {
   return FieldTypePriority[a.fieldType] - FieldTypePriority[b.fieldType];
 };
 
-module.exports = buildResources;
+module.exports = upgradeResources;
