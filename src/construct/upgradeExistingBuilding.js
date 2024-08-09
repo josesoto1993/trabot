@@ -7,13 +7,13 @@ const upgradeExistingBuilding = async (page, villageId, slotId) => {
   return await upgradeSelectedBuilding(page);
 };
 
-const selectBuilding = async (village, slotId) => {
+const selectBuilding = async (villageId, slotId) => {
   const villageUrl = new URL(TRAVIAN_BUILD_VIEW);
-  villageUrl.searchParams.append("newdid", village.id);
+  villageUrl.searchParams.append("newdid", villageId);
   villageUrl.searchParams.append("id", slotId);
   await goPage(villageUrl);
 
-  console.log(`Clicked on city ${village.name} building ${slotId}`);
+  console.log(`Clicked on city with id ${villageId} building ${slotId}`);
 };
 
 const upgradeSelectedBuilding = async (page) => {
@@ -31,7 +31,8 @@ const upgradeSelectedBuilding = async (page) => {
 };
 
 const getBuildButton = async (page) => {
-  const buildButtonSelector = ".upgradeButtonsContainer .section1 .build";
+  const buildButtonSelector =
+    "#build .upgradeBuilding .upgradeButtonsContainer .section1 .build";
 
   await page.waitForSelector(buildButtonSelector);
   return await page.$(buildButtonSelector);

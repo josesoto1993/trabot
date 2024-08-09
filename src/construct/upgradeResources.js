@@ -25,7 +25,7 @@ const upgradeResources = async (page) => {
 
       const upgradeTime = await upgradeExistingBuilding(
         page,
-        village,
+        village.id,
         resourceToUpgrade.id
       );
 

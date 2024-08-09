@@ -2,27 +2,33 @@ const { URL } = require("url");
 const { goPage } = require("../browser/browserService");
 const { TRAVIAN_BUILD_VIEW } = require("../constants/links");
 const { updatePlayerBuilding } = require("../player/playerHandler");
+const BuildingType = require("../constants/buildingTypes");
 
-const createBuilding = async (page, village, slotId, buildingType) => {
-  await selectSlot(village, slotId, buildingType.category);
+const createBuilding = async (page, villageId, slotId, buildingName) => {
+  const buildingType = BuildingType[buildingName];
+  if (!buildingType) {
+    throw new Error(`buildingName ${buildingName} not in BuildingType`);
+  }
+
+  await selectSlot(villageId, slotId, buildingType.category);
 
   const result = await buildSelectedBuilding(page, buildingType.name);
   if (result.error) {
     throw new Error(result.error);
   }
 
-  await updatePlayerBuilding(village.id, slotId, buildingType, 1);
+  await updatePlayerBuilding(villageId, slotId, buildingType, 1);
   return result.time;
 };
 
-const selectSlot = async (village, slotId, category) => {
+const selectSlot = async (villageId, slotId, category) => {
   const villageUrl = new URL(TRAVIAN_BUILD_VIEW);
-  villageUrl.searchParams.append("newdid", village.id);
+  villageUrl.searchParams.append("newdid", villageId);
   villageUrl.searchParams.append("id", slotId);
   villageUrl.searchParams.append("category", category);
   await goPage(villageUrl);
 
-  console.log(`selectSlot: ${village.name} / ${slotId} / ${category}`);
+  console.log(`selectSlot: ${villageId} / ${slotId} / ${category}`);
 };
 
 const buildSelectedBuilding = async (page, buildingName) => {

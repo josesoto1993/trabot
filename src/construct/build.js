@@ -1,5 +1,6 @@
 const upgradeResources = require("./upgradeResources");
 const { formatTime } = require("../utils/timePrint");
+const upgradeMainBuildings = require("./upgradeMainBuildings");
 
 let lastBuildTime = 0;
 let buildDuration = 0;
@@ -10,15 +11,18 @@ const build = async (page) => {
     return { nextExecutionTime: remainingTime, skip: true };
   }
 
-  console.log("Time to build resources, starting the build process...");
+  console.log("Time to build, starting the build process...");
 
-  buildDuration = await upgradeResources(page);
+  const mbDuration = await upgradeMainBuildings(page);
+  const resDuration = await upgradeResources(page);
+
+  buildDuration = Math.min(mbDuration, resDuration);
 
   updateNextBuildTime(buildDuration);
-  return { nextExecutionTime: getRemainingTime(), skip: false };
+  return { nextExecutionTime: getRemainingTime(buildDuration), skip: false };
 };
 
-const getRemainingTime = () => {
+const getRemainingTime = (buildDuration) => {
   const currentTime = Date.now();
   const timePassed = (currentTime - lastBuildTime) / 1000;
   return buildDuration - timePassed;

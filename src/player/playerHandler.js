@@ -1,4 +1,5 @@
 const Player = require("../models/player");
+const Building = require("../models/building");
 const getVillagesOverviewInfo = require("../village/listVillagesOverview");
 const getBuildingData = require("../village/buildingsData");
 const getResourceFieldsData = require("../village/resourceFieldsData");
