@@ -44,10 +44,8 @@ const buildingsRawToObject = (raw) => {
   buildings
     .filter(
       (building) =>
-        !BuildingTypes.some(
-          (buildingType) =>
-            building.id === buildingType.id ||
-            building.name === buildingType.name
+        !Object.values(BuildingTypes).some(
+          (buildingType) => building.id === buildingType.id
         )
     )
     .forEach((building) => {
@@ -69,7 +67,11 @@ const getConstructionStatus = (classes) => {
 };
 
 const addNewBuildingType = (id, name) => {
-  BuildingTypes.push({ id, name, category: "TBD" });
+  BuildingTypes[name] = {
+    id,
+    name,
+    category: "TBD",
+  };
 
   BuildingTypes.sort((a, b) => a.name.localeCompare(b.name));
 

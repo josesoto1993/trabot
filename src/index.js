@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const { formatTime, formatTimeMillis } = require("./utils/timePrint");
-const { open } = require("./browser/browserService");
+const { open, close } = require("./browser/browserService");
 const { login } = require("./browser/loginService");
 const { attackFarms } = require("./attackFarms/attackFarms");
 const { trainTroops } = require("./createTroops/troopCreator");
@@ -19,6 +19,7 @@ const main = async () => {
   await login(page);
   await initPlayer(page);
   await mainLoop(page);
+  await finalizeBrowser();
 };
 
 const initPlayer = async (page) => {
@@ -59,6 +60,15 @@ const initializeBrowser = async () => {
     return await open();
   } catch (error) {
     console.error("Error opening browser:", error);
+    process.exit(1);
+  }
+};
+
+const finalizeBrowser = async () => {
+  try {
+    return await close();
+  } catch (error) {
+    console.error("Error closing browser:", error);
     process.exit(1);
   }
 };
