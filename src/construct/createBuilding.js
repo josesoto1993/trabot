@@ -6,6 +6,7 @@ const {
   updatePlayerVillageBuildFinishAt,
 } = require("../player/playerHandler");
 const BuildingType = require("../constants/buildingTypes");
+const BuildingCategory = require("../constants/buildingCategory");
 
 const createBuilding = async (page, villageId, slotId, buildingName) => {
   const buildingType = BuildingType[buildingName];
@@ -13,7 +14,11 @@ const createBuilding = async (page, villageId, slotId, buildingName) => {
     throw new Error(`buildingName ${buildingName} not in BuildingType`);
   }
 
-  await selectSlot(villageId, slotId, buildingType.category);
+  const realSlotId =
+    buildingType.category !== BuildingCategory.other
+      ? slotId
+      : buildingType.slot;
+  await selectSlot(villageId, realSlotId, buildingType.category);
 
   const result = await buildSelectedBuilding(page, buildingType.name);
   if (result.error) {

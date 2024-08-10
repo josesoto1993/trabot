@@ -65,11 +65,13 @@ const BuildingTypes = {
     id: 33,
     name: "Palisade",
     category: BuildingCategory.other,
+    slot: 40,
   },
   "Rally Point": {
     id: 16,
     name: "Rally Point",
     category: BuildingCategory.other,
+    slot: 39,
   },
   Residence: {
     id: 25,

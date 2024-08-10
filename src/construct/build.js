@@ -5,6 +5,7 @@ const {
 } = require("../player/playerHandler");
 const createOrUpdateMainBuilding = require("./createOrUpdateMainBuilding");
 const upgradeResources = require("./upgradeResources");
+const createFundamentals = require("./createFundamentals");
 const { formatTime } = require("../utils/timePrint");
 
 const DEFAULT_INTERVAL = 15 * 60;
@@ -55,6 +56,11 @@ const processVillageBuild = async (page, village) => {
 
   const resourcesUpgraded = await upgradeResources(page, village);
   if (resourcesUpgraded) {
+    return;
+  }
+
+  const fundamentalsUpgraded = await createFundamentals(page, village);
+  if (fundamentalsUpgraded) {
     return;
   }
 
