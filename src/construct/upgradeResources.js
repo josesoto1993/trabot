@@ -1,11 +1,12 @@
 const getResourceFieldsData = require("../village/resourceFieldsData");
-const upgradeExistingBuilding = require("./upgradeExistingBuilding");
+const { upgradeExistingField } = require("./upgradeExistingBuilding");
 
 const ConstructionStatus = require("../constants/constructionStatus");
 const FieldTypePriority = require("../constants/fieldTypePriority");
 const CAPITAL_FIELDS_ENABLE = process.env.CAPITAL_FIELDS_ENABLE === "true";
 
 const BUILD_RESOURCES_INTERVAL = 15 * 60;
+const RESOURCE_MAX_LEVEL = 10;
 
 const upgradeResources = async (page, village) => {
   const resourceToUpgrade = await getResourceToUpgrade(page, village);
@@ -14,10 +15,18 @@ const upgradeResources = async (page, village) => {
     return BUILD_RESOURCES_INTERVAL;
   }
 
-  return await upgradeExistingBuilding(page, village.id, resourceToUpgrade.id);
+  return await upgradeExistingField(page, village.id, resourceToUpgrade.id);
 };
 
 const getResourceToUpgrade = async (page, village) => {
+  const allFieldsAreMaxLevel = village.resourceFields.every(
+    (field) => field.level >= RESOURCE_MAX_LEVEL
+  );
+
+  if (allFieldsAreMaxLevel && !village.capital) {
+    return null;
+  }
+
   const possibleResourcesToUpgrade = await getPossibleResourcesToUpgrade(
     page,
     village

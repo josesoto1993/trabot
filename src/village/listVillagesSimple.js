@@ -11,6 +11,7 @@ const getVillagesInfo = async (page) => {
     await waitForVillageList(page);
 
     const villages = await getVillagesFromPage(page);
+    villages[0].capital = true;
 
     validateActiveVillages(villages);
     await validateVillagesCount(page, villages);

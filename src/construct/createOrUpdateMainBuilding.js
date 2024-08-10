@@ -1,5 +1,4 @@
-const upgradeExistingBuilding = require("./upgradeExistingBuilding");
-const { updatePlayerBuilding } = require("../player/playerHandler");
+const { upgradeExistingBuilding } = require("./upgradeExistingBuilding");
 
 const BuildingTypes = require("../constants/buildingTypes");
 const createBuilding = require("./createBuilding");
@@ -51,7 +50,8 @@ const upgradeMainBuilding = async (page, village, mainBuilding) => {
   const upgradeTime = await upgradeExistingBuilding(
     page,
     village.id,
-    mainBuilding.slotId
+    mainBuilding.slotId,
+    mainBuildingType
   );
 
   if (!upgradeTime) {
@@ -59,12 +59,6 @@ const upgradeMainBuilding = async (page, village, mainBuilding) => {
     return BUILD_MB_INTERVAL;
   }
 
-  updatePlayerBuilding(
-    village.id,
-    mainBuilding.slotId,
-    mainBuildingType,
-    mainBuilding.level + 1
-  );
   return upgradeTime;
 };
 

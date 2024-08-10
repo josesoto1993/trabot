@@ -4,16 +4,17 @@ class Village {
     name,
     coordinateX,
     coordinateY,
-    active,
-    resources,
-    production,
-    capacity,
-    ongoingResources,
-    availableMerchants,
-    maxMerchants,
-    resourceFields,
-    buildings,
-    buildFinishAt
+    active = false,
+    resources = null,
+    production = null,
+    capacity = null,
+    ongoingResources = null,
+    availableMerchants = 0,
+    maxMerchants = 0,
+    resourceFields = [],
+    buildings = [],
+    buildFinishAt = 0,
+    capital = false
   ) {
     this.id = id;
     this.name = name;
@@ -29,6 +30,7 @@ class Village {
     this.resourceFields = resourceFields;
     this.buildings = buildings;
     this.buildFinishAt = buildFinishAt;
+    this.capital = capital;
   }
 
   toString() {

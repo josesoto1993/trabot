@@ -1,12 +1,34 @@
 const { URL } = require("url");
 const { goPage } = require("../browser/browserService");
 const { TRAVIAN_BUILD_VIEW } = require("../constants/links");
-const { updatePlayerVillageBuildFinishAt } = require("../player/playerHandler");
+const {
+  updatePlayerBuilding,
+  updatePlayerField,
+  updatePlayerVillageBuildFinishAt,
+} = require("../player/playerHandler");
 
-const upgradeExistingBuilding = async (page, villageId, slotId) => {
+const upgradeExistingBuilding = async (
+  page,
+  villageId,
+  slotId,
+  buildingType
+) => {
   await selectBuilding(villageId, slotId);
-  const duration = await upgradeSelectedBuilding(page);
-  await updatePlayerVillageBuildFinishAt(page, villageId, duration);
+  const { duration, level } = await upgradeSelectedBuilding(page);
+  if (duration) {
+    updatePlayerBuilding(villageId, slotId, buildingType, level + 1);
+    await updatePlayerVillageBuildFinishAt(page, villageId, duration);
+  }
+  return duration;
+};
+
+const upgradeExistingField = async (page, villageId, slotId) => {
+  await selectBuilding(villageId, slotId);
+  const { duration, level } = await upgradeSelectedBuilding(page);
+  if (duration) {
+    updatePlayerField(villageId, slotId, level + 1);
+    await updatePlayerVillageBuildFinishAt(page, villageId, duration);
+  }
   return duration;
 };
 
@@ -23,14 +45,15 @@ const upgradeSelectedBuilding = async (page) => {
   const buildButton = await getBuildButton(page);
   if (!buildButton) {
     console.log("No build button found.");
-    return null;
+    return { duration: null, level: null };
   }
 
   const durationValue = await getDurationValue(page);
+  const oldLevel = await getLevelValue(page);
 
   await buildButton.click();
   console.log("Clicked on the build button.");
-  return durationValue;
+  return { duration: durationValue, level: oldLevel };
 };
 
 const getBuildButton = async (page) => {
@@ -68,4 +91,18 @@ const getDurationValue = async (page) => {
   return durationValue;
 };
 
-module.exports = upgradeExistingBuilding;
+const getLevelValue = async (page) => {
+  const contentSelector = "#content .titleInHeader .level";
+
+  await page.waitForSelector(contentSelector);
+
+  const levelValue = await page.$eval(contentSelector, (span) => {
+    const levelText = span.textContent.trim();
+    const levelNumber = parseInt(levelText.replace(/\D/g, ""), 10);
+    return levelNumber;
+  });
+
+  return levelValue;
+};
+
+module.exports = { upgradeExistingBuilding, upgradeExistingField };

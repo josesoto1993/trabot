@@ -35,7 +35,9 @@ const updatePlayerBuilding = (villageId, slotId, buildingType, level) => {
     throw new Error(`Village with ID ${villageId} not found`);
   }
 
-  const buildingIndex = village.buildings.findIndex((b) => b.slotId === slotId);
+  const buildingIndex = village.buildings.findIndex(
+    (building) => building.slotId === slotId
+  );
   if (buildingIndex === -1) {
     throw new Error(
       `Building with Slot ID ${slotId} not found in village ${villageId}`
@@ -53,7 +55,31 @@ const updatePlayerBuilding = (villageId, slotId, buildingType, level) => {
   village.buildings[buildingIndex] = newBuilding;
 
   console.log(
-    `Updated building at slot ${slotId} in village ${villageId} to ${buildingType.name}`
+    `Updated building at slot ${slotId} in village ${villageId} to ${buildingType.name} level ${level}`
+  );
+};
+
+const updatePlayerField = (villageId, slotId, level) => {
+  const village = player.villages.find((village) => village.id === villageId);
+  if (!village) {
+    throw new Error(`Village with ID ${villageId} not found`);
+  }
+
+  const fieldIndex = village.resourceFields.findIndex(
+    (field) => field.id === slotId
+  );
+  if (fieldIndex === -1) {
+    throw new Error(
+      `Field with Slot ID ${slotId} not found in village ${villageId}`
+    );
+  }
+
+  let field = village.resourceFields[fieldIndex];
+  field.level = level;
+  village.resourceFields[fieldIndex] = field;
+
+  console.log(
+    `Updated building at slot ${slotId} in village ${villageId} to level ${level}`
   );
 };
 
@@ -99,6 +125,7 @@ module.exports = {
   getPlayer,
   getVillages,
   updatePlayerBuilding,
+  updatePlayerField,
   updatePlayerVillageBuildFinishAt,
   getNextBuildFinishAt,
 };
