@@ -2,7 +2,12 @@ const { upgradeExistingBuilding } = require("./upgradeExistingBuilding");
 const BuildingTypes = require("../constants/buildingTypes");
 const ConstructionStatus = require("../constants/constructionStatus");
 
-const updateBuildingList = async (page, village, buildingsToUpgrade) => {
+const updateBuildingList = async (
+  page,
+  village,
+  buildingsToUpgrade,
+  priority
+) => {
   const buildingsToUpgradeInVillage = filterBuildingsToUpgrade(
     village,
     buildingsToUpgrade
@@ -13,7 +18,9 @@ const updateBuildingList = async (page, village, buildingsToUpgrade) => {
     return await upgradeBuilding(page, village, building);
   }
 
-  console.log(`No buildings to upgrade in village ${village.name}`);
+  console.log(
+    `No priority ${priority} buildings to upgrade in village ${village.name}`
+  );
   return null;
 };
 

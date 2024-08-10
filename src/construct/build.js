@@ -72,7 +72,8 @@ const processVillageBuild = async (page, village) => {
   const highUpgraded = await updateBuildingList(
     page,
     village,
-    HighPriorityBuildings
+    HighPriorityBuildings,
+    "high"
   );
   if (highUpgraded) {
     return;
@@ -81,7 +82,8 @@ const processVillageBuild = async (page, village) => {
   const lowUpgraded = await updateBuildingList(
     page,
     village,
-    LowPriorityBuildings
+    LowPriorityBuildings,
+    "low"
   );
   if (lowUpgraded) {
     return;
