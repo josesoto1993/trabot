@@ -1,4 +1,5 @@
 const {
+  updateVillages,
   getVillages,
   getNextBuildFinishAt,
   updatePlayerVillageBuildFinishAt,
@@ -21,6 +22,7 @@ const build = async (page) => {
 
   console.log("Time to build, starting the build process...");
 
+  await updateVillages(page); // TODO: its better if we just look for the one we are interested in
   await processVillagesBuild(page);
 
   console.log(
@@ -52,17 +54,17 @@ const processVillageBuild = async (page, village) => {
     return;
   }
 
-  const mainBuildingUpgraded = await createOrUpdateMainBuilding(page, village);
+  const mainBuildingUpgraded = await createOrUpdateMainBuilding(page, village); // TODO check building status
   if (mainBuildingUpgraded) {
     return;
   }
 
-  const fundamentalsCreated = await createFundamentals(page, village);
+  const fundamentalsCreated = await createFundamentals(page, village); // TODO check building status
   if (fundamentalsCreated) {
     return;
   }
 
-  const resourcesUpgraded = await upgradeResources(page, village);
+  const resourcesUpgraded = await upgradeResources(page, village); // TODO check building status
   if (resourcesUpgraded) {
     return;
   }

@@ -1,5 +1,6 @@
 const { upgradeExistingBuilding } = require("./upgradeExistingBuilding");
 const BuildingTypes = require("../constants/buildingTypes");
+const ConstructionStatus = require("../constants/constructionStatus");
 
 const updateBuildingList = async (page, village, buildingsToUpgrade) => {
   const buildingsToUpgradeInVillage = filterBuildingsToUpgrade(
@@ -21,7 +22,11 @@ const filterBuildingsToUpgrade = (village, buildingsToUpgrade) => {
     const buildingToUpgrade = buildingsToUpgrade.find(
       (btu) => btu.type.name === villageBuilding.name
     );
-    return buildingToUpgrade && villageBuilding.level < buildingToUpgrade.level;
+    return (
+      buildingToUpgrade &&
+      villageBuilding.level < buildingToUpgrade.level &&
+      villageBuilding.constructionStatus === ConstructionStatus.readyToUpgrade
+    );
   });
 };
 
