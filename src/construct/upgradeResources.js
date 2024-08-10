@@ -5,14 +5,13 @@ const ConstructionStatus = require("../constants/constructionStatus");
 const FieldTypePriority = require("../constants/fieldTypePriority");
 const CAPITAL_FIELDS_ENABLE = process.env.CAPITAL_FIELDS_ENABLE === "true";
 
-const BUILD_RESOURCES_INTERVAL = 15 * 60;
 const RESOURCE_MAX_LEVEL = 10;
 
 const upgradeResources = async (page, village) => {
   const resourceToUpgrade = await getResourceToUpgrade(page, village);
 
   if (!resourceToUpgrade) {
-    return BUILD_RESOURCES_INTERVAL;
+    return null;
   }
 
   return await upgradeExistingField(page, village.id, resourceToUpgrade.id);

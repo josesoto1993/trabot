@@ -15,20 +15,24 @@ const upgradeExistingBuilding = async (
 ) => {
   await selectBuilding(villageId, slotId);
   const { duration, level } = await upgradeSelectedBuilding(page);
-  if (duration) {
-    updatePlayerBuilding(villageId, slotId, buildingType, level + 1);
-    await updatePlayerVillageBuildFinishAt(page, villageId, duration);
+  if (!duration) {
+    return null;
   }
+
+  updatePlayerBuilding(villageId, slotId, buildingType, level + 1);
+  await updatePlayerVillageBuildFinishAt(page, villageId, duration);
   return duration;
 };
 
 const upgradeExistingField = async (page, villageId, slotId) => {
   await selectBuilding(villageId, slotId);
   const { duration, level } = await upgradeSelectedBuilding(page);
-  if (duration) {
-    updatePlayerField(villageId, slotId, level + 1);
-    await updatePlayerVillageBuildFinishAt(page, villageId, duration);
+  if (!duration) {
+    return null;
   }
+
+  updatePlayerField(villageId, slotId, level + 1);
+  await updatePlayerVillageBuildFinishAt(page, villageId, duration);
   return duration;
 };
 

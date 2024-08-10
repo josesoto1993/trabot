@@ -5,8 +5,6 @@ const createBuilding = require("./createBuilding");
 
 const mainBuildingType = BuildingTypes["Main Building"];
 
-const BUILD_MB_INTERVAL = 15 * 60;
-
 const createOrUpdateMainBuilding = async (page, village) => {
   const mainBuilding = village.buildings.find(
     (building) => building.name === mainBuildingType.name
@@ -17,7 +15,7 @@ const createOrUpdateMainBuilding = async (page, village) => {
   } else if (mainBuilding.level < 20) {
     return await upgradeMainBuilding(page, village, mainBuilding);
   } else {
-    return BUILD_MB_INTERVAL;
+    return null;
   }
 };
 
@@ -33,7 +31,7 @@ const createMainBuilding = async (page, village) => {
     console.error(
       `No available slot found in village ${village.id} for Main Building.`
     );
-    return BUILD_MB_INTERVAL;
+    return null;
   }
 
   console.log(
@@ -56,7 +54,7 @@ const upgradeMainBuilding = async (page, village, mainBuilding) => {
 
   if (!upgradeTime) {
     console.log("There is MB to upgrade but cant upgrade now");
-    return BUILD_MB_INTERVAL;
+    return null;
   }
 
   return upgradeTime;

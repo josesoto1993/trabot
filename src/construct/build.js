@@ -1,9 +1,11 @@
 const {
   getVillages,
   getNextBuildFinishAt,
+  updatePlayerVillageBuildFinishAt,
 } = require("../player/playerHandler");
 const createOrUpdateMainBuilding = require("./createOrUpdateMainBuilding");
 const upgradeResources = require("./upgradeResources");
+const { formatTime } = require("../utils/timePrint");
 
 const DEFAULT_INTERVAL = 15 * 60;
 
@@ -16,6 +18,10 @@ const build = async (page) => {
   console.log("Time to build, starting the build process...");
 
   await processVillagesBuild(page);
+
+  console.log(
+    `Build process finish, next in ${formatTime(getNextBuildFinishAt())}`
+  );
 
   return {
     nextExecutionTime: getNextBuildFinishAt(),
@@ -32,27 +38,28 @@ const shouldSkipBuild = () => {
 
 const processVillagesBuild = async (page) => {
   const villages = getVillages();
-  let minBuildDuration = Infinity;
-
   for (const village of villages) {
-    const villageBuildDuration = await processVillageBuild(page, village);
-    if (villageBuildDuration !== null) {
-      minBuildDuration = Math.min(minBuildDuration, villageBuildDuration);
-    }
+    await processVillageBuild(page, village);
   }
-
-  return minBuildDuration === Infinity ? DEFAULT_INTERVAL : minBuildDuration;
 };
 
 const processVillageBuild = async (page, village) => {
   if (village.actualFinishAt >= Date.now()) {
-    return null;
+    return;
   }
 
-  const mbDuration = await createOrUpdateMainBuilding(page, village);
-  const resDuration = await upgradeResources(page, village);
+  const mainBuildingUpgraded = await createOrUpdateMainBuilding(page, village);
+  if (mainBuildingUpgraded) {
+    return;
+  }
 
-  return Math.min(mbDuration, resDuration);
+  const resourcesUpgraded = await upgradeResources(page, village);
+  if (resourcesUpgraded) {
+    return;
+  }
+
+  console.log(`Nothing to update in ${village.name}`);
+  await updatePlayerVillageBuildFinishAt(page, village.id, DEFAULT_INTERVAL);
 };
 
 module.exports = build;
