@@ -54,7 +54,7 @@ const createFundamentalBuilding = async (
 
   return await createBuilding(
     page,
-    village,
+    village.id,
     availableSlotId,
     fundamentalBuilding.name
   );
