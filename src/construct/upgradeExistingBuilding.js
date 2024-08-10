@@ -63,7 +63,7 @@ const upgradeSelectedBuilding = async (page) => {
 const getBuildButton = async (page) => {
   const buildSelector =
     "#build .upgradeBuilding .upgradeButtonsContainer .section1";
-  const buildButtonSelector = buildSelector + " .build";
+  const buildButtonSelector = buildSelector + " .build:not(.disabled)";
 
   await page.waitForSelector(buildSelector);
 
