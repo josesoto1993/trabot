@@ -6,7 +6,10 @@ const {
 const createOrUpdateMainBuilding = require("./createOrUpdateMainBuilding");
 const upgradeResources = require("./upgradeResources");
 const createFundamentals = require("./createFundamentals");
+const updateBuildingList = require("./updateBuildingList");
 const { formatTime } = require("../utils/timePrint");
+const HighPriorityBuildings = require("../constants/highPriorityBuilding");
+const LowPriorityBuildings = require("../constants/lowPriorityBuilding");
 
 const DEFAULT_INTERVAL = 15 * 60;
 
@@ -54,13 +57,31 @@ const processVillageBuild = async (page, village) => {
     return;
   }
 
+  const fundamentalsCreated = await createFundamentals(page, village);
+  if (fundamentalsCreated) {
+    return;
+  }
+
   const resourcesUpgraded = await upgradeResources(page, village);
   if (resourcesUpgraded) {
     return;
   }
 
-  const fundamentalsUpgraded = await createFundamentals(page, village);
-  if (fundamentalsUpgraded) {
+  const highUpgraded = await updateBuildingList(
+    page,
+    village,
+    HighPriorityBuildings
+  );
+  if (highUpgraded) {
+    return;
+  }
+
+  const lowUpgraded = await updateBuildingList(
+    page,
+    village,
+    LowPriorityBuildings
+  );
+  if (lowUpgraded) {
     return;
   }
 
