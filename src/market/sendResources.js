@@ -1,14 +1,8 @@
-const { URL } = require("url");
-
-const goVillage = require("../village/goVillage");
+const { goMarket } = require("../village/goVillage");
 const { formatTime } = require("../utils/timePrint");
-const { goPage, typeInSelector } = require("../browser/browserService");
+const { typeInSelector } = require("../browser/browserService");
 const { addTrade } = require("./ongoingTrades");
 
-const { TRAVIAN_BASE } = require("../constants/links");
-const MarketTabs = require("../constants/marketTabs");
-
-const MARKET_SELECTOR = "div.buttonsWrapper a.market";
 const TRADE_DELAY = 3;
 const MARKET_WAIT_POSSIBLE_ERROR = 1 * 1000;
 
@@ -35,32 +29,6 @@ const sendResources = async (page, trade) => {
     );
     return -1;
   }
-};
-
-const goMarket = async (page, from) => {
-  console.log("go market");
-  await goVillage(from);
-
-  await page.waitForSelector(MARKET_SELECTOR);
-  const marketAnchor = await page.$(MARKET_SELECTOR);
-  if (!marketAnchor) {
-    throw new Error("Market button not found.");
-  }
-
-  const href = await page.evaluate(
-    (anchor) => anchor.getAttribute("href"),
-    marketAnchor
-  );
-  if (!href) {
-    throw new Error("Market href not found.");
-  }
-
-  const marketUrl = new URL(href, TRAVIAN_BASE);
-  marketUrl.searchParams.set(
-    MarketTabs.QueryParamKey,
-    MarketTabs.SendResources
-  );
-  await goPage(marketUrl);
 };
 
 const setDestination = async (page, to) => {

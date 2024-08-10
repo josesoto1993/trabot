@@ -4,13 +4,17 @@ class Village {
     name,
     coordinateX,
     coordinateY,
-    active,
-    resources,
-    production,
-    capacity,
-    ongoingResources,
-    availableMerchants,
-    maxMerchants
+    active = false,
+    resources = null,
+    production = null,
+    capacity = null,
+    ongoingResources = null,
+    availableMerchants = 0,
+    maxMerchants = 0,
+    resourceFields = [],
+    buildings = [],
+    buildFinishAt = 0,
+    capital = false
   ) {
     this.id = id;
     this.name = name;
@@ -23,10 +27,14 @@ class Village {
     this.ongoingResources = ongoingResources;
     this.availableMerchants = availableMerchants;
     this.maxMerchants = maxMerchants;
+    this.resourceFields = resourceFields;
+    this.buildings = buildings;
+    this.buildFinishAt = buildFinishAt;
+    this.capital = capital;
   }
 
   toString() {
-    return `Village(id: ${this.id}, name: ${this.name}, coordX: ${this.coordinateX}, coordY: ${this.coordinateY}, active: ${this.active}, resources: ${this.resources}, production: ${this.production}, capacity: ${this.capacity}, ongoingResources: ${this.ongoingResources}, availableMerchants: ${this.availableMerchants}, maxMerchants: ${this.maxMerchants})`;
+    return `Village(id: ${this.id}, name: ${this.name}`;
   }
 }
 

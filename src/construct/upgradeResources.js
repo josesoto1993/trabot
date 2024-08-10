@@ -1,54 +1,31 @@
-const getVillagesInfo = require("../village/listVillageSimple");
-const getResourceFieldsData = require("./resourceFieldsData");
-const upgradeBuilding = require("./upgradeBuilding");
+const getResourceFieldsData = require("../village/resourceFieldsData");
+const { upgradeExistingField } = require("./upgradeExistingBuilding");
 
 const ConstructionStatus = require("../constants/constructionStatus");
 const FieldTypePriority = require("../constants/fieldTypePriority");
 const CAPITAL_FIELDS_ENABLE = process.env.CAPITAL_FIELDS_ENABLE === "true";
 
-let upgradeResourceCount = 0;
-const BUILD_RESOURCES_INTERVAL = 15 * 60;
+const RESOURCE_MAX_LEVEL = 10;
 
-const buildResources = async (page) => {
-  try {
-    const villages = await getVillagesInfo(page);
+const upgradeResources = async (page, village) => {
+  const resourceToUpgrade = await getResourceToUpgrade(page, village);
 
-    let upgradedThisRun = 0;
-    let minUpgradeTime = BUILD_RESOURCES_INTERVAL;
-
-    for (const village of villages) {
-      const resourceToUpgrade = await getResourceToUpgrade(page, village);
-
-      if (!resourceToUpgrade) {
-        continue;
-      }
-
-      const upgradeTime = await upgradeBuilding(
-        page,
-        village,
-        resourceToUpgrade.id
-      );
-
-      minUpgradeTime = Math.min(minUpgradeTime, upgradeTime);
-      upgradedThisRun += 1;
-      upgradeResourceCount += 1;
-    }
-
-    if (upgradedThisRun > 0) {
-      console.log(`Upgrades done this time: ${upgradedThisRun}`);
-      console.log(`Total upgrades done: ${upgradeResourceCount}`);
-    } else {
-      console.log("Nothing to update");
-    }
-
-    return minUpgradeTime;
-  } catch (error) {
-    console.error("Error in buildResources:", error);
-    return BUILD_RESOURCES_INTERVAL;
+  if (!resourceToUpgrade) {
+    return null;
   }
+
+  return await upgradeExistingField(page, village.id, resourceToUpgrade.id);
 };
 
 const getResourceToUpgrade = async (page, village) => {
+  const allFieldsAreMaxLevel = village.resourceFields.every(
+    (field) => field.level >= RESOURCE_MAX_LEVEL
+  );
+
+  if (allFieldsAreMaxLevel && !village.capital) {
+    return null;
+  }
+
   const possibleResourcesToUpgrade = await getPossibleResourcesToUpgrade(
     page,
     village
@@ -96,4 +73,4 @@ const sortResources = (a, b) => {
   return FieldTypePriority[a.fieldType] - FieldTypePriority[b.fieldType];
 };
 
-module.exports = buildResources;
+module.exports = upgradeResources;

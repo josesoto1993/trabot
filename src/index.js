@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const { formatTime, formatTimeMillis } = require("./utils/timePrint");
-const { open } = require("./browser/browserService");
+const { open, close } = require("./browser/browserService");
 const { login } = require("./browser/loginService");
 const { attackFarms } = require("./attackFarms/attackFarms");
 const { trainTroops } = require("./createTroops/troopCreator");
@@ -10,14 +10,22 @@ const build = require("./construct/build");
 const redeem = require("./redeemTask/redeemTask");
 const manageOverflow = require("./market/manageOverflow");
 const manageDeficit = require("./market/manageDeficit");
+const { updateVillages, getPlayer } = require("./player/playerHandler");
 
 const taskStats = {};
 
 const main = async () => {
   let page = await initializeBrowser();
   await login(page);
-
+  await initPlayer(page);
   await mainLoop(page);
+  await finalizeBrowser();
+};
+
+const initPlayer = async (page) => {
+  await updateVillages(page);
+  console.log(`Player loaded: ${getPlayer()}. Extended object:`);
+  console.log(`${JSON.stringify(getPlayer(), null, 2)}`);
 };
 
 const mainLoop = async (page) => {
@@ -56,6 +64,15 @@ const initializeBrowser = async () => {
   }
 };
 
+const finalizeBrowser = async () => {
+  try {
+    return await close();
+  } catch (error) {
+    console.error("Error closing browser:", error);
+    process.exit(1);
+  }
+};
+
 const runTaskWithTimer = async (taskName, task) => {
   if (!taskStats[taskName]) {
     taskStats[taskName] = { totalDuration: 0, count: 0 };
@@ -79,7 +96,7 @@ const runTaskWithTimer = async (taskName, task) => {
 
     console.log(`${taskName} ended, took ${formatTimeMillis(duration)}`);
     console.log(
-      `Average duration of ${taskName}: ${formatTimeMillis(averageDuration)}`
+      `Average duration of ${taskName}: ${formatTimeMillis(averageDuration)} for total runs ${taskStats[taskName].count}`
     );
 
     return nextExecutionTime;

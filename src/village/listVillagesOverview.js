@@ -1,5 +1,5 @@
 const { goPage } = require("../browser/browserService");
-const getVillagesInfo = require("./listVillageSimple");
+const getVillagesInfo = require("./listVillagesSimple");
 const { getIncomingResources } = require("../market/ongoingTrades");
 
 const OverviewTabs = require("../constants/overviewTabs");
@@ -21,7 +21,7 @@ const capacitySelectors = {
   crop: "td.max4",
 };
 
-const getVillagesDetailedInfo = async (page) => {
+const getVillagesOverviewInfo = async (page) => {
   try {
     const merchantsTable = await getOverviewMerchants(page);
     const resourcesTable = await getOverviewResources(
@@ -155,4 +155,4 @@ const rawToResourceObject = (resourcesRaw) => {
   return resourcesByVillage;
 };
 
-module.exports = getVillagesDetailedInfo;
+module.exports = getVillagesOverviewInfo;

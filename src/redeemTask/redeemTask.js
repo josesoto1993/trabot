@@ -1,5 +1,5 @@
 const { URL } = require("url");
-const getVillagesInfo = require("../village/listVillageSimple");
+const getVillagesInfo = require("../village/listVillagesSimple");
 const { goPage } = require("../browser/browserService");
 const { formatTime } = require("../utils/timePrint");
 const { TRAVIAN_TASK_VIEW } = require("../constants/links");
@@ -64,7 +64,7 @@ const redeemTask = async (page) => {
       console.log("Nothing to update");
     }
   } catch (error) {
-    console.error("Error in buildResources:", error);
+    console.error("Error in redem task:", error);
   }
 };
 

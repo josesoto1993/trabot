@@ -1,4 +1,4 @@
-const HeroStatus = {
+const HeroIconStatus = {
   running: "heroRunning",
   home: "heroHome",
   dead: "heroDead",
@@ -6,4 +6,4 @@ const HeroStatus = {
   reinforcing: "heroReinforcing",
 };
 
-module.exports = HeroStatus;
+module.exports = HeroIconStatus;
