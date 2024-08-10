@@ -56,7 +56,7 @@ const createFundamentalBuilding = async (
     page,
     village,
     availableSlotId,
-    fundamentalBuilding
+    fundamentalBuilding.name
   );
 };
 
