@@ -7,6 +7,7 @@ const LowPriorityBuildings = [
   { type: BuildingTypes["Embassy"], level: 20 },
   { type: BuildingTypes["Smithy"], level: 20 },
   { type: BuildingTypes["Hospital"], level: 5 },
+  { type: BuildingTypes["Stonemason's Lodge"], level: 20 },
 ];
 
 module.exports = LowPriorityBuildings;

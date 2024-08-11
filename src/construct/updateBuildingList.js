@@ -25,16 +25,20 @@ const updateBuildingList = async (
 };
 
 const filterBuildingsToUpgrade = (village, buildingsToUpgrade) => {
-  return village.buildings.filter((villageBuilding) => {
-    const buildingToUpgrade = buildingsToUpgrade.find(
-      (btu) => btu.type.name === villageBuilding.name
+  const filteredBuildings = [];
+
+  for (const buildingToUpgrade of buildingsToUpgrade) {
+    const matchingVillageBuildings = village.buildings.filter(
+      (villageBuilding) =>
+        villageBuilding.name === buildingToUpgrade.type.name &&
+        villageBuilding.level < buildingToUpgrade.level &&
+        villageBuilding.constructionStatus === ConstructionStatus.readyToUpgrade
     );
-    return (
-      buildingToUpgrade &&
-      villageBuilding.level < buildingToUpgrade.level &&
-      villageBuilding.constructionStatus === ConstructionStatus.readyToUpgrade
-    );
-  });
+
+    filteredBuildings.push(...matchingVillageBuildings);
+  }
+
+  return filteredBuildings;
 };
 
 const getFirstBuildingToUpgrade = (buildingsToUpgradeInVillage) => {
