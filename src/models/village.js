@@ -34,7 +34,7 @@ class Village {
   }
 
   toString() {
-    return `Village(id: ${this.id}, name: ${this.name}`;
+    return `Village(id: ${this.id}, name: ${this.name})`;
   }
 }
 

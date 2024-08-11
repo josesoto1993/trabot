@@ -4,15 +4,16 @@ const {
   getNextBuildFinishAt,
   updatePlayerVillageBuildFinishAt,
 } = require("../player/playerHandler");
-const createOrUpdateMainBuilding = require("./createOrUpdateMainBuilding");
 const upgradeResources = require("./upgradeResources");
 const createFundamentals = require("./createFundamentals");
 const updateBuildingList = require("./updateBuildingList");
 const { formatTime } = require("../utils/timePrint");
 const HighPriorityBuildings = require("../constants/highPriorityBuilding");
+const MidPriorityBuildings = require("../constants/midPriorityBuilding");
 const LowPriorityBuildings = require("../constants/lowPriorityBuilding");
 
 const DEFAULT_INTERVAL = 15 * 60;
+let totalBuilds = 0;
 
 const build = async (page) => {
   const skipBuild = shouldSkipBuild();
@@ -26,7 +27,7 @@ const build = async (page) => {
   await processVillagesBuild(page);
 
   console.log(
-    `Build process finish, next in ${formatTime(getNextBuildFinishAt())}`
+    `Build process finish, next in ${formatTime(getNextBuildFinishAt())}, total builds: ${totalBuilds}`
   );
 
   return {
@@ -54,18 +55,9 @@ const processVillageBuild = async (page, village) => {
     return;
   }
 
-  const mainBuildingUpgraded = await createOrUpdateMainBuilding(page, village); // TODO check building status
-  if (mainBuildingUpgraded) {
-    return;
-  }
-
-  const fundamentalsCreated = await createFundamentals(page, village); // TODO check building status
+  const fundamentalsCreated = await createFundamentals(page, village);
   if (fundamentalsCreated) {
-    return;
-  }
-
-  const resourcesUpgraded = await upgradeResources(page, village); // TODO check building status
-  if (resourcesUpgraded) {
+    totalBuilds += 1;
     return;
   }
 
@@ -76,6 +68,24 @@ const processVillageBuild = async (page, village) => {
     "high"
   );
   if (highUpgraded) {
+    totalBuilds += 1;
+    return;
+  }
+
+  const resourcesUpgraded = await upgradeResources(page, village);
+  if (resourcesUpgraded) {
+    totalBuilds += 1;
+    return;
+  }
+
+  const midUpgraded = await updateBuildingList(
+    page,
+    village,
+    MidPriorityBuildings,
+    "mid"
+  );
+  if (midUpgraded) {
+    totalBuilds += 1;
     return;
   }
 
@@ -86,6 +96,7 @@ const processVillageBuild = async (page, village) => {
     "low"
   );
   if (lowUpgraded) {
+    totalBuilds += 1;
     return;
   }
 

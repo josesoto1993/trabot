@@ -102,7 +102,6 @@ const getOverviewMerchants = async (page) => {
     return result;
   }, ROW_SELECTOR);
 
-  await new Promise((resolve) => setTimeout(resolve, 10 * 1000));
   return merchantsRaw;
 };
 
