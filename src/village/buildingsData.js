@@ -19,11 +19,17 @@ const getBuildingRawData = async (page) => {
     return nodes.map((node) => {
       const anchor = node.querySelector("a.level");
 
+      let level = anchor ? parseInt(anchor.getAttribute("data-level"), 10) : 0;
+
+      if (anchor && anchor.classList.contains("underConstruction")) {
+        level += 1;
+      }
+
       return {
         aid: node.getAttribute("data-aid"),
         gid: node.getAttribute("data-gid"),
         name: node.getAttribute("data-name"),
-        level: anchor ? anchor.getAttribute("data-level") : 0,
+        level: level,
         anchorClasses: anchor ? Array.from(anchor.classList) : [],
       };
     });
