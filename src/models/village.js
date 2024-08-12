@@ -9,6 +9,7 @@ class Village {
     production = null,
     capacity = null,
     ongoingResources = null,
+    celebrationTime = null,
     availableMerchants = null,
     maxMerchants = null,
     resourceFields = [],
@@ -25,6 +26,7 @@ class Village {
     this.production = production;
     this.capacity = capacity;
     this.ongoingResources = ongoingResources;
+    this.celebrationTime = celebrationTime;
     this.availableMerchants = availableMerchants;
     this.maxMerchants = maxMerchants;
     this.resourceFields = resourceFields;

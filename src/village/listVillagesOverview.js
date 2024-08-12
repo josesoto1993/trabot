@@ -39,6 +39,7 @@ const getVillagesOverviewInfo = async (page) => {
       OverviewTabs.resCapacity,
       capacitySelectors
     );
+    const cultureTable = await getOverviewCelebrations(page);
 
     const villages = await getVillagesInfo(page);
 
@@ -50,6 +51,7 @@ const getVillagesOverviewInfo = async (page) => {
       village.availableMerchants =
         merchantsTable[village.name].availableMerchants;
       village.maxMerchants = merchantsTable[village.name].maxMerchants;
+      village.celebrationTime = cultureTable[village.name].celebrationTime;
     }
 
     return villages;
@@ -103,6 +105,45 @@ const getOverviewMerchants = async (page) => {
   }, ROW_SELECTOR);
 
   return merchantsRaw;
+};
+
+const getOverviewCelebrations = async (page) => {
+  await goPage(OverviewTabs.culturepoints);
+  await page.waitForSelector(ROW_SELECTOR);
+
+  const celebrationsRaw = await page.evaluate((rowSelector) => {
+    const rows = document.querySelectorAll(rowSelector);
+
+    const result = {};
+    rows.forEach((row) => {
+      const villageLink = row.querySelector("td.vil a");
+      if (!villageLink) {
+        return;
+      }
+
+      const villageName = villageLink.textContent.trim();
+      if (!result[villageName]) {
+        result[villageName] = {};
+      }
+
+      const celebrationElement = row.querySelector("td.cel a span");
+      let value = null;
+      if (celebrationElement) {
+        if (celebrationElement.classList.contains("timer")) {
+          const durationText = celebrationElement.textContent.trim();
+          const [hours, minutes, seconds] = durationText.split(":").map(Number);
+          value = hours * 3600 + minutes * 60 + seconds;
+        } else if (celebrationElement.classList.contains("dot")) {
+          value = 0;
+        }
+      }
+
+      result[villageName].celebrationTime = value;
+    });
+    return result;
+  }, ROW_SELECTOR);
+
+  return celebrationsRaw;
 };
 
 const getOverviewResources = async (page, tableUrl, selectors) => {

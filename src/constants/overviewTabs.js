@@ -9,6 +9,8 @@ const OverviewTabs = {
     "https://ts100.x10.asia.travian.com/village/statistics/resources/production",
   resCapacity:
     "https://ts100.x10.asia.travian.com/village/statistics/resources/capacity",
+  culturepoints:
+    "https://ts100.x10.asia.travian.com/village/statistics/culturepoints",
 };
 
 module.exports = OverviewTabs;
