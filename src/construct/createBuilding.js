@@ -27,7 +27,7 @@ const createBuilding = async (page, villageId, slotId, buildingName) => {
   }
 
   updatePlayerBuilding(villageId, realSlotId, buildingType, 1);
-  await updatePlayerVillageBuildFinishAt(page, villageId, result.time);
+  updatePlayerVillageBuildFinishAt(villageId, result.time);
   return result.time;
 };
 
