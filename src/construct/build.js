@@ -58,7 +58,7 @@ const processVillagesBuild = async (page) => {
   await updateVillagesOverviewInfo(page);
   const villages = getVillages();
   for (const village of villages) {
-    if (village.actualFinishAt >= Date.now()) {
+    if (village.buildFinishAt >= Date.now()) {
       return;
     }
     await updateVillageResources(page, village.id);
