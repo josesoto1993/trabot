@@ -25,7 +25,7 @@ const createBuilding = async (page, villageId, slotId, buildingName) => {
     throw new Error(result.error);
   }
 
-  updatePlayerBuilding(villageId, slotId, buildingType, 1);
+  updatePlayerBuilding(villageId, realSlotId, buildingType, 1);
   await updatePlayerVillageBuildFinishAt(page, villageId, result.time);
   return result.time;
 };
@@ -83,8 +83,9 @@ const buildSelectedBuilding = async (page, buildingName) => {
     const durationValue = hours * 3600 + minutes * 60 + seconds;
 
     const contractLink = contractWrapper.querySelector(
-      ".contractLink button.build"
+      ".contractLink button:is(.build, .new)"
     );
+
     if (contractLink) {
       contractLink.click();
     } else {
