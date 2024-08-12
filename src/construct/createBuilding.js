@@ -22,7 +22,8 @@ const createBuilding = async (page, villageId, slotId, buildingName) => {
 
   const result = await buildSelectedBuilding(page, buildingType.name);
   if (result.error) {
-    throw new Error(result.error);
+    console.log("Error on create building:", result.error);
+    return null;
   }
 
   updatePlayerBuilding(villageId, realSlotId, buildingType, 1);
