@@ -60,7 +60,7 @@ const getFieldLevel = (classes) => {
     throw new Error(`Field level not found for classes: ${classes.join(", ")}`);
   }
 
-  const level = parseInt(levelClass.replace("level", ""), 10);
+  let level = parseInt(levelClass.replace("level", ""), 10);
   if (isNaN(level)) {
     throw new Error(
       `Field level is not a valid number for classes: ${classes.join(", ")}`
