@@ -82,7 +82,9 @@ const buildSelectedBuilding = async (page, buildingName) => {
     const [hours, minutes, seconds] = durationText.split(":").map(Number);
     const durationValue = hours * 3600 + minutes * 60 + seconds;
 
-    const contractLink = contractWrapper.querySelector(".contractLink button");
+    const contractLink = contractWrapper.querySelector(
+      ".contractLink button.build"
+    );
     if (contractLink) {
       contractLink.click();
     } else {
