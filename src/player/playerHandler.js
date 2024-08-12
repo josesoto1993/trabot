@@ -159,16 +159,6 @@ const updatePlayerVillageBuildFinishAt = async (
   );
 };
 
-const getNextBuildFinishAt = () => {
-  const currentTime = Date.now();
-
-  const minBuildFinishAt = Math.min(
-    ...player.villages.map((village) => village.buildFinishAt)
-  );
-
-  return (minBuildFinishAt - currentTime) / 1000;
-};
-
 module.exports = {
   updateVillages,
   updateVillageResources,
@@ -179,5 +169,4 @@ module.exports = {
   updatePlayerBuilding,
   updatePlayerField,
   updatePlayerVillageBuildFinishAt,
-  getNextBuildFinishAt,
 };

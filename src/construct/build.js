@@ -1,7 +1,8 @@
 const {
-  updateVillages,
+  updateVillagesOverviewInfo,
+  updateVillageResources,
+  updateVillageBuildings,
   getVillages,
-  getNextBuildFinishAt,
   updatePlayerVillageBuildFinishAt,
 } = require("../player/playerHandler");
 const upgradeResources = require("./upgradeResources");
@@ -23,7 +24,6 @@ const build = async (page) => {
 
   console.log("Time to build, starting the build process...");
 
-  await updateVillages(page); // TODO: its better if we just look for the one we are interested in
   await processVillagesBuild(page);
 
   console.log(
@@ -43,18 +43,31 @@ const shouldSkipBuild = () => {
     : null;
 };
 
+const getNextBuildFinishAt = () => {
+  const currentTime = Date.now();
+  const villages = getVillages();
+
+  const minBuildFinishAt = Math.min(
+    ...villages.map((village) => village.buildFinishAt)
+  );
+
+  return (minBuildFinishAt - currentTime) / 1000;
+};
+
 const processVillagesBuild = async (page) => {
+  await updateVillagesOverviewInfo(page);
   const villages = getVillages();
   for (const village of villages) {
+    if (village.actualFinishAt >= Date.now()) {
+      return;
+    }
+    await updateVillageResources(page, village.id);
+    await updateVillageBuildings(page, village.id);
     await processVillageBuild(page, village);
   }
 };
 
 const processVillageBuild = async (page, village) => {
-  if (village.actualFinishAt >= Date.now()) {
-    return;
-  }
-
   if (!village.capital) {
     const fundamentalsCreated = await createFundamentals(page, village);
     if (fundamentalsCreated) {
