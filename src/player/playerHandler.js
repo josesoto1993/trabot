@@ -9,16 +9,64 @@ const { formatTimeMillis } = require("../utils/timePrint");
 let player = new Player([]);
 
 const updateVillages = async (page) => {
+  await updateVillagesOverviewInfo(page);
+
+  for (const village of player.villages) {
+    await updateVillageResources(page, village.id);
+    await updateVillageBuildings(page, village.id);
+  }
+};
+
+const updateVillageResources = async (page, villageId) => {
+  const village = player.villages.find((v) => v.id === villageId);
+
+  if (!village) {
+    throw new Error("There is no village with id:", villageId);
+  }
+
+  village.resourceFields = await getResourceFieldsData(page, village);
+};
+
+const updateVillageBuildings = async (page, villageId) => {
+  const village = player.villages.find((v) => v.id === villageId);
+
+  if (!village) {
+    throw new Error("There is no village with id:", villageId);
+  }
+
+  village.buildings = await getBuildingData(page, village);
+};
+
+const updateVillagesOverviewInfo = async (page) => {
   const villages = await getVillagesOverviewInfo(page);
 
   for (const village of villages) {
-    village.resourceFields = await getResourceFieldsData(page, village);
-    village.buildings = await getBuildingData(page, village);
+    const playerVillage = player.villages.find((v) => v.id === village.id);
+
+    if (playerVillage) {
+      for (const key in village) {
+        const value = village[key];
+
+        if (
+          value === null ||
+          value === undefined ||
+          (Array.isArray(value) && value.length === 0)
+        ) {
+          continue;
+        }
+
+        if (Array.isArray(value)) {
+          playerVillage[key] = [...value];
+        } else if (typeof value === "object") {
+          playerVillage[key] = { ...playerVillage[key], ...value };
+        } else {
+          playerVillage[key] = value;
+        }
+      }
+    } else {
+      player.villages.push(village);
+    }
   }
-
-  player.villages = villages;
-
-  return player;
 };
 
 const getPlayer = () => {
@@ -123,6 +171,9 @@ const getNextBuildFinishAt = () => {
 
 module.exports = {
   updateVillages,
+  updateVillageResources,
+  updateVillageBuildings,
+  updateVillagesOverviewInfo,
   getPlayer,
   getVillages,
   updatePlayerBuilding,

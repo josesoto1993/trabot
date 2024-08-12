@@ -1,8 +1,11 @@
-const getVillagesOverviewInfo = require("../village/listVillagesOverview");
 const sendResources = require("./sendResources");
 const { formatTime } = require("../utils/timePrint");
 const Resources = require("../models/resources");
 const Trade = require("../models/trade");
+const {
+  getVillages,
+  updateVillagesOverviewInfo,
+} = require("../player/playerHandler");
 
 const MERCHANTS_CAPACITY = process.env.MERCHANTS_CAPACITY;
 const RESOURCE_THRESHOLD = 0.8;
@@ -43,7 +46,8 @@ const updateNextOverflowTime = () => {
 
 const checkVillagesOverflow = async (page) => {
   try {
-    const villages = await getVillagesOverviewInfo(page);
+    await updateVillagesOverviewInfo(page);
+    const villages = await getVillages();
 
     for (const village of villages) {
       await checkVillageOverflow(page, village, villages);

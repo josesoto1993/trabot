@@ -9,11 +9,11 @@ class Village {
     production = null,
     capacity = null,
     ongoingResources = null,
-    availableMerchants = 0,
-    maxMerchants = 0,
+    availableMerchants = null,
+    maxMerchants = null,
     resourceFields = [],
     buildings = [],
-    buildFinishAt = 0,
+    buildFinishAt = null,
     capital = false
   ) {
     this.id = id;

@@ -1,4 +1,3 @@
-const getResourceFieldsData = require("../village/resourceFieldsData");
 const { upgradeExistingField } = require("./upgradeExistingBuilding");
 
 const ConstructionStatus = require("../constants/constructionStatus");
@@ -8,7 +7,7 @@ const CAPITAL_FIELDS_ENABLE = process.env.CAPITAL_FIELDS_ENABLE === "true";
 const RESOURCE_MAX_LEVEL = 10;
 
 const upgradeResources = async (page, village) => {
-  const resourceToUpgrade = await getResourceToUpgrade(page, village);
+  const resourceToUpgrade = getResourceToUpgrade(village);
 
   if (!resourceToUpgrade) {
     return null;
@@ -17,19 +16,8 @@ const upgradeResources = async (page, village) => {
   return await upgradeExistingField(page, village.id, resourceToUpgrade.id);
 };
 
-const getResourceToUpgrade = async (page, village) => {
-  const allFieldsAreMaxLevel = village.resourceFields.every(
-    (field) => field.level >= RESOURCE_MAX_LEVEL
-  );
-
-  if (allFieldsAreMaxLevel && !village.capital) {
-    return null;
-  }
-
-  const possibleResourcesToUpgrade = await getPossibleResourcesToUpgrade(
-    page,
-    village
-  );
+const getResourceToUpgrade = (village) => {
+  const possibleResourcesToUpgrade = getPossibleResourcesToUpgrade(village);
 
   if (possibleResourcesToUpgrade.length === 0) {
     console.log(
@@ -42,13 +30,13 @@ const getResourceToUpgrade = async (page, village) => {
   return possibleResourcesToUpgrade[0];
 };
 
-const getPossibleResourcesToUpgrade = async (page, village) => {
-  const resourceFields = await getResourceFieldsData(page, village);
+const getPossibleResourcesToUpgrade = (village) => {
+  const resourceFields = village.resourceFields;
 
   const possibleResourcesToUpgrade = resourceFields.filter(
     (field) =>
       field.constructionStatus === ConstructionStatus.readyToUpgrade &&
-      (field.level < 10 || CAPITAL_FIELDS_ENABLE)
+      (field.level < RESOURCE_MAX_LEVEL || CAPITAL_FIELDS_ENABLE)
   );
 
   possibleResourcesToUpgrade.sort(sortResources);

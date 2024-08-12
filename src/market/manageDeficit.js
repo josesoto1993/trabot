@@ -1,8 +1,11 @@
-const getVillagesOverviewInfo = require("../village/listVillagesOverview");
 const sendResources = require("./sendResources");
 const Resources = require("../models/resources");
 const Trade = require("../models/trade");
 const { formatTime } = require("../utils/timePrint");
+const {
+  getVillages,
+  updateVillagesOverviewInfo,
+} = require("../player/playerHandler");
 
 const MERCHANTS_CAPACITY = process.env.MERCHANTS_CAPACITY;
 const DEFICIT_THRESHOLD = 0.4;
@@ -45,7 +48,8 @@ const updateNextDeficitTime = () => {
 
 const checkVillagesDeficit = async (page) => {
   try {
-    const villages = await getVillagesOverviewInfo(page);
+    await updateVillagesOverviewInfo;
+    const villages = getVillages();
 
     for (const village of villages) {
       await checkVillageDeficit(page, village, villages);
