@@ -55,10 +55,12 @@ const processVillageBuild = async (page, village) => {
     return;
   }
 
-  const fundamentalsCreated = await createFundamentals(page, village);
-  if (fundamentalsCreated) {
-    totalBuilds += 1;
-    return;
+  if (!village.capital) {
+    const fundamentalsCreated = await createFundamentals(page, village);
+    if (fundamentalsCreated) {
+      totalBuilds += 1;
+      return;
+    }
   }
 
   const highUpgraded = await updateBuildingList(
