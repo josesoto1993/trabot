@@ -67,6 +67,10 @@ const getFieldLevel = (classes) => {
     );
   }
 
+  if (classes.includes("underConstruction")) {
+    level += 1;
+  }
+
   return level;
 };
 
