@@ -79,14 +79,21 @@ const addNewBuildingType = (id, name) => {
     category: "TBD",
   };
 
-  BuildingTypes.sort((a, b) => a.name.localeCompare(b.name));
+  const sortedKeys = Object.keys(BuildingTypes).sort((a, b) =>
+    a.localeCompare(b)
+  );
+
+  const sortedBuildingTypes = {};
+  sortedKeys.forEach((key) => {
+    sortedBuildingTypes[key] = BuildingTypes[key];
+  });
 
   const buildingTypesPath = path.resolve(
     __dirname,
     "../constants/buildingTypes.js"
   );
 
-  const updatedContent = `const BuildingTypes = ${JSON.stringify(BuildingTypes, null, 2)};
+  const updatedContent = `const BuildingTypes = ${JSON.stringify(sortedBuildingTypes, null, 2)};
     
     module.exports = BuildingTypes;`;
 

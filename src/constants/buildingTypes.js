@@ -26,6 +26,11 @@ const BuildingTypes = {
     name: "Brickyard",
     category: BuildingCategory.resources,
   },
+  Cranny: {
+    id: 23,
+    name: "Cranny",
+    category: BuildingCategory.infrastructure,
+  },
   Embassy: {
     id: 18,
     name: "Embassy",
@@ -59,6 +64,11 @@ const BuildingTypes = {
   Marketplace: {
     id: 17,
     name: "Marketplace",
+    category: BuildingCategory.infrastructure,
+  },
+  Palace: {
+    id: 26,
+    name: "Palace",
     category: BuildingCategory.infrastructure,
   },
   Palisade: {
