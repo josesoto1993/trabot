@@ -1,7 +1,9 @@
-const { goMarket } = require("../village/goVillage");
+const { goBuilding } = require("../village/goVillage");
 const { formatTime } = require("../utils/timePrint");
 const { typeInSelector } = require("../browser/browserService");
 const { addTrade } = require("./ongoingTrades");
+const BuildingTypes = require("../constants/buildingTypes");
+const MarketTabs = require("../constants/marketTabs");
 
 const TRADE_DELAY = 3;
 const MARKET_WAIT_POSSIBLE_ERROR = 1 * 1000;
@@ -11,7 +13,7 @@ const sendResources = async (page, trade) => {
     `Start send resources from ${trade.from.name} to ${trade.to.name}`
   );
   try {
-    await goMarket(page, trade.from);
+    await goMarket(trade.from);
     await setDestination(page, trade.to);
     await setResources(page, trade.resources);
     await verify(page);
@@ -29,6 +31,17 @@ const sendResources = async (page, trade) => {
     );
     return -1;
   }
+};
+
+const goMarket = async (village) => {
+  const marketTabSearchParam = {
+    [MarketTabs.QueryParamKey]: MarketTabs.SendResources,
+  };
+  await goBuilding(
+    village,
+    BuildingTypes["Marketplace"].name,
+    marketTabSearchParam
+  );
 };
 
 const setDestination = async (page, to) => {
