@@ -64,6 +64,7 @@ const updateVillagesOverviewInfo = async (page) => {
         }
       }
     } else {
+      console.log("Add village to list:", village.name);
       player.villages.push(village);
     }
   }
@@ -131,26 +132,15 @@ const updatePlayerField = (villageId, slotId, level) => {
   );
 };
 
-const updatePlayerVillageBuildFinishAt = async (
-  page,
-  villageId,
-  durationInSeconds
-) => {
-  let village = player.villages.find((village) => village.id === villageId);
+const updatePlayerVillageBuildFinishAt = (villageId, durationInSeconds) => {
+  const village = player.villages.find((village) => village.id === villageId);
 
   if (!village) {
     console.log(`Village with ID ${villageId} not found. Updating villages...`);
-    await updateVillages(page);
-    village = player.villages.find((village) => village.id === villageId);
-
-    if (!village) {
-      throw new Error(
-        `Village with ID ${villageId} still not found after update.`
-      );
-    }
+    return;
   }
 
-  const actualFinishAt = Math.max(Date.now(), village.buildFinishAt);
+  const actualFinishAt = Math.max(Date.now(), village.buildFinishAt || 0);
   village.buildFinishAt = actualFinishAt + durationInSeconds * 1000;
   const remainingTime = village.buildFinishAt - Date.now();
 

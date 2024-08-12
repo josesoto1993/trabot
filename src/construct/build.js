@@ -8,7 +8,7 @@ const {
 const upgradeResources = require("./upgradeResources");
 const createFundamentals = require("./createFundamentals");
 const updateBuildingList = require("./updateBuildingList");
-const { formatTime } = require("../utils/timePrint");
+const { formatTime, formatTimeMillis } = require("../utils/timePrint");
 const HighPriorityBuildings = require("../constants/highPriorityBuilding");
 const MidPriorityBuildings = require("../constants/midPriorityBuilding");
 const LowPriorityBuildings = require("../constants/lowPriorityBuilding");
@@ -59,7 +59,10 @@ const processVillagesBuild = async (page) => {
   const villages = getVillages();
   for (const village of villages) {
     if (village.buildFinishAt >= Date.now()) {
-      return;
+      console.log(
+        `skip village ${village.name}, next build try: ${formatTimeMillis(village.buildFinishAt - Date.now())}`
+      );
+      continue;
     }
     await updateVillageResources(page, village.id);
     await updateVillageBuildings(page, village.id);
@@ -116,7 +119,7 @@ const processVillageBuild = async (page, village) => {
   }
 
   console.log(`Nothing to update in ${village.name}`);
-  await updatePlayerVillageBuildFinishAt(page, village.id, DEFAULT_INTERVAL);
+  updatePlayerVillageBuildFinishAt(village.id, DEFAULT_INTERVAL);
 };
 
 module.exports = build;

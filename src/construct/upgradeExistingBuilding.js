@@ -20,7 +20,7 @@ const upgradeExistingBuilding = async (
   }
 
   updatePlayerBuilding(villageId, slotId, buildingType, level + 1);
-  await updatePlayerVillageBuildFinishAt(page, villageId, duration);
+  updatePlayerVillageBuildFinishAt(villageId, duration);
   return duration;
 };
 
@@ -32,7 +32,7 @@ const upgradeExistingField = async (page, villageId, slotId) => {
   }
 
   updatePlayerField(villageId, slotId, level + 1);
-  await updatePlayerVillageBuildFinishAt(page, villageId, duration);
+  updatePlayerVillageBuildFinishAt(villageId, duration);
   return duration;
 };
 
