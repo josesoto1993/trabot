@@ -10,6 +10,7 @@ const build = require("./construct/build");
 const redeem = require("./redeemTask/redeemTask");
 const manageOverflow = require("./market/manageOverflow");
 const manageDeficit = require("./market/manageDeficit");
+const manageCelebrations = require("./celebration/celebration");
 const { updateVillages, getPlayer } = require("./player/playerHandler");
 
 const taskStats = {};
@@ -41,8 +42,9 @@ const mainLoop = async (page) => {
         await runTaskWithTimer("Go Adventure", () => goAdventure(page)),
         await runTaskWithTimer("Build", () => build(page)),
         await runTaskWithTimer("Redeem", () => redeem(page)),
-        await runTaskWithTimer("Manage Overflow", () => manageOverflow(page)),
-        await runTaskWithTimer("Manage Deficit", () => manageDeficit(page))
+        await runTaskWithTimer("Overflow", () => manageOverflow(page)),
+        await runTaskWithTimer("Deficit", () => manageDeficit(page)),
+        await runTaskWithTimer("Celebrations", () => manageCelebrations(page))
       );
 
       console.log(`Waiting for ${formatTime(nextLoop)} before next run...`);
