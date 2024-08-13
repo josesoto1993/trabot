@@ -90,11 +90,15 @@ const celebrate = async (page, village) => {
 const selectCelebration = async (page) => {
   const { smallCelebration, greatCelebration } = await getValidButtons(page);
 
-  if (greatCelebration.button) {
+  if (greatCelebration.exist && greatCelebration.button) {
     await greatCelebration.button.click();
     console.log("Great celebration selected.");
     return greatCelebration.celebrationTime;
-  } else if (smallCelebration.button) {
+  } else if (
+    smallCelebration.exist &&
+    smallCelebration.button &&
+    !greatCelebration.exist
+  ) {
     await smallCelebration.button.click();
     console.log("Small celebration selected.");
     return smallCelebration.celebrationTime;
@@ -107,8 +111,8 @@ const selectCelebration = async (page) => {
 const getValidButtons = async (page) => {
   const researchSections = await page.$$("div.researches div.research");
 
-  let smallCelebration = null;
-  let greatCelebration = null;
+  let smallCelebration = { button: null, celebrationTime: null, exist: false };
+  let greatCelebration = { button: null, celebrationTime: null, exist: false };
 
   for (const researchSection of researchSections) {
     const titleElement = await researchSection.$("div.information div.title a");
@@ -123,9 +127,17 @@ const getValidButtons = async (page) => {
       const celebrationTime = await getCelebrationTime(page, researchSection);
 
       if (titleText === "Small celebration") {
-        smallCelebration = { button, celebrationTime };
+        smallCelebration = {
+          button,
+          celebrationTime,
+          exist: true,
+        };
       } else if (titleText === "Great celebration") {
-        greatCelebration = { button, celebrationTime };
+        greatCelebration = {
+          button,
+          celebrationTime,
+          exist: true,
+        };
       }
     }
   }
