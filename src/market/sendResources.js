@@ -1,11 +1,10 @@
 const { goBuilding } = require("../village/goVillage");
 const { formatTime } = require("../utils/timePrint");
-const { typeInSelector } = require("../browser/browserService");
+const { typeInSelector, CLICK_DELAY } = require("../browser/browserService");
 const { addTrade } = require("./ongoingTrades");
 const BuildingTypes = require("../constants/buildingTypes");
 const MarketTabs = require("../constants/marketTabs");
 
-const TRADE_DELAY = 3;
 const MARKET_WAIT_POSSIBLE_ERROR = 1 * 1000;
 
 const sendResources = async (page, trade) => {
@@ -96,7 +95,7 @@ const executeTrade = async (page) => {
   if (sendButton) {
     const durationValue = await getTradeDuration(page);
     await sendButton.click();
-    await new Promise((resolve) => setTimeout(resolve, TRADE_DELAY * 1000));
+    await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
     return durationValue;
   } else {
     throw new Error("Send button not found.");

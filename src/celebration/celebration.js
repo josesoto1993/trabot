@@ -5,6 +5,7 @@ const {
 } = require("../player/playerHandler");
 const { formatTime } = require("../utils/timePrint");
 const { goBuilding } = require("../village/goVillage");
+const { CLICK_DELAY } = require("../browser/browserService");
 
 const CELEBRATION_TIME_GAP = 4 * 60 * 60;
 const TOWN_HALL = BuildingTypes["Town Hall"];
@@ -93,6 +94,7 @@ const selectCelebration = async (page) => {
   if (greatCelebration.exist && greatCelebration.button) {
     await greatCelebration.button.click();
     console.log("Great celebration selected.");
+    await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
     return greatCelebration.celebrationTime;
   } else if (
     smallCelebration.exist &&
@@ -101,6 +103,7 @@ const selectCelebration = async (page) => {
   ) {
     await smallCelebration.button.click();
     console.log("Small celebration selected.");
+    await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
     return smallCelebration.celebrationTime;
   } else {
     console.log("No celebration can be selected.");

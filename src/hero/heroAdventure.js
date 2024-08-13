@@ -1,4 +1,4 @@
-const { goPage } = require("../browser/browserService");
+const { goPage, CLICK_DELAY } = require("../browser/browserService");
 const { getClassOfHeroIcon, getHeroAdventures } = require("./heroStatus");
 const { TRAVIAN_HERO_ADVENTURES } = require("../constants/links");
 const { formatTime } = require("../utils/timePrint");
@@ -70,6 +70,7 @@ const clickAdventureButton = async (page) => {
     const button = await page.$(adventureButtonSelector);
     if (button) {
       await button.click();
+      await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
       console.log("First adventure button clicked.");
     } else {
       console.log("No adventures available.");
