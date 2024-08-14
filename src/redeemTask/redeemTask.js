@@ -1,6 +1,6 @@
 const { URL } = require("url");
 const getVillagesInfo = require("../village/listVillagesSimple");
-const { goPage } = require("../browser/browserService");
+const { goPage, CLICK_DELAY } = require("../browser/browserService");
 const { formatTime } = require("../utils/timePrint");
 const { TRAVIAN_TASK_VIEW } = require("../constants/links");
 const TaskTabs = require("../constants/taskTabs");
@@ -9,7 +9,6 @@ let redeemTaskCount = 0;
 let lastRedeemTime = 0;
 
 const REDEEM_TASK_INTERVAL = 1 * 60 * 60;
-const CLICK_BUTTON_DELAY = 5;
 const REDEEM_TASK_VIEW_SELECTOR = ".taskOverview";
 const REDEEM_BUTTONS_SELECTOR = ".taskOverview .achieved .progress .collect";
 
@@ -116,9 +115,7 @@ const redeemAll = async (page) => {
 
 const redeemSingle = async (buttonToClick) => {
   await buttonToClick.click();
-  await new Promise((resolve) =>
-    setTimeout(resolve, CLICK_BUTTON_DELAY * 1000)
-  );
+  await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
 };
 
 module.exports = redeem;

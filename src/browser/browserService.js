@@ -5,6 +5,7 @@ let page;
 
 const WINDOW_WIDTH = parseInt(process.env.WINDOW_WIDTH, 10) || 1366;
 const WINDOW_HEIGHT = parseInt(process.env.WINDOW_HEIGHT, 10) || 768;
+const CLICK_DELAY = 3 * 1000;
 
 const open = async () => {
   if (!browser) {
@@ -51,4 +52,5 @@ module.exports = {
   close,
   goPage,
   typeInSelector,
+  CLICK_DELAY,
 };

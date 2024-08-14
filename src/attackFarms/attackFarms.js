@@ -1,4 +1,4 @@
-const { goPage } = require("../browser/browserService");
+const { goPage, CLICK_DELAY } = require("../browser/browserService");
 const { TRAVIAN_FARM_LIST } = require("../constants/links");
 const { formatTime } = require("../utils/timePrint");
 
@@ -7,8 +7,6 @@ let randomAttackInterval = 0;
 let attackCount = 1;
 const MIN_ATTACK_INTERVAL = 5 * 60;
 const RANDOM_INTERVAL_VARIATION_MILLIS = 0.5 * 60 * 1000;
-const MIN_CLICK_INTERVAL_MILLIS = 3 * 1000;
-const MAX_CLICK_INTERVAL_MILLIS = 5 * 1000;
 
 const attackFarms = async (page) => {
   const remainingTime = getremainingTime();
@@ -76,11 +74,7 @@ const clickButtons = async (page) => {
   for (const button of buttons) {
     await button.click();
     console.log("Click button successfully.");
-    const randomTime =
-      Math.floor(
-        Math.random() * (MAX_CLICK_INTERVAL_MILLIS - MIN_CLICK_INTERVAL_MILLIS)
-      ) + MIN_CLICK_INTERVAL_MILLIS;
-    await new Promise((resolve) => setTimeout(resolve, randomTime));
+    await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
   }
 };
 

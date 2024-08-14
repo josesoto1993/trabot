@@ -1,5 +1,5 @@
 const { URL } = require("url");
-const { goPage } = require("../browser/browserService");
+const { goPage, CLICK_DELAY } = require("../browser/browserService");
 const { TRAVIAN_BUILD_VIEW } = require("../constants/links");
 const {
   updatePlayerBuilding,
@@ -21,6 +21,7 @@ const createBuilding = async (page, villageId, slotId, buildingName) => {
   await selectSlot(villageId, realSlotId, buildingType.category);
 
   const result = await buildSelectedBuilding(page, buildingType.name);
+  await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
   if (result.error) {
     console.log("Error on create building:", result.error);
     return null;

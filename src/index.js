@@ -95,7 +95,9 @@ const runTaskWithTimer = async (taskName, task) => {
     const averageDuration =
       taskStats[taskName].totalDuration / (taskStats[taskName].count || 1);
 
-    console.log(`${taskName} ended, took ${formatTimeMillis(duration)}`);
+    console.log(
+      `${taskName} ended, took ${formatTimeMillis(duration)}, next in ${formatTime(nextExecutionTime)}`
+    );
     console.log(
       `Average duration of ${taskName}: ${formatTimeMillis(averageDuration)} for total runs ${taskStats[taskName].count}`
     );

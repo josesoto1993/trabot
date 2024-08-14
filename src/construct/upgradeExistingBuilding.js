@@ -1,11 +1,13 @@
 const { URL } = require("url");
-const { goPage } = require("../browser/browserService");
+const { goPage, CLICK_DELAY } = require("../browser/browserService");
 const { TRAVIAN_BUILD_VIEW } = require("../constants/links");
 const {
   updatePlayerBuilding,
   updatePlayerField,
   updatePlayerVillageBuildFinishAt,
 } = require("../player/playerHandler");
+
+const UPGRADE_DELAY = 3 * 1000;
 
 const upgradeExistingBuilding = async (
   page,
@@ -56,6 +58,7 @@ const upgradeSelectedBuilding = async (page) => {
   const oldLevel = await getLevelValue(page);
 
   await buildButton.click();
+  await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
   console.log("Clicked on the build button.");
   return { duration: durationValue, level: oldLevel };
 };

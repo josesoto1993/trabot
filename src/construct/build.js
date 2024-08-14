@@ -12,6 +12,7 @@ const { formatTime, formatTimeMillis } = require("../utils/timePrint");
 const HighPriorityBuildings = require("../constants/highPriorityBuilding");
 const MidPriorityBuildings = require("../constants/midPriorityBuilding");
 const LowPriorityBuildings = require("../constants/lowPriorityBuilding");
+const { SkipCreation, SkipUpgrade } = require("../constants/skipBuild");
 
 const DEFAULT_INTERVAL = 15 * 60;
 let totalBuilds = 0;
@@ -58,6 +59,15 @@ const processVillagesBuild = async (page) => {
   await updateVillagesOverviewInfo(page);
   const villages = getVillages();
   for (const village of villages) {
+    if (
+      SkipUpgrade.includes(village.name) &&
+      SkipCreation.includes(village.name)
+    ) {
+      console.log(`Skipp ${village.name} build and upgrade`);
+      updatePlayerVillageBuildFinishAt(village.id, DEFAULT_INTERVAL * 999);
+      continue;
+    }
+
     if (village.buildFinishAt >= Date.now()) {
       console.log(
         `skip village ${village.name}, next build try: ${formatTimeMillis(village.buildFinishAt - Date.now())}`
@@ -71,12 +81,17 @@ const processVillagesBuild = async (page) => {
 };
 
 const processVillageBuild = async (page, village) => {
-  if (!village.capital) {
+  if (!village.capital && !SkipCreation.includes(village.name)) {
     const fundamentalsCreated = await createFundamentals(page, village);
     if (fundamentalsCreated) {
       totalBuilds += 1;
       return;
     }
+  }
+
+  if (SkipUpgrade.includes(village.name)) {
+    console.log(`Nothing to update in ${village.name}`);
+    updatePlayerVillageBuildFinishAt(village.id, DEFAULT_INTERVAL);
   }
 
   const highUpgraded = await updateBuildingList(
