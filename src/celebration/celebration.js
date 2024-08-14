@@ -75,8 +75,11 @@ const processVillageCelebration = async (page, village) => {
 
   const celebrationTime = await celebrate(page, village);
   if (!celebrationTime) {
-    const awaitMoreResourcesTime = 15 * 60;
+    const awaitMoreResourcesTime = CELEBRATION_TIME_GAP + 15 * 60;
     village.celebrationTime = awaitMoreResourcesTime;
+    console.log(
+      `Set default celebration time ${village.celebrationTime} on ${village.name}`
+    );
     return;
   }
 
