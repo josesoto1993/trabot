@@ -91,6 +91,7 @@ const processVillageCelebration = async (page, village) => {
 };
 
 const celebrate = async (page, village) => {
+  console.log(`celebrate village ${village.name}`);
   await goBuilding(village, TOWN_HALL.name);
   return await selectCelebration(page);
 };
@@ -157,12 +158,15 @@ const getValidButtons = async (page) => {
 
 const getValidButton = async (page, researchSection) => {
   const button = await researchSection.$("div.information div.cta button");
+  if (!button) {
+    return null;
+  }
+
   const isValidButton = await page.evaluate(
     (btn) =>
       !btn.classList.contains("gold") && !btn.classList.contains("disabled"),
     button
   );
-
   if (!isValidButton) {
     return null;
   }
