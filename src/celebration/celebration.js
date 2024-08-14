@@ -62,7 +62,7 @@ const processVillagesCelebration = async (page) => {
       village.celebrationTime > CELEBRATION_TIME_GAP
     ) {
       console.log(
-        `Village ${village.name} does not need celebration, remaning time ${village.celebrationTime}`
+        `Village ${village.name} does not need celebration, remaning time ${formatTime(village.celebrationTime)} > desired ${formatTime(CELEBRATION_TIME_GAP)} `
       );
       continue;
     }
