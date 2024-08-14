@@ -5,6 +5,7 @@ const { open, close } = require("./browser/browserService");
 const login = require("./browser/loginService");
 const attackFarms = require("./attackFarms/attackFarms");
 const trainTroops = require("./troops/troopCreator");
+const upgradeTroops = require("./troops/troopUpdater");
 const goAdventure = require("./hero/heroAdventure");
 const build = require("./construct/build");
 const redeem = require("./redeemTask/redeemTask");
@@ -39,6 +40,7 @@ const mainLoop = async (page) => {
       nextLoop = Math.min(
         await runTaskWithTimer("Attack Farms", () => attackFarms(page)),
         await runTaskWithTimer("Train Troops", () => trainTroops(page)),
+        await runTaskWithTimer("Upgrade Troops", () => upgradeTroops(page)),
         await runTaskWithTimer("Go Adventure", () => goAdventure(page)),
         await runTaskWithTimer("Build", () => build(page)),
         await runTaskWithTimer("Redeem", () => redeem(page)),
