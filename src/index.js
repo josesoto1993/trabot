@@ -11,21 +11,14 @@ const redeem = require("./redeemTask/redeemTask");
 const manageOverflow = require("./market/manageOverflow");
 const manageDeficit = require("./market/manageDeficit");
 const manageCelebrations = require("./celebration/celebration");
-const { updateVillages, getPlayer } = require("./player/playerHandler");
 
 const taskStats = {};
 
 const main = async () => {
   let page = await initializeBrowser();
   await login(page);
-  await initPlayer(page);
   await mainLoop(page);
   await finalizeBrowser();
-};
-
-const initPlayer = async (page) => {
-  await updateVillages(page);
-  console.log(`Player loaded: ${getPlayer()}`);
 };
 
 const mainLoop = async (page) => {
