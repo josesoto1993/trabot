@@ -1,4 +1,8 @@
 const formatTime = (rawSeconds) => {
+  if (!rawSeconds) {
+    return "nullTime";
+  }
+
   let seconds = Math.floor(rawSeconds) % 60;
   let minutes = Math.floor(rawSeconds / 60) % 60;
   let hours = Math.floor(rawSeconds / 3600);
@@ -18,6 +22,10 @@ const formatTime = (rawSeconds) => {
 };
 
 const formatTimeMillis = (milliseconds) => {
+  if (!milliseconds) {
+    return "nullTime";
+  }
+
   return formatTime(milliseconds / 1000);
 };
 
