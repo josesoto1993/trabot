@@ -70,6 +70,9 @@ const processVillageCelebration = async (page, village) => {
 
   if (!villageTownHall || !timeToCelebrate) {
     village.celebrationTime = CELEBRATION_TIME_GAP * 5;
+    console.log(
+      `Village ${village.name} does not need celebration [!${villageTownHall}||!${timeToCelebrate}], set time to ${village.celebrationTime}`
+    );
     return;
   }
 
