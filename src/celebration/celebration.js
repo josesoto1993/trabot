@@ -2,6 +2,7 @@ const BuildingTypes = require("../constants/buildingTypes");
 const {
   getVillages,
   updateVillagesOverviewInfo,
+  updateVillageBuildings,
 } = require("../player/playerHandler");
 const { formatTime } = require("../utils/timePrint");
 const { goBuilding } = require("../village/goVillage");
@@ -56,6 +57,9 @@ const processVillagesCelebration = async (page) => {
   await updateVillagesOverviewInfo(page);
   const villages = getVillages();
   for (const village of villages) {
+    if (village.buildings.length === 0) {
+      await updateVillageBuildings(page, village.id);
+    }
     await processVillageCelebration(page, village);
   }
 };
