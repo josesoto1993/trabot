@@ -25,7 +25,7 @@ const main = async () => {
 
 const initPlayer = async (page) => {
   await updateVillages(page);
-  console.log(`Player loaded: ${getPlayer()}. Extended object:`);
+  console.log(`Player loaded: ${getPlayer()}`);
 };
 
 const mainLoop = async (page) => {

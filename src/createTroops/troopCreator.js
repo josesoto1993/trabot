@@ -60,7 +60,7 @@ const performTrain = async (page, unit, village) => {
 
     if (remainingTime < MAX_TRAIN_TIME) {
       console.log(
-        `Need to train, remaining time=${formatTime(remainingTime)} is lower than MAX_TRAIN_TIME=${formatTime(MAX_TRAIN_TIME)}`
+        `Need to train [${village.name} / ${unit.name}], remaining time=${formatTime(remainingTime)} is lower than MAX_TRAIN_TIME=${formatTime(MAX_TRAIN_TIME)}`
       );
       await writeInputValueToMax(page, unit.selector);
       await submit(page);
@@ -68,7 +68,7 @@ const performTrain = async (page, unit, village) => {
       updateVillageTroopTime(village, unit, finalRemainingTime);
     } else {
       console.log(
-        `No need to train, remaining time=${formatTime(remainingTime)} is higher than MAX_TRAIN_TIME=${formatTime(MAX_TRAIN_TIME)}`
+        `No need to train [${village.name} / ${unit.name}], remaining time=${formatTime(remainingTime)} is higher than MAX_TRAIN_TIME=${formatTime(MAX_TRAIN_TIME)}`
       );
     }
 
@@ -137,7 +137,7 @@ const updateVillageTroopTime = (village, unit, finalRemainingTime) => {
   }
 
   console.log(
-    `Village status -> {barracks: ${formatTime(village.barracksTime)}, stable: ${formatTime(village.stableTime)}, workshop: ${formatTime(village.workshopTime)}}`
+    `Village ${village.name} / ${unit.name} -> {barracks: ${formatTime(village.barracksTime)}, stable: ${formatTime(village.stableTime)}, workshop: ${formatTime(village.workshopTime)}}`
   );
 };
 
