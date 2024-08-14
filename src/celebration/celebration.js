@@ -57,14 +57,23 @@ const processVillagesCelebration = async (page) => {
   await updateVillagesOverviewInfo(page);
   const villages = getVillages();
   for (const village of villages) {
-    if (village.buildings.length === 0) {
-      await updateVillageBuildings(page, village.id);
+    if (
+      village.celebrationTime !== null &&
+      village.celebrationTime > CELEBRATION_TIME_GAP
+    ) {
+      console.log(
+        `Village ${village.name} does not need celebration, remaning time ${village.celebrationTime}`
+      );
+      continue;
     }
     await processVillageCelebration(page, village);
   }
 };
 
 const processVillageCelebration = async (page, village) => {
+  if (village.buildings.length === 0) {
+    await updateVillageBuildings(page, village.id);
+  }
   const villageTownHall = village.buildings.find(
     (building) => building.name === TOWN_HALL.name
   );
@@ -72,7 +81,7 @@ const processVillageCelebration = async (page, village) => {
   if (!villageTownHall) {
     village.celebrationTime = CELEBRATION_TIME_GAP * 2;
     console.log(
-      `Village ${village.name} does not need celebration as does not have town hall[!${villageTownHall}], set time to ${village.celebrationTime}`
+      `Village ${village.name} does not need celebration as does not have town hall, set time to ${village.celebrationTime}`
     );
     return;
   }
