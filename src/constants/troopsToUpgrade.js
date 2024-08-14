@@ -1,6 +1,6 @@
 const Unit = require("./units");
 
-const UpdateList = [
+const UpgradeList = [
   {
     villageName: "HDS 01",
     unit: Unit.Haeduan,
@@ -39,4 +39,4 @@ const UpdateList = [
   },
 ];
 
-module.exports = UpdateList;
+module.exports = UpgradeList;

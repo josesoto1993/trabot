@@ -37,6 +37,14 @@ const TrainList = [
     villageName: "HDS 08",
     unit: Unit.Phalanx,
   },
+  {
+    villageName: "HDS 09",
+    unit: Unit.Phalanx,
+  },
+  {
+    villageName: "HDS 10",
+    unit: Unit.Phalanx,
+  },
 ];
 
 module.exports = TrainList;
