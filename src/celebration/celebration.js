@@ -114,8 +114,11 @@ const selectCelebration = async (page) => {
     await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
     return smallCelebration.celebrationTime;
   } else {
-    console.log("No celebration can be selected.");
-    return null;
+    const remainingTime = await getRemainingCelebrationTime(page);
+    console.log(
+      `No celebration can be selected. Keep remainingTime ${formatTime(remainingTime)}`
+    );
+    return remainingTime;
   }
 };
 
@@ -184,6 +187,21 @@ const getCelebrationTime = async (page, researchSection) => {
   );
   const [hours, minutes, seconds] = durationText.split(":").map(Number);
   return hours * 3600 + minutes * 60 + seconds;
+};
+
+const getRemainingCelebrationTime = async (page) => {
+  const durationElement = await page.$("table tbody tr td.dur span.timer");
+
+  if (!durationElement) {
+    return null;
+  }
+
+  const duration = await page.evaluate(
+    (el) => parseInt(el.getAttribute("value")),
+    durationElement
+  );
+
+  return isNaN(duration) ? null : duration;
 };
 
 module.exports = manageCelebrations;
