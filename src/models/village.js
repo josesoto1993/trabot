@@ -15,6 +15,9 @@ class Village {
     resourceFields = [],
     buildings = [],
     buildFinishAt = null,
+    barracksTime = null,
+    stableTime = null,
+    workshopTime = null,
     capital = false
   ) {
     this.id = id;
@@ -33,6 +36,9 @@ class Village {
     this.buildings = buildings;
     this.buildFinishAt = buildFinishAt;
     this.capital = capital;
+    this.barracksTime = barracksTime;
+    this.stableTime = stableTime;
+    this.workshopTime = workshopTime;
   }
 
   toString() {
