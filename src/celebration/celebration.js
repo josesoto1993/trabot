@@ -71,9 +71,6 @@ const processVillagesCelebration = async (page) => {
 };
 
 const processVillageCelebration = async (page, village) => {
-  if (village.buildings.length === 0) {
-    await updateVillageBuildings(page, village.id);
-  }
   const villageTownHall = village.buildings.find(
     (building) => building.name === TOWN_HALL.name
   );
