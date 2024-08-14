@@ -68,14 +68,11 @@ const processVillageCelebration = async (page, village) => {
   const villageTownHall = village.buildings.find(
     (building) => building.name === TOWN_HALL.name
   );
-  const timeToCelebrate =
-    village.celebrationTime == null ||
-    village.celebrationTime < CELEBRATION_TIME_GAP;
 
-  if (!villageTownHall || !timeToCelebrate) {
-    village.celebrationTime = CELEBRATION_TIME_GAP * 5;
+  if (!villageTownHall) {
+    village.celebrationTime = CELEBRATION_TIME_GAP * 2;
     console.log(
-      `Village ${village.name} does not need celebration [!${villageTownHall}||!${timeToCelebrate}], set time to ${village.celebrationTime}`
+      `Village ${village.name} does not need celebration as does not have town hall[!${villageTownHall}], set time to ${village.celebrationTime}`
     );
     return;
   }
@@ -85,7 +82,7 @@ const processVillageCelebration = async (page, village) => {
     const awaitMoreResourcesTime = CELEBRATION_TIME_GAP + 15 * 60;
     village.celebrationTime = awaitMoreResourcesTime;
     console.log(
-      `Set default celebration time ${village.celebrationTime} on ${village.name}`
+      `Set await resources celebration time ${village.celebrationTime} on ${village.name}`
     );
     return;
   }
