@@ -46,6 +46,11 @@ const BuildingTypes = {
     name: "Granary",
     category: BuildingCategory.infrastructure,
   },
+  "Hero's Mansion": {
+    id: 37,
+    name: "Hero's Mansion",
+    category: BuildingCategory.military,
+  },
   Hospital: {
     id: 46,
     name: "Hospital",
