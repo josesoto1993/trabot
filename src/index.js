@@ -47,7 +47,9 @@ const mainLoop = async (page) => {
         await runTaskWithTimer("Celebrations", () => manageCelebrations(page))
       );
 
-      console.log(`Waiting for ${formatTime(nextLoop)} before next run...`);
+      console.log(
+        `\n---------------- Waiting for ${formatTime(nextLoop)} before next run----------------`
+      );
       await new Promise((resolve) => setTimeout(resolve, nextLoop * 1000));
     }
   } catch (error) {

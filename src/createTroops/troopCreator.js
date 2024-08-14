@@ -1,5 +1,5 @@
 const { typeInSelector } = require("../browser/browserService");
-const { formatTime } = require("../utils/timePrint");
+const { formatTime, formatDateTime } = require("../utils/timePrint");
 const { getVillages } = require("../player/playerHandler");
 const { goBuilding } = require("../village/goVillage");
 const BuildingTypes = require("../constants/buildingTypes");
@@ -7,6 +7,7 @@ const TrainList = require("../constants/trainList");
 
 const UNITS_TO_TRAIN = "999";
 const MAX_TRAIN_TIME = 4 * 60 * 60;
+const MIN_TRAIN_DELAY = 5 * 60;
 
 const trainTroops = async (page) => {
   const skipBuild = shouldSkipBuild();
@@ -27,8 +28,10 @@ const trainTroops = async (page) => {
     }
   }
 
+  const nextExecutionTime = Math.max(getNextTrainRemaining(), MIN_TRAIN_DELAY);
+
   return {
-    nextExecutionTime: getNextTrainRemaining(),
+    nextExecutionTime: nextExecutionTime,
     skip: !anyTrainPerformed,
   };
 };
@@ -61,7 +64,7 @@ const getNextTrainRemaining = () => {
     }
     return minTime;
   }, Infinity);
-  return minTroopTime - MAX_TRAIN_TIME;
+  return minTroopTime - Date.now() / 1000 - MAX_TRAIN_TIME;
 };
 
 const performTrain = async (page, unit, village) => {
@@ -137,19 +140,20 @@ const submit = async (page) => {
 
 const updateVillageTroopTime = (village, unit, finalRemainingTime) => {
   const buildingName = unit.building.name;
+  const finishTime = finalRemainingTime + Date.now() / 1000;
 
   if (buildingName === BuildingTypes["Barracks"].name) {
-    village.barracksTime = finalRemainingTime;
+    village.barracksTime = finishTime;
   }
   if (buildingName === BuildingTypes["Stable"].name) {
-    village.stableTime = finalRemainingTime;
+    village.stableTime = finishTime;
   }
   if (buildingName === BuildingTypes["Workshop"].name) {
-    village.workshopTime = workshopTime;
+    village.workshopTime = finishTime;
   }
 
   console.log(
-    `Village ${village.name} / ${unit.name} -> {barracks: ${formatTime(village.barracksTime)}, stable: ${formatTime(village.stableTime)}, workshop: ${formatTime(village.workshopTime)}}`
+    `Village ${village.name} / ${unit.name} -> duration ${formatTime(finalRemainingTime)} will finish ${formatDateTime(finishTime)}`
   );
 };
 
