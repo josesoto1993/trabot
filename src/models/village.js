@@ -17,8 +17,7 @@ class Village {
     buildFinishAt = null,
     barracksTime = null,
     stableTime = null,
-    workshop = null,
-    hospitalTime = null,
+    workshopTime = null,
     capital = false
   ) {
     this.id = id;
@@ -39,8 +38,7 @@ class Village {
     this.capital = capital;
     this.barracksTime = barracksTime;
     this.stableTime = stableTime;
-    this.workshop = workshop;
-    this.hospitalTime = hospitalTime;
+    this.workshopTime = workshopTime;
   }
 
   toString() {
