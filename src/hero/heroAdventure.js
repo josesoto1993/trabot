@@ -80,6 +80,4 @@ const clickAdventureButton = async (page) => {
   }
 };
 
-module.exports = {
-  goAdventure,
-};
+module.exports = goAdventure;

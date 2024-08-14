@@ -157,6 +157,4 @@ const updateVillageTroopTime = (village, unit, finalRemainingTime) => {
   );
 };
 
-module.exports = {
-  trainTroops,
-};
+module.exports = trainTroops;
