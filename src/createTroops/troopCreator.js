@@ -28,28 +28,39 @@ const trainTroops = async (page) => {
   }
 
   return {
-    nextExecutionTime: getNextTrainRemaning(),
+    nextExecutionTime: getNextTrainRemaining(),
     skip: !anyTrainPerformed,
   };
 };
 
 const shouldSkipBuild = () => {
-  const remainingTime = getNextTrainRemaning();
+  const remainingTime = getNextTrainRemaining();
   return remainingTime > 0
     ? { nextExecutionTime: remainingTime, skip: true }
     : null;
 };
 
-const getNextTrainRemaning = () => {
+const getNextTrainRemaining = () => {
   const villages = getVillages();
 
-  const minTroopTime = Math.min(
-    ...villages.map((village) => village.barracksTime),
-    ...villages.map((village) => village.stableTime),
-    ...villages.map((village) => village.workshop),
-    ...villages.map((village) => village.hospitalTime)
-  );
+  const minTroopTime = villages.reduce((minTime, village) => {
+    for (const train of TrainList) {
+      if (village.name === train.villageName) {
+        const buildingName = train.unit.building.name;
 
+        if (buildingName === BuildingTypes.Barracks.name) {
+          minTime = Math.min(minTime, village.barracksTime);
+        }
+        if (buildingName === BuildingTypes.Stable.name) {
+          minTime = Math.min(minTime, village.stableTime);
+        }
+        if (buildingName === BuildingTypes.Workshop.name) {
+          minTime = Math.min(minTime, village.workshopTime);
+        }
+      }
+    }
+    return minTime;
+  }, Infinity);
   return minTroopTime - MAX_TRAIN_TIME;
 };
 
@@ -70,6 +81,7 @@ const performTrain = async (page, unit, village) => {
       console.log(
         `No need to train [${village.name} / ${unit.name}], remaining time=${formatTime(remainingTime)} is higher than MAX_TRAIN_TIME=${formatTime(MAX_TRAIN_TIME)}`
       );
+      updateVillageTroopTime(village, unit, remainingTime);
     }
 
     return true;
