@@ -14,6 +14,10 @@ const TrainList = [
     unit: Unit.Phalanx,
   },
   {
+    villageName: "HDS 02",
+    unit: Unit.Pathfinder,
+  },
+  {
     villageName: "HDS 03",
     unit: Unit.Phalanx,
   },
@@ -44,6 +48,30 @@ const TrainList = [
   {
     villageName: "HDS 10",
     unit: Unit.Phalanx,
+  },
+  {
+    villageName: "HDS 11",
+    unit: Unit.Phalanx,
+  },
+  {
+    villageName: "HDS 12",
+    unit: Unit.Phalanx,
+  },
+  {
+    villageName: "HDS 13",
+    unit: Unit.Phalanx,
+  },
+  {
+    villageName: "HDS 20",
+    unit: Unit.Swordsman,
+  },
+  {
+    villageName: "HDS 20",
+    unit: Unit.Haeduan,
+  },
+  {
+    villageName: "HDS 20",
+    unit: Unit.Trebuchet,
   },
 ];
 

@@ -8,9 +8,9 @@ const UpgradeList = require("../constants/troopsToUpgrade");
 const MIN_UPGRADE_DELAY = 5 * 60;
 
 const upgradeTroops = async (page) => {
-  const skipBuild = shouldSkipBuild();
-  if (skipBuild) {
-    return skipBuild;
+  const skip = shouldSkip();
+  if (skip) {
+    return skip;
   }
 
   const villages = getVillages();
@@ -37,7 +37,7 @@ const upgradeTroops = async (page) => {
   };
 };
 
-const shouldSkipBuild = () => {
+const shouldSkip = () => {
   const remainingTime = getNextUpgradeRemaining();
   return remainingTime > 0
     ? { nextExecutionTime: remainingTime, skip: true }
@@ -158,8 +158,12 @@ const getUnitLevel = async (page, unitName) => {
 const improveUnit = async (page, unitName) => {
   const researchSections = await page.$$("div.researches div.research");
 
+  console.log("temporal >>> researchSections", researchSections);
+
   for (const section of researchSections) {
     const titleElements = await section.$$("div.information div.title a");
+
+    console.log("temporal >>> titleElements", titleElements);
 
     const matchingTitleElement = await page.evaluate(
       (titleElements, unitName) => {
@@ -174,6 +178,8 @@ const improveUnit = async (page, unitName) => {
       titleElements,
       unitName
     );
+
+    console.log("temporal >>> matchingTitleElement", matchingTitleElement);
 
     if (matchingTitleElement) {
       const button = await section.$(

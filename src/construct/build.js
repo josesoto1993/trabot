@@ -18,9 +18,9 @@ const DEFAULT_INTERVAL = 15 * 60;
 let totalBuilds = 0;
 
 const build = async (page) => {
-  const skipBuild = shouldSkipBuild();
-  if (skipBuild) {
-    return skipBuild;
+  const skip = shouldSkip();
+  if (skip) {
+    return skip;
   }
 
   console.log("Time to build, starting the build process...");
@@ -37,7 +37,7 @@ const build = async (page) => {
   };
 };
 
-const shouldSkipBuild = () => {
+const shouldSkip = () => {
   const remainingTime = getNextBuildFinishAt();
   return remainingTime > 0
     ? { nextExecutionTime: remainingTime, skip: true }
@@ -63,7 +63,7 @@ const processVillagesBuild = async (page) => {
       SkipUpgrade.includes(village.name) &&
       SkipCreation.includes(village.name)
     ) {
-      console.log(`Skipp ${village.name} build and upgrade`);
+      console.log(`Skip ${village.name} build and upgrade`);
       updatePlayerVillageBuildFinishAt(village.id, DEFAULT_INTERVAL * 999);
       continue;
     }
@@ -92,6 +92,7 @@ const processVillageBuild = async (page, village) => {
   if (SkipUpgrade.includes(village.name)) {
     console.log(`Nothing to update in ${village.name}`);
     updatePlayerVillageBuildFinishAt(village.id, DEFAULT_INTERVAL);
+    return;
   }
 
   const highUpgraded = await updateBuildingList(

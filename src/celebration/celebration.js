@@ -12,9 +12,9 @@ const CELEBRATION_TIME_GAP = 4 * 60 * 60;
 const TOWN_HALL = BuildingTypes["Town Hall"];
 
 const manageCelebrations = async (page) => {
-  const skipBuild = shouldSkipCelebrations();
-  if (skipBuild) {
-    return skipBuild;
+  const skip = shouldSkip();
+  if (skip) {
+    return skip;
   }
 
   console.log("Time to start celebrations process...");
@@ -33,7 +33,7 @@ const manageCelebrations = async (page) => {
   };
 };
 
-const shouldSkipCelebrations = () => {
+const shouldSkip = () => {
   const remainingTimes = getVillages()
     .map((village) => village.celebrationTime)
     .filter((time) => time !== null);
