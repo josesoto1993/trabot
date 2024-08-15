@@ -55,6 +55,4 @@ const submit = async (page) => {
   }
 };
 
-module.exports = {
-  login,
-};
+module.exports = login;

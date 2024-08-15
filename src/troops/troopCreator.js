@@ -10,9 +10,9 @@ const MAX_TRAIN_TIME = 4 * 60 * 60;
 const MIN_TRAIN_DELAY = 5 * 60;
 
 const trainTroops = async (page) => {
-  const skipBuild = shouldSkipBuild();
-  if (skipBuild) {
-    return skipBuild;
+  const skip = shouldSkip();
+  if (skip) {
+    return skip;
   }
 
   const villages = getVillages();
@@ -36,7 +36,7 @@ const trainTroops = async (page) => {
   };
 };
 
-const shouldSkipBuild = () => {
+const shouldSkip = () => {
   const remainingTime = getNextTrainRemaining();
   return remainingTime > 0
     ? { nextExecutionTime: remainingTime, skip: true }
@@ -157,6 +157,4 @@ const updateVillageTroopTime = (village, unit, finalRemainingTime) => {
   );
 };
 
-module.exports = {
-  trainTroops,
-};
+module.exports = trainTroops;

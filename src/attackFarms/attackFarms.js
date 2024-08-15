@@ -78,6 +78,4 @@ const clickButtons = async (page) => {
   }
 };
 
-module.exports = {
-  attackFarms,
-};
+module.exports = attackFarms;

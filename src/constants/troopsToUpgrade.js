@@ -1,6 +1,6 @@
 const Unit = require("./units");
 
-const TrainList = [
+const UpgradeList = [
   {
     villageName: "HDS 01",
     unit: Unit.Swordsman,
@@ -8,6 +8,10 @@ const TrainList = [
   {
     villageName: "HDS 01",
     unit: Unit.Haeduan,
+  },
+  {
+    villageName: "HDS 01",
+    unit: Unit.Ram,
   },
   {
     villageName: "HDS 01",
@@ -74,9 +78,13 @@ const TrainList = [
     unit: Unit.Haeduan,
   },
   {
+    villageName: "HDS 01",
+    unit: Unit.Ram,
+  },
+  {
     villageName: "HDS 20",
     unit: Unit.Trebuchet,
   },
 ];
 
-module.exports = TrainList;
+module.exports = UpgradeList;
