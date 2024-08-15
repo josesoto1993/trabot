@@ -124,82 +124,66 @@ const getRemainingTime = async (page) => {
 };
 
 const getUnitLevel = async (page, unitName) => {
-  const unitLevelElement = await page.evaluate((unitName) => {
-    const researchElements = document.querySelectorAll(
-      "div.researches div.research"
-    );
+  const section = await getSection(page, unitName);
 
-    for (let research of researchElements) {
-      const titleElement = research.querySelector("div.information div.title");
-
-      if (titleElement) {
-        const links = titleElement.querySelectorAll("a");
-
-        const match = Array.from(links).find((link) =>
-          link.textContent.toLowerCase().includes(unitName.toLowerCase())
-        );
-
-        if (match) {
-          const levelElement = titleElement.querySelector("span.level");
-          if (levelElement) {
-            const levelText = levelElement.textContent;
-            return parseInt(levelText.replace(/\D/g, ""), 10);
-          }
-        }
-      }
-    }
-
+  if (!section) {
+    console.log(`No level section found for ${unitName}.`);
     return null;
-  }, unitName);
+  }
 
-  return unitLevelElement;
+  const levelElement = await section.$("div.information div.title span.level");
+  if (!levelElement) {
+    console.log(`No level information found for ${unitName}.`);
+    return null;
+  }
+
+  const levelText = await page.evaluate((el) => el.textContent, levelElement);
+  return parseInt(levelText.replace(/\D/g, ""), 10);
 };
 
 const improveUnit = async (page, unitName) => {
+  const section = await getSection(page, unitName);
+
+  if (!section) {
+    console.log(`No matching unit found for ${unitName}.`);
+    return false;
+  }
+
+  const button = await section.$("div.information div.cta button.contracting");
+  if (!button) {
+    console.log(`No contracting button found for ${unitName}.`);
+    return false;
+  }
+
+  await button.click();
+  console.log(`${unitName} improvement initiated.`);
+  await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
+  return true;
+};
+
+const getSection = async (page, unitName) => {
   const researchSections = await page.$$("div.researches div.research");
 
-  console.log("temporal >>> researchSections", researchSections);
-
   for (const section of researchSections) {
-    const titleElements = await section.$$("div.information div.title a");
+    const titleElement = await section.$("div.information div.title");
 
-    console.log("temporal >>> titleElements", titleElements);
-
-    const matchingTitleElement = await page.evaluate(
-      (titleElements, unitName) => {
-        for (const el of titleElements) {
-          const textContent = el.textContent?.trim().toLowerCase();
-          if (textContent && textContent.includes(unitName.toLowerCase())) {
-            return true;
-          }
-        }
-        return false;
-      },
-      titleElements,
-      unitName
-    );
-
-    console.log("temporal >>> matchingTitleElement", matchingTitleElement);
-
-    if (matchingTitleElement) {
-      const button = await section.$(
-        "div.information div.cta button.contracting"
+    if (titleElement) {
+      const titleText = await page.evaluate(
+        (el) => el.textContent?.trim(),
+        titleElement
       );
 
-      if (button) {
-        await button.click();
-        console.log(`${unitName} improvement initiated.`);
-        await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
-        return true;
-      } else {
-        console.log(`No contracting button found for ${unitName}.`);
-        return false;
+      if (
+        titleText &&
+        titleText.toLowerCase().includes(unitName.toLowerCase())
+      ) {
+        return section;
       }
     }
   }
 
-  console.log(`No matching unit found for ${unitName}.`);
-  return false;
+  console.log(`No matching section found for ${unitName}.`);
+  return null;
 };
 
 const updateVillageTroopTime = (village, unit, finalRemainingTime) => {
