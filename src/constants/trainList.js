@@ -10,6 +10,10 @@ const TrainList = [
     unit: Unit.Haeduan,
   },
   {
+    villageName: "HDS 01",
+    unit: Unit.Trebuchet,
+  },
+  {
     villageName: "HDS 02",
     unit: Unit.Phalanx,
   },
