@@ -38,14 +38,14 @@ const mainLoop = async (page) => {
       console.log(`\n\n\n---------------- loop ${loopNumber} ----------------`);
 
       nextLoop = Math.min(
+        await runTaskWithTimer("Deficit", () => manageDeficit(page)),
+        await runTaskWithTimer("Overflow", () => manageOverflow(page)),
         await runTaskWithTimer("Attack Farms", () => attackFarms(page)),
         await runTaskWithTimer("Train Troops", () => trainTroops(page)),
         await runTaskWithTimer("Upgrade Troops", () => upgradeTroops(page)),
         await runTaskWithTimer("Go Adventure", () => goAdventure(page)),
         await runTaskWithTimer("Build", () => build(page)),
         await runTaskWithTimer("Redeem", () => redeem(page)),
-        await runTaskWithTimer("Overflow", () => manageOverflow(page)),
-        await runTaskWithTimer("Deficit", () => manageDeficit(page)),
         await runTaskWithTimer("Celebrations", () => manageCelebrations(page))
       );
 

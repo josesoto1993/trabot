@@ -8,9 +8,6 @@ const {
 } = require("../player/playerHandler");
 
 const MERCHANTS_CAPACITY = process.env.MERCHANTS_CAPACITY;
-const DEFICIT_THRESHOLD = 0.4;
-const DEFICIT_MAX_VALUE = 35000;
-const REQUEST_THRESHOLD = 0.6;
 const DONOR_SAFE_LEVEL = 0.5;
 const DONOR_SAFE_VALUE = 40000;
 const ROUNDING_SAFETY_FACTOR = 0.999;
@@ -48,7 +45,7 @@ const updateNextDeficitTime = () => {
 
 const checkVillagesDeficit = async (page) => {
   try {
-    await updateVillagesOverviewInfo;
+    await updateVillagesOverviewInfo(page);
     const villages = getVillages();
 
     for (const village of villages) {
@@ -60,43 +57,13 @@ const checkVillagesDeficit = async (page) => {
 };
 
 const checkVillageDeficit = async (page, village, villages) => {
-  const actualVillageResources = Resources.add(
-    village.resources,
-    village.ongoingResources
-  );
-  const deficitResources = getDeficitResources(
-    actualVillageResources,
-    village.capacity
-  );
+  const deficitResources = village.getDeficitResources();
 
   if (deficitResources.getTotal() > 0) {
     await handleDeficitResources(page, villages, village, deficitResources);
   } else {
     console.log(`Village ${village.name} does not need resources`);
   }
-};
-
-const getDeficitResources = (resources, capacity) => {
-  const deficitResources = new Resources(0, 0, 0, 0);
-
-  Resources.getKeys().forEach((resourceType) => {
-    const actual = resources[resourceType];
-    const maxCapacity = capacity[resourceType];
-    const thresholdValue = Math.min(
-      maxCapacity * DEFICIT_THRESHOLD,
-      DEFICIT_MAX_VALUE
-    );
-
-    if (actual < thresholdValue) {
-      const thresholdRequest = Math.min(
-        maxCapacity * REQUEST_THRESHOLD,
-        DEFICIT_MAX_VALUE
-      );
-      deficitResources[resourceType] = thresholdRequest - actual;
-    }
-  });
-
-  return deficitResources;
 };
 
 const handleDeficitResources = async (
