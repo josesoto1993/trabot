@@ -56,15 +56,15 @@ class Village {
     return `Village(id: ${this.id}, name: ${this.name})`;
   }
 
+  getFutureResources = () => {
+    return Resources.add(this.resources, this.ongoingResources);
+  };
+
   getOverflowResources = () => {
-    const futureResources = Resources.add(
-      this.resources,
-      this.ongoingResources
-    );
     const overflowResources = new Resources(0, 0, 0, 0);
 
     Resources.getKeys().forEach((resourceType) => {
-      const actual = this.futureResources[resourceType];
+      const actual = this.getFutureResources()[resourceType];
       const maxCapacity = this.capacity[resourceType];
 
       if (actual > maxCapacity * OVERFLOW_THRESHOLD) {
@@ -77,14 +77,10 @@ class Village {
   };
 
   getDeficitResources = () => {
-    const futureResources = Resources.add(
-      this.resources,
-      this.ongoingResources
-    );
     const deficitResources = new Resources(0, 0, 0, 0);
 
     Resources.getKeys().forEach((resourceType) => {
-      const actual = futureResources[resourceType];
+      const actual = this.getFutureResources()[resourceType];
       const maxCapacity = this.capacity[resourceType];
       const negativeProduction = this.production[resourceType] < 0;
 
