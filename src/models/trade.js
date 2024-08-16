@@ -6,7 +6,7 @@ class Trade {
   }
 
   toString() {
-    return `Trade from ${this.from.name} to ${this.to.name} with ${this.resources}`;
+    return `Trade from ${this.from.name}[${this.from.availableMerchants}] to ${this.to.name}[${this.to.availableMerchants}] with ${this.resources}`;
   }
 }
 

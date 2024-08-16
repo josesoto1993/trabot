@@ -3,7 +3,7 @@ const { formatTime, formatDateTime } = require("../utils/timePrint");
 const { getVillages } = require("../player/playerHandler");
 const { goBuilding } = require("../village/goVillage");
 const BuildingTypes = require("../constants/buildingTypes");
-const UpgradeList = require("../constants/troopsToUpgrade");
+let UpgradeList = require("../constants/troopsToUpgrade");
 
 const MIN_UPGRADE_DELAY = 5 * 60;
 
@@ -74,10 +74,10 @@ const performUpgrade = async (page, unit, village) => {
     const unitLevel = await getUnitLevel(page, unit.name);
     if (unitLevel === 20) {
       console.log(
-        `No need to upgrade [${village.name} / ${unitName}], as it is level 20`
+        `No need to upgrade [${village.name} / ${unit.name}], as it is level 20`
       );
 
-      UpgradeList = UpgradeList.filter((item) => item.unit.name !== unitName);
+      UpgradeList = UpgradeList.filter((item) => item.unit.name !== unit.name);
 
       return false;
     }
@@ -168,15 +168,18 @@ const getSection = async (page, unitName) => {
     const titleElement = await section.$("div.information div.title");
 
     if (titleElement) {
-      const titleText = await page.evaluate(
-        (el) => el.textContent?.trim(),
-        titleElement
-      );
+      const titleText = await page.evaluate((el) => {
+        return el.textContent
+          ?.replace(/[^a-zA-Z]/g, "")
+          .trim()
+          .toLowerCase();
+      }, titleElement);
 
-      if (
-        titleText &&
-        titleText.toLowerCase().includes(unitName.toLowerCase())
-      ) {
+      const normalizedUnitName = unitName
+        .replace(/[^a-zA-Z]/g, "")
+        .toLowerCase();
+
+      if (titleText && titleText.includes(normalizedUnitName)) {
         return section;
       }
     }

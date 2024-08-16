@@ -123,6 +123,11 @@ const BuildingTypes = {
     name: "Town Hall",
     category: BuildingCategory.infrastructure,
   },
+  "Trade Office": {
+    id: 28,
+    name: "Trade Office",
+    category: BuildingCategory.infrastructure,
+  },
   Treasury: {
     id: 27,
     name: "Treasury",

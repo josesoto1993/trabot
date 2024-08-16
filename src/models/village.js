@@ -1,3 +1,12 @@
+const Resources = require("../models/resources");
+
+const DEFICIT_THRESHOLD = 0.4;
+const DEFICIT_MAX_VALUE = 35000;
+const REQUEST_THRESHOLD = 0.6;
+
+const OVERFLOW_THRESHOLD = 0.8;
+const OVERFLOW_SAFE_LEVEL = 0.6;
+
 class Village {
   constructor(
     id,
@@ -46,6 +55,67 @@ class Village {
   toString() {
     return `Village(id: ${this.id}, name: ${this.name})`;
   }
+
+  getFutureResources = () => {
+    return Resources.add(this.resources, this.ongoingResources);
+  };
+
+  getOverflowResources = () => {
+    const overflowResources = new Resources(0, 0, 0, 0);
+
+    Resources.getKeys().forEach((resourceType) => {
+      const actual = this.getFutureResources()[resourceType];
+      const maxCapacity = this.capacity[resourceType];
+
+      if (actual > maxCapacity * OVERFLOW_THRESHOLD) {
+        overflowResources[resourceType] =
+          actual - maxCapacity * OVERFLOW_SAFE_LEVEL;
+      }
+    });
+
+    return overflowResources;
+  };
+
+  getDeficitResources = () => {
+    const deficitResources = new Resources(0, 0, 0, 0);
+
+    Resources.getKeys().forEach((resourceType) => {
+      const actual = this.getFutureResources()[resourceType];
+      const maxCapacity = this.capacity[resourceType];
+      const negativeProduction = this.production[resourceType] < 0;
+
+      const thresholdDeficit = this.getThresholdDeficit(
+        maxCapacity,
+        negativeProduction
+      );
+
+      if (actual < thresholdDeficit) {
+        const thresholdRequest = this.getThresholdRequest(
+          maxCapacity,
+          negativeProduction
+        );
+        deficitResources[resourceType] = thresholdRequest - actual;
+      }
+    });
+
+    return deficitResources;
+  };
+
+  getThresholdRequest = (maxCapacity, negativeProduction) => {
+    if (negativeProduction) {
+      return maxCapacity * REQUEST_THRESHOLD;
+    } else {
+      return Math.min(maxCapacity * REQUEST_THRESHOLD, DEFICIT_MAX_VALUE);
+    }
+  };
+
+  getThresholdDeficit = (maxCapacity, negativeProduction) => {
+    if (negativeProduction) {
+      return maxCapacity * DEFICIT_THRESHOLD;
+    } else {
+      return Math.min(maxCapacity * DEFICIT_THRESHOLD, DEFICIT_MAX_VALUE);
+    }
+  };
 }
 
 module.exports = Village;
