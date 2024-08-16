@@ -7,6 +7,10 @@ const UpgradeList = [
   },
   {
     villageName: "HDS 01",
+    unit: Unit.TheutatesThunder,
+  },
+  {
+    villageName: "HDS 01",
     unit: Unit.Haeduan,
   },
   {
@@ -75,10 +79,14 @@ const UpgradeList = [
   },
   {
     villageName: "HDS 20",
+    unit: Unit.TheutatesThunder,
+  },
+  {
+    villageName: "HDS 20",
     unit: Unit.Haeduan,
   },
   {
-    villageName: "HDS 01",
+    villageName: "HDS 20",
     unit: Unit.Ram,
   },
   {
