@@ -2,7 +2,6 @@ const BuildingTypes = require("../constants/buildingTypes");
 const {
   getVillages,
   updateVillagesOverviewInfo,
-  updateVillageBuildings,
 } = require("../player/playerHandler");
 const { formatTime } = require("../utils/timePrint");
 const { goBuilding } = require("../village/goVillage");
