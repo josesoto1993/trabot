@@ -4,6 +4,9 @@ const DEFICIT_THRESHOLD = 0.4;
 const DEFICIT_MAX_VALUE = 35000;
 const REQUEST_THRESHOLD = 0.6;
 
+const OVERFLOW_THRESHOLD = 0.8;
+const OVERFLOW_SAFE_LEVEL = 0.6;
+
 class Village {
   constructor(
     id,
@@ -52,6 +55,26 @@ class Village {
   toString() {
     return `Village(id: ${this.id}, name: ${this.name})`;
   }
+
+  getOverflowResources = () => {
+    const futureResources = Resources.add(
+      this.resources,
+      this.ongoingResources
+    );
+    const overflowResources = new Resources(0, 0, 0, 0);
+
+    Resources.getKeys().forEach((resourceType) => {
+      const actual = this.futureResources[resourceType];
+      const maxCapacity = this.capacity[resourceType];
+
+      if (actual > maxCapacity * OVERFLOW_THRESHOLD) {
+        overflowResources[resourceType] =
+          actual - maxCapacity * OVERFLOW_SAFE_LEVEL;
+      }
+    });
+
+    return overflowResources;
+  };
 
   getDeficitResources = () => {
     const futureResources = Resources.add(

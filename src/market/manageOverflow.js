@@ -8,9 +8,7 @@ const {
 } = require("../player/playerHandler");
 
 const MERCHANTS_CAPACITY = process.env.MERCHANTS_CAPACITY;
-const RESOURCE_THRESHOLD = 0.8;
 const RECEIVER_THRESHOLD = 0.7;
-const SAFE_LEVEL = 0.6;
 const ROUNDING_SAFETY_FACTOR = 0.999;
 const OVERFLOW_INTERVAL = 4 * 60;
 
@@ -58,35 +56,13 @@ const checkVillagesOverflow = async (page) => {
 };
 
 const checkVillageOverflow = async (page, village, villages) => {
-  const actualVillageResources = Resources.add(
-    village.resources,
-    village.ongoingResources
-  );
-  const excessResources = getOverflowResources(
-    actualVillageResources,
-    village.capacity
-  );
+  const excessResources = village.getOverflowResources();
 
   if (excessResources.getTotal() > 0) {
     await handleOverflowResources(page, villages, village, excessResources);
   } else {
     console.log(`Village ${village.name} does not need to balance resources.`);
   }
-};
-
-const getOverflowResources = (resources, capacity) => {
-  const overflowResources = new Resources(0, 0, 0, 0);
-
-  Resources.getKeys().forEach((resourceType) => {
-    const actual = resources[resourceType];
-    const maxCapacity = capacity[resourceType];
-
-    if (actual > maxCapacity * RESOURCE_THRESHOLD) {
-      overflowResources[resourceType] = actual - maxCapacity * SAFE_LEVEL;
-    }
-  });
-
-  return overflowResources;
 };
 
 const handleOverflowResources = async (
