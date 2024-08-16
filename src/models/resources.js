@@ -7,7 +7,7 @@ class Resources {
   }
 
   toString() {
-    return `Resources(lumber: ${this.lumber}, clay: ${this.clay}, iron: ${this.iron}, crop: ${this.crop})`;
+    return `Resources(lumber: ${this.lumber}, clay: ${this.clay}, iron: ${this.iron}, crop: ${this.crop})[${this.getTotal()}]`;
   }
 
   getTotal() {

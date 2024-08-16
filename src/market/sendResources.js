@@ -24,10 +24,7 @@ const sendResources = async (page, trade) => {
     );
     return tradeDuration;
   } catch (error) {
-    console.error(
-      `Error in sendResources for trade ${JSON.stringify(trade, null, 2)} :`,
-      error
-    );
+    console.error(`Error in sendResources for trade ${trade} :`, error);
     return -1;
   }
 };
