@@ -168,15 +168,18 @@ const getSection = async (page, unitName) => {
     const titleElement = await section.$("div.information div.title");
 
     if (titleElement) {
-      const titleText = await page.evaluate(
-        (el) => el.textContent?.trim(),
-        titleElement
-      );
+      const titleText = await page.evaluate((el) => {
+        return el.textContent
+          ?.replace(/[^a-zA-Z]/g, "")
+          .trim()
+          .toLowerCase();
+      }, titleElement);
 
-      if (
-        titleText &&
-        titleText.toLowerCase().includes(unitName.toLowerCase())
-      ) {
+      const normalizedUnitName = unitName
+        .replace(/[^a-zA-Z]/g, "")
+        .toLowerCase();
+
+      if (titleText && titleText.includes(normalizedUnitName)) {
         return section;
       }
     }
