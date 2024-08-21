@@ -12,7 +12,6 @@ const FundamentalBuildings = [
   BuildingTypes["Brickyard"],
   BuildingTypes["Sawmill"],
   BuildingTypes["Iron Foundry"],
-  BuildingTypes["Barracks"],
   BuildingTypes["Academy"],
   BuildingTypes["Town Hall"],
   BuildingTypes["Bakery"],
