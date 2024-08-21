@@ -45,7 +45,7 @@ const createFundamentalBuilding = async (
     console.error(
       `No available slot found in village ${village.id} for fundamental Building ${fundamentalBuilding.name}.`
     );
-    return BUILD_FUNDAMENTAL_INTERVAL;
+    return null;
   }
 
   console.log(

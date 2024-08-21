@@ -2,7 +2,6 @@ const BuildingTypes = require("../constants/buildingTypes");
 const {
   getVillages,
   updateVillagesOverviewInfo,
-  updateVillageBuildings,
 } = require("../player/playerHandler");
 const { formatTime } = require("../utils/timePrint");
 const { goBuilding } = require("../village/goVillage");
@@ -38,9 +37,10 @@ const shouldSkip = () => {
     .map((village) => village.celebrationTime)
     .filter((time) => time !== null);
 
-  const remainingTime = Math.min(...remainingTimes, Infinity);
+  const remainingTime =
+    Math.min(...remainingTimes, Infinity) - CELEBRATION_TIME_GAP;
 
-  return remainingTime > CELEBRATION_TIME_GAP
+  return remainingTime > 0
     ? { nextExecutionTime: remainingTime, skip: true }
     : null;
 };
