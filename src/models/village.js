@@ -1,8 +1,10 @@
 const Resources = require("../models/resources");
 
 const DEFICIT_THRESHOLD = 0.4;
+const DEFICIT_THRESHOLD_NEGATIVE_PRODUCTION = 0.7;
 const DEFICIT_MAX_VALUE = 35000;
 const REQUEST_THRESHOLD = 0.6;
+const REQUEST_THRESHOLD_NEGATIVE_PRODUCTION = 0.8;
 
 const OVERFLOW_THRESHOLD = 0.8;
 const OVERFLOW_SAFE_LEVEL = 0.6;
@@ -18,6 +20,7 @@ class Village {
     production = null,
     capacity = null,
     ongoingResources = null,
+    consumption = null,
     celebrationTime = null,
     availableMerchants = null,
     maxMerchants = null,
@@ -39,6 +42,7 @@ class Village {
     this.production = production;
     this.capacity = capacity;
     this.ongoingResources = ongoingResources;
+    this.consumption = consumption;
     this.celebrationTime = celebrationTime;
     this.availableMerchants = availableMerchants;
     this.maxMerchants = maxMerchants;
@@ -64,12 +68,17 @@ class Village {
     const overflowResources = new Resources(0, 0, 0, 0);
 
     Resources.getKeys().forEach((resourceType) => {
-      const actual = this.getFutureResources()[resourceType];
+      const negativeProduction = this.getNetProduction()[resourceType] < 0;
+      if (negativeProduction) {
+        return 0;
+      }
+
+      const futureResources = this.getFutureResources()[resourceType];
       const maxCapacity = this.capacity[resourceType];
 
-      if (actual > maxCapacity * OVERFLOW_THRESHOLD) {
+      if (futureResources > maxCapacity * OVERFLOW_THRESHOLD) {
         overflowResources[resourceType] =
-          actual - maxCapacity * OVERFLOW_SAFE_LEVEL;
+          futureResources - maxCapacity * OVERFLOW_SAFE_LEVEL;
       }
     });
 
@@ -80,21 +89,21 @@ class Village {
     const deficitResources = new Resources(0, 0, 0, 0);
 
     Resources.getKeys().forEach((resourceType) => {
-      const actual = this.getFutureResources()[resourceType];
+      const futureResources = this.getFutureResources()[resourceType];
       const maxCapacity = this.capacity[resourceType];
-      const negativeProduction = this.production[resourceType] < 0;
+      const negativeProduction = this.getNetProduction()[resourceType] < 0;
 
       const thresholdDeficit = this.getThresholdDeficit(
         maxCapacity,
         negativeProduction
       );
 
-      if (actual < thresholdDeficit) {
+      if (futureResources < thresholdDeficit) {
         const thresholdRequest = this.getThresholdRequest(
           maxCapacity,
           negativeProduction
         );
-        deficitResources[resourceType] = thresholdRequest - actual;
+        deficitResources[resourceType] = thresholdRequest - futureResources;
       }
     });
 
@@ -103,7 +112,7 @@ class Village {
 
   getThresholdRequest = (maxCapacity, negativeProduction) => {
     if (negativeProduction) {
-      return maxCapacity * REQUEST_THRESHOLD;
+      return maxCapacity * REQUEST_THRESHOLD_NEGATIVE_PRODUCTION;
     } else {
       return Math.min(maxCapacity * REQUEST_THRESHOLD, DEFICIT_MAX_VALUE);
     }
@@ -111,10 +120,17 @@ class Village {
 
   getThresholdDeficit = (maxCapacity, negativeProduction) => {
     if (negativeProduction) {
-      return maxCapacity * DEFICIT_THRESHOLD;
+      return maxCapacity * DEFICIT_THRESHOLD_NEGATIVE_PRODUCTION;
     } else {
       return Math.min(maxCapacity * DEFICIT_THRESHOLD, DEFICIT_MAX_VALUE);
     }
+  };
+
+  getNetProduction = () => {
+    return Resources.subtract(
+      this.production,
+      new Resources(0, 0, 0, this.consumption)
+    );
   };
 }
 

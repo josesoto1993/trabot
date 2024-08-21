@@ -6,6 +6,7 @@ const OverviewTabs = require("../constants/overviewTabs");
 const Resources = require("../models/resources");
 
 const ROW_SELECTOR = "#content table tbody tr";
+const CONSUMPTION_TABLE_SELECTOR = "#content div.troops_wrapper table";
 
 const resourceSelectors = {
   lumber: "td.lum",
@@ -40,6 +41,7 @@ const getVillagesOverviewInfo = async (page) => {
       capacitySelectors
     );
     const cultureTable = await getOverviewCelebrations(page);
+    const consumptionTable = await getOverviewConsumption(page);
 
     const villages = await getVillagesInfo(page);
 
@@ -52,6 +54,7 @@ const getVillagesOverviewInfo = async (page) => {
         merchantsTable[village.name].availableMerchants;
       village.maxMerchants = merchantsTable[village.name].maxMerchants;
       village.celebrationTime = cultureTable[village.name].celebrationTime;
+      village.consumption = consumptionTable[village.name];
     }
 
     return villages;
@@ -144,6 +147,63 @@ const getOverviewCelebrations = async (page) => {
   }, ROW_SELECTOR);
 
   return celebrationsRaw;
+};
+0;
+
+const getOverviewConsumption = async (page) => {
+  await goPage(OverviewTabs.troopsInVillages);
+  await page.waitForSelector(CONSUMPTION_TABLE_SELECTOR);
+
+  const consumptionRaw = await page.evaluate((rowSelector) => {
+    const rows = document.querySelectorAll(rowSelector);
+
+    let errorCount = 0;
+    const result = {};
+    rows.forEach((row) => {
+      const villageNameElement = row.querySelector("thead tr th");
+      if (!villageNameElement) {
+        result[errorCount] = "no villageNameElement";
+        return;
+      }
+
+      const villageName = villageNameElement
+        ? villageNameElement.textContent.trim()
+        : null;
+
+      if (!villageName) {
+        result[errorCount] = "no villageName";
+        return;
+      }
+
+      const upkeepBody = row.querySelector("tbody.upkeep");
+      if (!upkeepBody) {
+        result[villageName] = "no upkeepBody";
+        return;
+      }
+
+      const consumptionRow = upkeepBody.querySelector("tr");
+      const spanElements = consumptionRow.querySelectorAll(
+        "td div.consumption span"
+      );
+      if (!spanElements) {
+        result[villageName] = "no spanElements";
+        return;
+      }
+
+      const consumption = Array.from(spanElements).reduce((sum, span) => {
+        const value = parseInt(
+          span.textContent.trim().replace(/[^0-9]/g, ""),
+          10
+        );
+        return sum + (isNaN(value) ? 0 : value);
+      }, 0);
+
+      result[villageName] = consumption;
+    });
+    return result;
+  }, CONSUMPTION_TABLE_SELECTOR);
+
+  return consumptionRaw;
 };
 
 const getOverviewResources = async (page, tableUrl, selectors) => {

@@ -13,6 +13,8 @@ const OverviewTabs = {
     "https://ts100.x10.asia.travian.com/village/statistics/culturepoints",
   troopsTraining:
     "https://ts100.x10.asia.travian.com/village/statistics/troops/training",
+  troopsInVillages:
+    "https://ts100.x10.asia.travian.com/village/statistics/troops/support",
 };
 
 module.exports = OverviewTabs;
