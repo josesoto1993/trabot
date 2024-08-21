@@ -37,9 +37,10 @@ const shouldSkip = () => {
     .map((village) => village.celebrationTime)
     .filter((time) => time !== null);
 
-  const remainingTime = Math.min(...remainingTimes, Infinity);
+  const remainingTime =
+    Math.min(...remainingTimes, Infinity) - CELEBRATION_TIME_GAP;
 
-  return remainingTime > CELEBRATION_TIME_GAP
+  return remainingTime > 0
     ? { nextExecutionTime: remainingTime, skip: true }
     : null;
 };
