@@ -1,4 +1,4 @@
-const BuildingCategory = require("./buildingCategory");
+const { BuildingCategory } = require("./buildingCategory");
 
 const BuildingTypes = {
   "": {

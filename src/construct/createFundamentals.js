@@ -1,8 +1,6 @@
 const FundamentalBuildings = require("../constants/fundamentalBuildings");
-const BuildingCategory = require("../constants/buildingCategory");
+const { BuildingCategory } = require("../constants/buildingCategory");
 const createBuilding = require("./createBuilding");
-
-const BUILD_FUNDAMENTAL_INTERVAL = 15 * 60;
 
 const createFundamentals = async (page, village) => {
   for (const fundamentalBuilding of FundamentalBuildings) {

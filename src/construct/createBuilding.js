@@ -6,7 +6,7 @@ const {
   updatePlayerVillageBuildFinishAt,
 } = require("../player/playerHandler");
 const BuildingType = require("../constants/buildingTypes");
-const BuildingCategory = require("../constants/buildingCategory");
+const { BuildingCategory } = require("../constants/buildingCategory");
 
 const createBuilding = async (page, villageId, slotId, buildingName) => {
   const buildingType = BuildingType[buildingName];

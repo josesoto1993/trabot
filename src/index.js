@@ -14,13 +14,23 @@ const manageOverflow = require("./market/manageOverflow");
 const manageDeficit = require("./market/manageDeficit");
 const manageCelebrations = require("./celebration/celebration");
 const { updateVillages, getPlayer } = require("./player/playerHandler");
+const populateBuildingCategories = require("./populators/buildingCategoryPopulator");
+const { loadBuildingCategories } = require("./constants/buildingCategory");
 
 const taskStats = {};
 
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => console.log("Connected to MongoDB Atlas"))
-  .catch((error) => console.error(error));
+  .then(async () => {
+    console.log("Connected to MongoDB Atlas");
+  })
+  .then(async () => {
+    await populateBuildingCategories();
+  })
+  .then(async () => {
+    await loadBuildingCategories();
+  })
+  .catch((error) => console.error("Error connecting to MongoDB:", error));
 
 const main = async () => {
   let page = await initializeBrowser();

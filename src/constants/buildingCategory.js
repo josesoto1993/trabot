@@ -1,8 +1,12 @@
-const BuildingCategory = {
-  infrastructure: 1,
-  military: 2,
-  resources: 3,
-  other: 4,
+const BuildingCategoryModel = require("../schemas/buildingCategorySchema");
+
+let BuildingCategory = {};
+
+const loadBuildingCategories = async () => {
+  const categories = await BuildingCategoryModel.find();
+  categories.forEach((category) => {
+    BuildingCategory[category.name] = category.value;
+  });
 };
 
-module.exports = BuildingCategory;
+module.exports = { BuildingCategory, loadBuildingCategories };
