@@ -1,9 +1,11 @@
-const fs = require("fs");
-const path = require("path");
 const ConstructionStatus = require("../constants/constructionStatus");
 const { goVillageBuildingView } = require("./goVillage");
 const Building = require("../models/building");
-const BuildingTypes = require("../constants/buildingTypes");
+const {
+  getBuildingTypes,
+  upsertBuildingType,
+} = require("../services/buildingTypeService");
+const { getBuildingCategory } = require("../services/buildingCategoryService");
 
 const getBuildingData = async (page, village) => {
   await goVillageBuildingView(village);
@@ -11,7 +13,7 @@ const getBuildingData = async (page, village) => {
 
   const buildings = await getBuildingRawData(page);
 
-  return buildingsRawToObject(buildings);
+  return await buildingsRawToObject(buildings);
 };
 
 const getBuildingRawData = async (page) => {
@@ -36,26 +38,27 @@ const getBuildingRawData = async (page) => {
   });
 };
 
-const buildingsRawToObject = (raw) => {
+const buildingsRawToObject = async (raw) => {
   const buildings = raw.map((data) => {
     const slotId = parseInt(data.aid, 10);
-    const id = parseInt(data.gid, 10);
+    const structureId = parseInt(data.gid, 10);
     const name = data.name;
     const level = parseInt(data.level, 10);
     const constructionStatus = getConstructionStatus(data.anchorClasses);
 
-    return new Building(id, slotId, name, level, constructionStatus);
+    return new Building(structureId, slotId, name, level, constructionStatus);
   });
 
+  const buildingTypes = await getBuildingTypes();
   buildings
     .filter(
       (building) =>
-        !Object.values(BuildingTypes).some(
-          (buildingType) => building.id === buildingType.id
+        !Object.values(buildingTypes).some(
+          (buildingType) => building.structureId === buildingType.structureId
         )
     )
-    .forEach((building) => {
-      addNewBuildingType(building.id, building.name);
+    .forEach((newBuildingType) => {
+      addNewBuildingType(newBuildingType.structureId, newBuildingType.name);
     });
 
   return buildings;
@@ -72,34 +75,26 @@ const getConstructionStatus = (classes) => {
   return ConstructionStatus.notEnoughStorage;
 };
 
-const addNewBuildingType = (id, name) => {
-  BuildingTypes[name] = {
-    id,
+const addNewBuildingType = async (structureId, name) => {
+  const buildingCategory = await getBuildingCategory("TBD");
+
+  if (!buildingCategory) {
+    console.error("Error: 'TBD' category not found.");
+    return;
+  }
+
+  const buildingTypeData = {
+    structureId,
     name,
-    category: "TBD",
+    category: buildingCategory,
+    slot: null,
   };
 
-  const sortedKeys = Object.keys(BuildingTypes).sort((a, b) =>
-    a.localeCompare(b)
+  await upsertBuildingType(buildingTypeData);
+
+  console.log(
+    `Added or updated building type: ${name} with id: ${structureId}`
   );
-
-  const sortedBuildingTypes = {};
-  sortedKeys.forEach((key) => {
-    sortedBuildingTypes[key] = BuildingTypes[key];
-  });
-
-  const buildingTypesPath = path.resolve(
-    __dirname,
-    "../constants/buildingTypes.js"
-  );
-
-  const updatedContent = `const BuildingTypes = ${JSON.stringify(sortedBuildingTypes, null, 2)};
-    
-    module.exports = BuildingTypes;`;
-
-  fs.writeFileSync(buildingTypesPath, updatedContent, "utf8");
-
-  console.log(`Added new building type: ${name} with id: ${id}`);
 };
 
 module.exports = getBuildingData;

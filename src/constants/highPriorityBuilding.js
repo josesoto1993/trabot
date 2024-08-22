@@ -1,17 +1,18 @@
-const BuildingTypes = require("./buildingTypes");
+const { getBuildingType } = require("../services/buildingTypeService");
 
-const HighPriorityBuildings = [
-  { type: BuildingTypes["Residence"], level: 10 },
-  { type: BuildingTypes["Main Building"], level: 20 },
-  { type: BuildingTypes["Hero's Mansion"], level: 10 },
-  { type: BuildingTypes["Grain Mill"], level: 5 },
-  { type: BuildingTypes["Brickyard"], level: 5 },
-  { type: BuildingTypes["Sawmill"], level: 5 },
-  { type: BuildingTypes["Iron Foundry"], level: 5 },
-  { type: BuildingTypes["Bakery"], level: 5 },
-  { type: BuildingTypes["Warehouse"], level: 9 },
-  { type: BuildingTypes["Granary"], level: 8 },
-  { type: BuildingTypes["Marketplace"], level: 3 },
-];
+const getHighPriorityBuildings = async () => {
+  return [
+    { type: await getBuildingType("Residence"), level: 10 },
+    { type: await getBuildingType("Main Building"), level: 20 },
+    { type: await getBuildingType("Grain Mill"), level: 5 },
+    { type: await getBuildingType("Brickyard"), level: 5 },
+    { type: await getBuildingType("Sawmill"), level: 5 },
+    { type: await getBuildingType("Iron Foundry"), level: 5 },
+    { type: await getBuildingType("Bakery"), level: 5 },
+    { type: await getBuildingType("Warehouse"), level: 9 },
+    { type: await getBuildingType("Granary"), level: 8 },
+    { type: await getBuildingType("Marketplace"), level: 3 },
+  ];
+};
 
-module.exports = HighPriorityBuildings;
+module.exports = getHighPriorityBuildings;

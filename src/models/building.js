@@ -1,6 +1,6 @@
 class Building {
-  constructor(id, slotId, name, level, constructionStatus) {
-    this.id = id;
+  constructor(structureId, slotId, name, level, constructionStatus) {
+    this.structureId = structureId;
     this.slotId = slotId;
     this.name = name;
     this.level = level;
@@ -8,7 +8,7 @@ class Building {
   }
 
   toString() {
-    return `Building(id: ${this.id}, citySlotId: ${this.slotId}, name: ${this.name}, level: ${this.level}, constructionStatus: ${this.constructionStatus})`;
+    return `Building(structureId: ${this.structureId}, citySlotId: ${this.slotId}, name: ${this.name}, level: ${this.level}, constructionStatus: ${this.constructionStatus})`;
   }
 }
 

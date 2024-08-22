@@ -1,15 +1,17 @@
-const BuildingTypes = require("./buildingTypes");
+const { getBuildingType } = require("../services/buildingTypeService");
 
-const LowPriorityBuildings = [
-  { type: BuildingTypes["Warehouse"], level: 20 },
-  { type: BuildingTypes["Granary"], level: 20 },
-  { type: BuildingTypes["Marketplace"], level: 20 },
-  { type: BuildingTypes["Stonemason's Lodge"], level: 20 },
-  { type: BuildingTypes["Palace"], level: 20 },
-  { type: BuildingTypes["Rally Point"], level: 10 },
-  { type: BuildingTypes["Palisade"], level: 10 },
-  { type: BuildingTypes["Trade Office"], level: 10 },
-  { type: BuildingTypes["Embassy"], level: 20 },
-];
+const getLowPriorityBuildings = async () => {
+  return [
+    { type: await getBuildingType("Warehouse"), level: 20 },
+    { type: await getBuildingType("Granary"), level: 20 },
+    { type: await getBuildingType("Marketplace"), level: 20 },
+    { type: await getBuildingType("Stonemason's Lodge"), level: 20 },
+    { type: await getBuildingType("Palace"), level: 20 },
+    { type: await getBuildingType("Rally Point"), level: 10 },
+    { type: await getBuildingType("Palisade"), level: 10 },
+    { type: await getBuildingType("Trade Office"), level: 10 },
+    { type: await getBuildingType("Embassy"), level: 20 },
+  ];
+};
 
-module.exports = LowPriorityBuildings;
+module.exports = getLowPriorityBuildings;

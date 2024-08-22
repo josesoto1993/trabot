@@ -5,20 +5,19 @@ const {
   updatePlayerBuilding,
   updatePlayerVillageBuildFinishAt,
 } = require("../player/playerHandler");
-const BuildingType = require("../constants/buildingTypes");
-const { BuildingCategory } = require("../constants/buildingCategory");
+const { getBuildingType } = require("../services/buildingTypeService");
+const { getBuildingCategory } = require("../services/buildingCategoryService");
 
 const createBuilding = async (page, villageId, slotId, buildingName) => {
-  const buildingType = BuildingType[buildingName];
+  const buildingType = await getBuildingType(buildingName);
   if (!buildingType) {
     throw new Error(`buildingName ${buildingName} not in BuildingType`);
   }
 
+  const otherCategory = await getBuildingCategory("other");
   const realSlotId =
-    buildingType.category !== BuildingCategory.other
-      ? slotId
-      : buildingType.slot;
-  await selectSlot(villageId, realSlotId, buildingType.category);
+    buildingType.category !== otherCategory ? slotId : buildingType.slot;
+  await selectSlot(villageId, realSlotId, buildingType.category.value);
 
   const result = await buildSelectedBuilding(page, buildingType.name);
   await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
@@ -32,14 +31,14 @@ const createBuilding = async (page, villageId, slotId, buildingName) => {
   return result.time;
 };
 
-const selectSlot = async (villageId, slotId, category) => {
+const selectSlot = async (villageId, slotId, categoryValue) => {
   const villageUrl = new URL(TRAVIAN_BUILD_VIEW);
   villageUrl.searchParams.append("newdid", villageId);
   villageUrl.searchParams.append("id", slotId);
-  villageUrl.searchParams.append("category", category);
+  villageUrl.searchParams.append("category", categoryValue);
   await goPage(villageUrl);
 
-  console.log(`selectSlot: ${villageId} / ${slotId} / ${category}`);
+  console.log(`selectSlot: ${villageId} / ${slotId} / ${categoryValue}`);
 };
 
 const buildSelectedBuilding = async (page, buildingName) => {

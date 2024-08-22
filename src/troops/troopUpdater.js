@@ -2,14 +2,17 @@ const { CLICK_DELAY } = require("../browser/browserService");
 const { formatTime, formatDateTime } = require("../utils/timePrint");
 const { getVillages } = require("../player/playerHandler");
 const { goBuilding } = require("../village/goVillage");
-const BuildingTypes = require("../constants/buildingTypes");
-let UpgradeList = require("../constants/troopsToUpgrade");
+let {
+  getUpgradeList,
+  removeFromUpgradeList,
+} = require("../constants/troopsToUpgrade");
 
 const MIN_UPGRADE_DELAY = 5 * 60;
-const Smithy = BuildingTypes["Smithy"].name;
+const SMITHY = "Smithy";
 
 const upgradeTroops = async (page) => {
-  const skip = shouldSkip();
+  const upgradeList = await getUpgradeList();
+  const skip = shouldSkip(upgradeList);
   if (skip) {
     return skip;
   }
@@ -17,21 +20,19 @@ const upgradeTroops = async (page) => {
   const villages = getVillages();
 
   let anyUpgradePerformed = false;
-  for (const upgrade of UpgradeList) {
+  for (const upgrade of upgradeList) {
     const village = villages.find(
       (village) => village.name === upgrade.villageName
     );
 
     const villageSmithy = village.buildings.find(
-      (building) => building.name === Smithy
+      (building) => building.name === SMITHY
     );
     if (!villageSmithy) {
       console.log(
         `Cant upgrade ${village.name}-${upgrade.unit.name} as does not have Smithy`
       );
-      UpgradeList = UpgradeList.filter(
-        (item) => item.unit.name !== upgrade.unit.name
-      );
+      removeFromUpgradeList(upgrade.unit.name);
       continue;
     }
 
@@ -42,7 +43,7 @@ const upgradeTroops = async (page) => {
   }
 
   const nextExecutionTime = Math.max(
-    getNextUpgradeRemaining(),
+    getNextUpgradeRemaining(upgradeList),
     MIN_UPGRADE_DELAY
   );
 
@@ -52,18 +53,18 @@ const upgradeTroops = async (page) => {
   };
 };
 
-const shouldSkip = () => {
-  const remainingTime = getNextUpgradeRemaining();
+const shouldSkip = (upgradeList) => {
+  const remainingTime = getNextUpgradeRemaining(upgradeList);
   return remainingTime > 0
     ? { nextExecutionTime: remainingTime, skip: true }
     : null;
 };
 
-const getNextUpgradeRemaining = () => {
+const getNextUpgradeRemaining = (upgradeList) => {
   const villages = getVillages();
 
   const minTroopUpgradeTime = villages.reduce((minTime, village) => {
-    if (UpgradeList.some((upgrade) => village.name === upgrade.villageName)) {
+    if (upgradeList.some((upgrade) => village.name === upgrade.villageName)) {
       const upgradeTime = village.upgradeTroopTime || 0;
       return Math.min(minTime, upgradeTime);
     }
@@ -75,7 +76,7 @@ const getNextUpgradeRemaining = () => {
 
 const performUpgrade = async (page, unit, village) => {
   try {
-    await goBuilding(village, Smithy);
+    await goBuilding(village, SMITHY);
     const remainingTime = await getRemainingTime(page);
 
     if (remainingTime !== 0) {
@@ -92,7 +93,7 @@ const performUpgrade = async (page, unit, village) => {
         `No need to upgrade [${village.name} / ${unit.name}], as it is level 20`
       );
 
-      UpgradeList = UpgradeList.filter((item) => item.unit.name !== unit.name);
+      await removeFromUpgradeList(unit.name);
 
       return false;
     }

@@ -1,6 +1,6 @@
 const { upgradeExistingBuilding } = require("./upgradeExistingBuilding");
-const BuildingTypes = require("../constants/buildingTypes");
 const ConstructionStatus = require("../constants/constructionStatus");
+const { getBuildingType } = require("../services/buildingTypeService");
 
 const updateBuildingList = async (
   page,
@@ -53,7 +53,7 @@ const upgradeBuilding = async (page, village, building) => {
     `Upgrading building ${building.name} in village ${village.name} from level ${building.level}`
   );
 
-  const buildingType = BuildingTypes[building.name];
+  const buildingType = await getBuildingType(building.name);
   const upgradeTime = await upgradeExistingBuilding(
     page,
     village.id,

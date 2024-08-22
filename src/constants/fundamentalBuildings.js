@@ -1,20 +1,22 @@
-const BuildingTypes = require("./buildingTypes");
+const { getBuildingType } = require("../services/buildingTypeService");
 
-const FundamentalBuildings = [
-  BuildingTypes["Main Building"],
-  BuildingTypes["Rally Point"],
-  BuildingTypes["Palisade"],
-  BuildingTypes["Warehouse"],
-  BuildingTypes["Granary"],
-  BuildingTypes["Marketplace"],
-  BuildingTypes["Residence"],
-  BuildingTypes["Grain Mill"],
-  BuildingTypes["Brickyard"],
-  BuildingTypes["Sawmill"],
-  BuildingTypes["Iron Foundry"],
-  BuildingTypes["Academy"],
-  BuildingTypes["Town Hall"],
-  BuildingTypes["Bakery"],
-];
+const getFundamentalBuildings = async () => {
+  return [
+    await getBuildingType("Main Building"),
+    await getBuildingType("Rally Point"),
+    await getBuildingType("Palisade"),
+    await getBuildingType("Warehouse"),
+    await getBuildingType("Granary"),
+    await getBuildingType("Marketplace"),
+    await getBuildingType("Residence"),
+    await getBuildingType("Grain Mill"),
+    await getBuildingType("Brickyard"),
+    await getBuildingType("Sawmill"),
+    await getBuildingType("Iron Foundry"),
+    await getBuildingType("Academy"),
+    await getBuildingType("Town Hall"),
+    await getBuildingType("Bakery"),
+  ];
+};
 
-module.exports = FundamentalBuildings;
+module.exports = getFundamentalBuildings;

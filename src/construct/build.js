@@ -9,9 +9,9 @@ const upgradeResources = require("./upgradeResources");
 const createFundamentals = require("./createFundamentals");
 const updateBuildingList = require("./updateBuildingList");
 const { formatTime, formatTimeMillis } = require("../utils/timePrint");
-const HighPriorityBuildings = require("../constants/highPriorityBuilding");
-const MidPriorityBuildings = require("../constants/midPriorityBuilding");
-const LowPriorityBuildings = require("../constants/lowPriorityBuilding");
+const getHighPriorityBuildings = require("../constants/highPriorityBuilding");
+const getMidPriorityBuildings = require("../constants/midPriorityBuilding");
+const getLowPriorityBuildings = require("../constants/lowPriorityBuilding");
 const { SkipCreation, SkipUpgrade } = require("../constants/skipBuild");
 
 const DEFAULT_INTERVAL = 15 * 60;
@@ -98,7 +98,7 @@ const processVillageBuild = async (page, village) => {
   const highUpgraded = await updateBuildingList(
     page,
     village,
-    HighPriorityBuildings,
+    await getHighPriorityBuildings(),
     "high"
   );
   if (highUpgraded) {
@@ -115,7 +115,7 @@ const processVillageBuild = async (page, village) => {
   const midUpgraded = await updateBuildingList(
     page,
     village,
-    MidPriorityBuildings,
+    await getMidPriorityBuildings(),
     "mid"
   );
   if (midUpgraded) {
@@ -126,7 +126,7 @@ const processVillageBuild = async (page, village) => {
   const lowUpgraded = await updateBuildingList(
     page,
     village,
-    LowPriorityBuildings,
+    await getLowPriorityBuildings(),
     "low"
   );
   if (lowUpgraded) {

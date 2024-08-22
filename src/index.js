@@ -14,8 +14,7 @@ const manageOverflow = require("./market/manageOverflow");
 const manageDeficit = require("./market/manageDeficit");
 const manageCelebrations = require("./celebration/celebration");
 const { updateVillages, getPlayer } = require("./player/playerHandler");
-const populateBuildingCategories = require("./populators/buildingCategoryPopulator");
-const { loadBuildingCategories } = require("./constants/buildingCategory");
+const populate = require("./populators/populator");
 
 const taskStats = {};
 
@@ -23,14 +22,16 @@ mongoose
   .connect(process.env.MONGODB_URI)
   .then(async () => {
     console.log("Connected to MongoDB Atlas");
+    await populate();
   })
-  .then(async () => {
-    await populateBuildingCategories();
+  .then(() => {
+    console.log("Starting main application");
+    return main();
   })
-  .then(async () => {
-    await loadBuildingCategories();
-  })
-  .catch((error) => console.error("Error connecting to MongoDB:", error));
+  .catch((error) => {
+    console.error("Error:", error);
+    process.exit(1);
+  });
 
 const main = async () => {
   let page = await initializeBrowser();
@@ -128,5 +129,3 @@ const runTaskWithTimer = async (taskName, task) => {
     return { nextExecutionTime: 0, skip: true };
   }
 };
-
-main();

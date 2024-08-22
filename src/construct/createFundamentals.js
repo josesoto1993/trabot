@@ -1,9 +1,10 @@
-const FundamentalBuildings = require("../constants/fundamentalBuildings");
-const { BuildingCategory } = require("../constants/buildingCategory");
+const getFundamentalBuildings = require("../constants/fundamentalBuildings");
 const createBuilding = require("./createBuilding");
+const { getBuildingCategory } = require("../services/buildingCategoryService");
 
 const createFundamentals = async (page, village) => {
-  for (const fundamentalBuilding of FundamentalBuildings) {
+  const fundamentals = await getFundamentalBuildings();
+  for (const fundamentalBuilding of fundamentals) {
     const buildingExists = village.buildings.some(
       (building) => building.name === fundamentalBuilding.name
     );
@@ -28,7 +29,8 @@ const createFundamentalBuilding = async (
   village,
   fundamentalBuilding
 ) => {
-  if (fundamentalBuilding.category === BuildingCategory.other) {
+  const otherCategory = await getBuildingCategory("other");
+  if (fundamentalBuilding.category === otherCategory) {
     return await createBuilding(page, village.id, 0, fundamentalBuilding.name);
   }
 
