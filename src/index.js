@@ -1,4 +1,5 @@
 require("dotenv").config();
+const mongoose = require("mongoose");
 
 const { formatTime, formatTimeMillis } = require("./utils/timePrint");
 const { open, close } = require("./browser/browserService");
@@ -15,6 +16,11 @@ const manageCelebrations = require("./celebration/celebration");
 const { updateVillages, getPlayer } = require("./player/playerHandler");
 
 const taskStats = {};
+
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("Connected to MongoDB Atlas"))
+  .catch((error) => console.error(error));
 
 const main = async () => {
   let page = await initializeBrowser();
