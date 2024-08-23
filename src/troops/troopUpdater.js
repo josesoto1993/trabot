@@ -6,6 +6,7 @@ const BuildingTypes = require("../constants/buildingTypes");
 let UpgradeList = require("../constants/troopsToUpgrade");
 
 const MIN_UPGRADE_DELAY = 5 * 60;
+const Smithy = BuildingTypes["Smithy"].name;
 
 const upgradeTroops = async (page) => {
   const skip = shouldSkip();
@@ -20,6 +21,20 @@ const upgradeTroops = async (page) => {
     const village = villages.find(
       (village) => village.name === upgrade.villageName
     );
+
+    const villageSmithy = village.buildings.find(
+      (building) => building.name === Smithy
+    );
+    if (!villageSmithy) {
+      console.log(
+        `Cant upgrade ${village.name}-${upgrade.unit.name} as does not have Smithy`
+      );
+      UpgradeList = UpgradeList.filter(
+        (item) => item.unit.name !== upgrade.unit.name
+      );
+      continue;
+    }
+
     const trainPerformed = await performUpgrade(page, upgrade.unit, village);
     if (trainPerformed) {
       anyUpgradePerformed = true;
@@ -60,7 +75,7 @@ const getNextUpgradeRemaining = () => {
 
 const performUpgrade = async (page, unit, village) => {
   try {
-    await goBuilding(village, BuildingTypes["Smithy"].name);
+    await goBuilding(village, Smithy);
     const remainingTime = await getRemainingTime(page);
 
     if (remainingTime !== 0) {
