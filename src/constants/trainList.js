@@ -10,6 +10,10 @@ const TrainList = [
     unit: Unit.Haeduan,
   },
   {
+    villageName: "HDS 01",
+    unit: Unit.Trebuchet,
+  },
+  {
     villageName: "HDS 02",
     unit: Unit.Phalanx,
   },
@@ -48,7 +52,7 @@ const TrainList = [
   {
     villageName: "HDS 11",
     unit: Unit.Phalanx,
-  } /*
+  },
   {
     villageName: "HDS 12",
     unit: Unit.Phalanx,
@@ -56,7 +60,7 @@ const TrainList = [
   {
     villageName: "HDS 13",
     unit: Unit.Phalanx,
-  },*/,
+  },
   {
     villageName: "HDS 20",
     unit: Unit.Swordsman,

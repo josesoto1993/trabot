@@ -1,4 +1,4 @@
 const SkipOverflow = [];
-const SkipDeficit = ["HDS 38"];
+const SkipDeficit = [];
 
 module.exports = { SkipOverflow, SkipDeficit };
