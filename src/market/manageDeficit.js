@@ -6,6 +6,7 @@ const {
   getVillages,
   updateVillagesOverviewInfo,
 } = require("../player/playerHandler");
+const { SkipDeficit } = require("../constants/skipMarket");
 
 const MERCHANTS_CAPACITY = process.env.MERCHANTS_CAPACITY;
 const DONOR_SAFE_LEVEL = 0.5;
@@ -49,6 +50,11 @@ const checkVillagesDeficit = async (page) => {
     const villages = getVillages();
 
     for (const village of villages) {
+      if (SkipDeficit.includes(village.name)) {
+        console.log(`Skip ${village.name} deficit check`);
+        continue;
+      }
+
       await checkVillageDeficit(page, village, villages);
     }
   } catch (error) {
