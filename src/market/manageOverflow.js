@@ -6,6 +6,7 @@ const {
   getVillages,
   updateVillagesOverviewInfo,
 } = require("../player/playerHandler");
+const { SkipOverflow } = require("../constants/skipMarket");
 
 const MERCHANTS_CAPACITY = process.env.MERCHANTS_CAPACITY;
 const RECEIVER_THRESHOLD = 0.7;
@@ -48,6 +49,10 @@ const checkVillagesOverflow = async (page) => {
     const villages = await getVillages();
 
     for (const village of villages) {
+      if (SkipOverflow.includes(village.name)) {
+        console.log(`Skip ${village.name} overflow check`);
+        continue;
+      }
       await checkVillageOverflow(page, village, villages);
     }
   } catch (error) {
