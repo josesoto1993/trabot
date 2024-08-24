@@ -52,6 +52,12 @@ const sortResources = (a, b) => {
   if (aLowLevel && !bLowLevel) return -1;
   if (!aLowLevel && bLowLevel) return 1;
 
+  if (aLowLevel && bLowLevel) {
+    if (a.level !== b.level) {
+      return a.level - b.level;
+    }
+  }
+
   // Higher level priority: Fields with levels > 3
   if (b.level !== a.level) {
     return b.level - a.level;
