@@ -1,4 +1,4 @@
-const SkipCreation = ["HDS 01"];
+const SkipCreation = [];
 const SkipUpgrade = [];
 
 module.exports = { SkipCreation, SkipUpgrade };

@@ -3,6 +3,7 @@ const BuildingTypes = require("./buildingTypes");
 const HighPriorityBuildings = [
   { type: BuildingTypes["Residence"], level: 10 },
   { type: BuildingTypes["Main Building"], level: 20 },
+  { type: BuildingTypes["Hero's Mansion"], level: 10 },
   { type: BuildingTypes["Grain Mill"], level: 5 },
   { type: BuildingTypes["Brickyard"], level: 5 },
   { type: BuildingTypes["Sawmill"], level: 5 },

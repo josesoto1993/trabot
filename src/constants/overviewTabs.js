@@ -1,20 +1,15 @@
+const { TRAVIAN_BASE } = require("./links");
+
 const OverviewTabs = {
-  mainUrl: "https://ts100.x10.asia.travian.com/village/statistics",
-  overview: "https://ts100.x10.asia.travian.com/village/statistics/overview",
-  resResources:
-    "https://ts100.x10.asia.travian.com/village/statistics/resources/resources",
-  resWarehouse:
-    "https://ts100.x10.asia.travian.com/village/statistics/resources/warehouse",
-  resProduction:
-    "https://ts100.x10.asia.travian.com/village/statistics/resources/production",
-  resCapacity:
-    "https://ts100.x10.asia.travian.com/village/statistics/resources/capacity",
-  culturepoints:
-    "https://ts100.x10.asia.travian.com/village/statistics/culturepoints",
-  troopsTraining:
-    "https://ts100.x10.asia.travian.com/village/statistics/troops/training",
-  troopsInVillages:
-    "https://ts100.x10.asia.travian.com/village/statistics/troops/support",
+  mainUrl: `${TRAVIAN_BASE}/village/statistics`,
+  overview: `${TRAVIAN_BASE}/village/statistics/overview`,
+  resResources: `${TRAVIAN_BASE}/village/statistics/resources/resources`,
+  resWarehouse: `${TRAVIAN_BASE}/village/statistics/resources/warehouse`,
+  resProduction: `${TRAVIAN_BASE}/village/statistics/resources/production`,
+  resCapacity: `${TRAVIAN_BASE}/village/statistics/resources/capacity`,
+  culturepoints: `${TRAVIAN_BASE}/village/statistics/culturepoints`,
+  troopsTraining: `${TRAVIAN_BASE}/village/statistics/troops/training`,
+  troopsInVillages: `${TRAVIAN_BASE}/village/statistics/troops/support`,
 };
 
 module.exports = OverviewTabs;
