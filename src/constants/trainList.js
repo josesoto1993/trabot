@@ -1,4 +1,4 @@
-const { getUnit } = require("./units");
+const { getUnit } = require("../services/unitService");
 
 const getTrainList = async () => {
   const swordsman = await getUnit("Swordsman");
