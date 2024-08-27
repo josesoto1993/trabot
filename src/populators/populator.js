@@ -1,5 +1,6 @@
 const populateBuildingCategories = require("./buildingCategoryPopulator");
 const populateBuildingTypes = require("./buildingTypePopulator");
+const ensureTrainCollectionExists = require("./trainPopulator");
 const populateUnits = require("./unitPopulator");
 
 const populate = async () => {
@@ -7,6 +8,7 @@ const populate = async () => {
   await populateBuildingCategories();
   await populateBuildingTypes();
   await populateUnits();
+  await ensureTrainCollectionExists();
   console.log("End population");
 };
 

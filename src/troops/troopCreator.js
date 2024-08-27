@@ -2,7 +2,7 @@ const { typeInSelector } = require("../browser/browserService");
 const { formatTime, formatDateTime } = require("../utils/timePrint");
 const { getVillages } = require("../player/playerHandler");
 const { goBuilding } = require("../village/goVillage");
-const getTrainList = require("../constants/trainList");
+const { getTrainList } = require("../services/trainService");
 
 const BARRACKS = "Barracks";
 const STABLE = "Stable";
@@ -70,7 +70,7 @@ const getNextTrainRemaining = (trainList) => {
       }
     }
     return minTime;
-  }, Infinity);
+  }, MAX_TRAIN_TIME + MIN_TRAIN_DELAY);
   return minTroopTime - Date.now() / 1000 - MAX_TRAIN_TIME;
 };
 
