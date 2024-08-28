@@ -6,7 +6,7 @@ const {
   upsertBuildingType,
 } = require("../services/buildingTypeService");
 const { getBuildingCategory } = require("../services/buildingCategoryService");
-const BUILDING_CATEGORIES = require("../constants/BuildingCategories");
+const BUILDING_CATEGORIES = require("../constants/buildingCategories");
 
 const getBuildingData = async (page, village) => {
   await goVillageBuildingView(village);

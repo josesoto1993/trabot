@@ -1,15 +1,15 @@
 const { TRAVIAN_BASE } = require("./links");
 
-const OverviewTabs = {
-  mainUrl: `${TRAVIAN_BASE}/village/statistics`,
-  overview: `${TRAVIAN_BASE}/village/statistics/overview`,
-  resResources: `${TRAVIAN_BASE}/village/statistics/resources/resources`,
-  resWarehouse: `${TRAVIAN_BASE}/village/statistics/resources/warehouse`,
-  resProduction: `${TRAVIAN_BASE}/village/statistics/resources/production`,
-  resCapacity: `${TRAVIAN_BASE}/village/statistics/resources/capacity`,
-  culturepoints: `${TRAVIAN_BASE}/village/statistics/culturepoints`,
-  troopsTraining: `${TRAVIAN_BASE}/village/statistics/troops/training`,
-  troopsInVillages: `${TRAVIAN_BASE}/village/statistics/troops/support`,
-};
+const OVERVIEW_TABS = Object.freeze({
+  MAIN_URL: `${TRAVIAN_BASE}/village/statistics`,
+  OVERVIEW: `${TRAVIAN_BASE}/village/statistics/overview`,
+  RESOURCES_RESOURCES: `${TRAVIAN_BASE}/village/statistics/resources/resources`,
+  RESOURCES_WAREHOUSE: `${TRAVIAN_BASE}/village/statistics/resources/warehouse`,
+  RESOURCES_PRODUCTION: `${TRAVIAN_BASE}/village/statistics/resources/production`,
+  RESOURCES_CAPACITY: `${TRAVIAN_BASE}/village/statistics/resources/capacity`,
+  CULTUREPOINTS: `${TRAVIAN_BASE}/village/statistics/culturepoints`,
+  TROOPS_TARINING: `${TRAVIAN_BASE}/village/statistics/troops/training`,
+  TROOPS_INVILLAGE: `${TRAVIAN_BASE}/village/statistics/troops/support`,
+});
 
-module.exports = OverviewTabs;
+module.exports = OVERVIEW_TABS;

@@ -2,7 +2,7 @@ const TaskModel = require("../schemas/taskSchema");
 
 const isActive = async (name) => {
   const filter = { name };
-  const task = await TaskModel.findOne(filter).exec();
+  const task = await TaskModel.findOne(filter);
   return task ? task.isActive : null;
 };
 

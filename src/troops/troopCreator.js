@@ -3,10 +3,8 @@ const { formatTime, formatDateTime } = require("../utils/timePrint");
 const { getVillages } = require("../player/playerHandler");
 const { goBuilding } = require("../village/goVillage");
 const { getTrainList } = require("../services/trainService");
+const BUILDING_NAMES = require("../constants/buildingNames");
 
-const BARRACKS = "Barracks";
-const STABLE = "Stable";
-const WORKSHOP = "Workshop";
 const UNITS_TO_TRAIN = "999";
 const MAX_TRAIN_TIME = 4 * 60 * 60;
 const MIN_TRAIN_DELAY = 5 * 60;
@@ -58,13 +56,13 @@ const getNextTrainRemaining = (trainList) => {
       if (village.name === train.villageName) {
         const buildingName = train.unit.building.name;
 
-        if (buildingName === BARRACKS) {
+        if (buildingName === BUILDING_NAMES.BARRACKS) {
           minTime = Math.min(minTime, village.barracksTime);
         }
-        if (buildingName === STABLE) {
+        if (buildingName === BUILDING_NAMES.STABLE) {
           minTime = Math.min(minTime, village.stableTime);
         }
-        if (buildingName === WORKSHOP) {
+        if (buildingName === BUILDING_NAMES.WORKSHOP) {
           minTime = Math.min(minTime, village.workshopTime);
         }
       }
@@ -149,13 +147,13 @@ const updateVillageTroopTime = (village, unit, finalRemainingTime) => {
   const buildingName = unit.building.name;
   const finishTime = finalRemainingTime + Date.now() / 1000;
 
-  if (buildingName === BARRACKS) {
+  if (buildingName === BUILDING_NAMES.BARRACKS) {
     village.barracksTime = finishTime;
   }
-  if (buildingName === STABLE) {
+  if (buildingName === BUILDING_NAMES.STABLE) {
     village.stableTime = finishTime;
   }
-  if (buildingName === WORKSHOP) {
+  if (buildingName === BUILDING_NAMES.WORKSHOP) {
     village.workshopTime = finishTime;
   }
 

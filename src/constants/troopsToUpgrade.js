@@ -1,15 +1,16 @@
 const { getUnit } = require("../services/unitService");
+const UNIT_NAMES = require("../constants/unitsNames");
 
 let upgradeList = [];
 
 const populateUpgradeList = async () => {
-  const phalanx = await getUnit("Phalanx");
-  const swordsman = await getUnit("Swordsman");
-  const pathfinder = await getUnit("Pathfinder");
-  const theutatesThunder = await getUnit("TheutatesThunder");
-  const haeduan = await getUnit("Haeduan");
-  const ram = await getUnit("Ram");
-  const trebuchet = await getUnit("Trebuchet");
+  const phalanx = await getUnit(UNIT_NAMES.PHALANX);
+  const swordsman = await getUnit(UNIT_NAMES.SWORDSMAN);
+  const pathfinder = await getUnit(UNIT_NAMES.PATHFINDER);
+  const theutatesThunder = await getUnit(UNIT_NAMES.THEUTATES_THUNDER);
+  const haeduan = await getUnit(UNIT_NAMES.HAEDUAN);
+  const ram = await getUnit(UNIT_NAMES.RAM);
+  const trebuchet = await getUnit(UNIT_NAMES.TREBUCHET);
 
   upgradeList = [
     {

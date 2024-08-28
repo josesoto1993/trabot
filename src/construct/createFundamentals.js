@@ -2,7 +2,7 @@ const createBuilding = require("./createBuilding");
 const { getBuildingCategory } = require("../services/buildingCategoryService");
 const { getAllByPriority } = require("../services/PriorityBuildingService");
 const PRIORITY_LEVELS = require("../constants/priorityLevels");
-const BUILDING_CATEGORIES = require("../constants/BuildingCategories");
+const BUILDING_CATEGORIES = require("../constants/buildingCategories");
 
 const createFundamentals = async (page, village) => {
   const fundamentals = await getAllByPriority(PRIORITY_LEVELS.FUNDAMENTAL);

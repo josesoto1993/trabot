@@ -110,8 +110,8 @@ const finalizeBrowser = async () => {
 const runTaskWithTimer = async (taskName, task) => {
   const taskStatus = await isActive(taskName);
   if (!taskStatus) {
-    console.log(`Task "${taskName}" is not active. Skipping.`);
-    return { nextExecutionTime: Infinity, skip: true };
+    console.log(`\n---------------- ${taskName} skip ----------------`);
+    return Infinity;
   }
 
   if (!taskStats[taskName]) {
@@ -144,6 +144,6 @@ const runTaskWithTimer = async (taskName, task) => {
     return nextExecutionTime;
   } catch (error) {
     console.error(`Error during ${taskName} task:`, error);
-    return { nextExecutionTime: 0, skip: true };
+    return 0;
   }
 };

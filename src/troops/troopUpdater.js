@@ -2,13 +2,13 @@ const { CLICK_DELAY } = require("../browser/browserService");
 const { formatTime, formatDateTime } = require("../utils/timePrint");
 const { getVillages } = require("../player/playerHandler");
 const { goBuilding } = require("../village/goVillage");
-let {
+const {
   getUpgradeList,
   removeFromUpgradeList,
 } = require("../constants/troopsToUpgrade");
+const BUILDING_NAMES = require("../constants/buildingNames");
 
 const MIN_UPGRADE_DELAY = 5 * 60;
-const SMITHY = "Smithy";
 
 const upgradeTroops = async (page) => {
   const upgradeList = await getUpgradeList();
@@ -26,7 +26,7 @@ const upgradeTroops = async (page) => {
     );
 
     const villageSmithy = village.buildings.find(
-      (building) => building.name === SMITHY
+      (building) => building.name === BUILDING_NAMES.SMITHY
     );
     if (!villageSmithy) {
       console.log(
@@ -76,7 +76,7 @@ const getNextUpgradeRemaining = (upgradeList) => {
 
 const performUpgrade = async (page, unit, village) => {
   try {
-    await goBuilding(village, SMITHY);
+    await goBuilding(village, BUILDING_NAMES.SMITHY);
     const remainingTime = await getRemainingTime(page);
 
     if (remainingTime !== 0) {

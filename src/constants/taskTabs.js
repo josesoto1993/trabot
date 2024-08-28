@@ -1,7 +1,7 @@
-const TaskTabs = {
-  QueryParamKey: "t",
-  CityTab: "1",
-  PlayerTab: "2",
+const TASK_TABS = {
+  QUERY_PARAM_KEY: "t",
+  CITY_TAB: "1",
+  PLAYER_TAB: "2",
 };
 
-module.exports = TaskTabs;
+module.exports = TASK_TABS;

@@ -1,4 +1,4 @@
-const BUILDING_CATEGORIES = require("../constants/BuildingCategories");
+const BUILDING_CATEGORIES = require("../constants/buildingCategories");
 const {
   upsertBuildingCategory,
 } = require("../services/buildingCategoryService");
