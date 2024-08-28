@@ -1,10 +1,13 @@
-const getFundamentalBuildings = require("../constants/fundamentalBuildings");
 const createBuilding = require("./createBuilding");
 const { getBuildingCategory } = require("../services/buildingCategoryService");
+const { getAllByPriority } = require("../services/PriorityBuildingService");
+const PRIORITY_LEVELS = require("../constants/priorityLevels");
+const BUILDING_CATEGORIES = require("../constants/BuildingCategories");
 
 const createFundamentals = async (page, village) => {
-  const fundamentals = await getFundamentalBuildings();
-  for (const fundamentalBuilding of fundamentals) {
+  const fundamentals = await getAllByPriority(PRIORITY_LEVELS.FUNDAMENTAL);
+  for (const fundamental of fundamentals) {
+    const fundamentalBuilding = fundamental.building;
     const buildingExists = village.buildings.some(
       (building) => building.name === fundamentalBuilding.name
     );
@@ -29,17 +32,10 @@ const createFundamentalBuilding = async (
   village,
   fundamentalBuilding
 ) => {
-  const otherCategory = await getBuildingCategory("other");
-  if (fundamentalBuilding.category === otherCategory) {
-    return await createBuilding(page, village.id, 0, fundamentalBuilding.name);
-  }
-
-  const availableSlotId = village.buildings.find(
-    (building) =>
-      building.name === null ||
-      building.name === "null" ||
-      building.name.trim() === ""
-  )?.slotId;
+  const availableSlotId = await getAvailableSlotId(
+    fundamentalBuilding,
+    village
+  );
 
   if (availableSlotId === undefined) {
     console.error(
@@ -59,5 +55,19 @@ const createFundamentalBuilding = async (
     fundamentalBuilding.name
   );
 };
+
+async function getAvailableSlotId(fundamentalBuilding, village) {
+  const otherCategory = await getBuildingCategory(BUILDING_CATEGORIES.OTHER);
+  if (fundamentalBuilding.category._id.equals(otherCategory._id)) {
+    return fundamentalBuilding.slot;
+  }
+
+  return village.buildings.find(
+    (building) =>
+      building.name === null ||
+      building.name === "null" ||
+      building.name.trim() === ""
+  )?.slotId;
+}
 
 module.exports = createFundamentals;

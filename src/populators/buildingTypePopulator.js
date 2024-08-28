@@ -1,5 +1,6 @@
 const { upsertBuildingType } = require("../services/buildingTypeService"); // Import the upsert function
 const { getBuildingCategory } = require("../services/buildingCategoryService");
+const BUILDING_CATEGORIES = require("../constants/BuildingCategories");
 
 const populateBuildingTypes = async () => {
   console.log("start populate building types");
@@ -25,11 +26,18 @@ const populateBuildingTypes = async () => {
 };
 
 const getBaseBuildingTypes = async () => {
-  const buildingCategoryOther = await getBuildingCategory("other");
-  const buildingCategoryMilitary = await getBuildingCategory("military");
-  const buildingCategoryResources = await getBuildingCategory("resources");
-  const buildingCategoryInfrastructure =
-    await getBuildingCategory("infrastructure");
+  const buildingCategoryOther = await getBuildingCategory(
+    BUILDING_CATEGORIES.OTHER
+  );
+  const buildingCategoryMilitary = await getBuildingCategory(
+    BUILDING_CATEGORIES.MILITARY
+  );
+  const buildingCategoryResources = await getBuildingCategory(
+    BUILDING_CATEGORIES.RESOURCES
+  );
+  const buildingCategoryInfrastructure = await getBuildingCategory(
+    BUILDING_CATEGORIES.INFRASTRUCTURE
+  );
 
   const buildingTypes = [
     { structureId: 22, name: "Academy", category: buildingCategoryMilitary },

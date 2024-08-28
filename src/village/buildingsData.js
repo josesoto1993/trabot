@@ -6,6 +6,7 @@ const {
   upsertBuildingType,
 } = require("../services/buildingTypeService");
 const { getBuildingCategory } = require("../services/buildingCategoryService");
+const BUILDING_CATEGORIES = require("../constants/BuildingCategories");
 
 const getBuildingData = async (page, village) => {
   await goVillageBuildingView(village);
@@ -76,10 +77,14 @@ const getConstructionStatus = (classes) => {
 };
 
 const addNewBuildingType = async (structureId, name) => {
-  const buildingCategory = await getBuildingCategory("TBD");
+  const buildingCategory = await getBuildingCategory(
+    BUILDING_CATEGORIES.UNDEFINED
+  );
 
   if (!buildingCategory) {
-    console.error("Error: 'TBD' category not found.");
+    console.error(
+      `Error: '${BUILDING_CATEGORIES.UNDEFINED}' category not found.`
+    );
     return;
   }
 

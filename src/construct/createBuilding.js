@@ -6,7 +6,7 @@ const {
   updatePlayerVillageBuildFinishAt,
 } = require("../player/playerHandler");
 const { getBuildingType } = require("../services/buildingTypeService");
-const { getBuildingCategory } = require("../services/buildingCategoryService");
+require("../services/buildingCategoryService");
 
 const createBuilding = async (page, villageId, slotId, buildingName) => {
   const buildingType = await getBuildingType(buildingName);
@@ -14,10 +14,7 @@ const createBuilding = async (page, villageId, slotId, buildingName) => {
     throw new Error(`buildingName ${buildingName} not in BuildingType`);
   }
 
-  const otherCategory = await getBuildingCategory("other");
-  const realSlotId =
-    buildingType.category !== otherCategory ? slotId : buildingType.slot;
-  await selectSlot(villageId, realSlotId, buildingType.category.value);
+  await selectSlot(villageId, slotId, buildingType.category.value);
 
   const result = await buildSelectedBuilding(page, buildingType.name);
   await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
@@ -26,7 +23,7 @@ const createBuilding = async (page, villageId, slotId, buildingName) => {
     return null;
   }
 
-  updatePlayerBuilding(villageId, realSlotId, buildingType, 1);
+  updatePlayerBuilding(villageId, slotId, buildingType, 1);
   updatePlayerVillageBuildFinishAt(villageId, result.time);
   return result.time;
 };

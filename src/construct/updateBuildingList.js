@@ -30,8 +30,8 @@ const filterBuildingsToUpgrade = (village, buildingsToUpgrade) => {
   for (const buildingToUpgrade of buildingsToUpgrade) {
     const matchingVillageBuildings = village.buildings.filter(
       (villageBuilding) =>
-        villageBuilding.name === buildingToUpgrade.type.name &&
-        villageBuilding.level < buildingToUpgrade.level &&
+        villageBuilding.name === buildingToUpgrade.building.name &&
+        villageBuilding.level < buildingToUpgrade.targetLevel &&
         villageBuilding.constructionStatus === ConstructionStatus.readyToUpgrade
     );
 
