@@ -15,6 +15,8 @@ const manageDeficit = require("./market/manageDeficit");
 const manageCelebrations = require("./celebration/celebration");
 const { updateVillages, getPlayer } = require("./player/playerHandler");
 const populate = require("./populators/populator");
+const TASK_NAMES = require("./constants/taskNames");
+const { isActive } = require("./services/taskService");
 
 const taskStats = {};
 
@@ -55,15 +57,25 @@ const mainLoop = async (page) => {
       console.log(`\n\n\n---------------- loop ${loopNumber} ----------------`);
 
       nextLoop = Math.min(
-        await runTaskWithTimer("Deficit", () => manageDeficit(page)),
-        await runTaskWithTimer("Overflow", () => manageOverflow(page)),
-        await runTaskWithTimer("Attack Farms", () => attackFarms(page)),
-        await runTaskWithTimer("Train Troops", () => trainTroops(page)),
-        await runTaskWithTimer("Upgrade Troops", () => upgradeTroops(page)),
-        await runTaskWithTimer("Go Adventure", () => goAdventure(page)),
-        await runTaskWithTimer("Build", () => build(page)),
-        await runTaskWithTimer("Redeem", () => redeem(page)),
-        await runTaskWithTimer("Celebrations", () => manageCelebrations(page))
+        await runTaskWithTimer(TASK_NAMES.DEFICIT, () => manageDeficit(page)),
+        await runTaskWithTimer(TASK_NAMES.OVERFLOW, () => manageOverflow(page)),
+        await runTaskWithTimer(TASK_NAMES.ATTACK_FARMS, () =>
+          attackFarms(page)
+        ),
+        await runTaskWithTimer(TASK_NAMES.TRAIN_TROOPS, () =>
+          trainTroops(page)
+        ),
+        await runTaskWithTimer(TASK_NAMES.UPGRADE_TROOPS, () =>
+          upgradeTroops(page)
+        ),
+        await runTaskWithTimer(TASK_NAMES.GO_ADVENTURE, () =>
+          goAdventure(page)
+        ),
+        await runTaskWithTimer(TASK_NAMES.BUILD, () => build(page)),
+        await runTaskWithTimer(TASK_NAMES.REDEEM, () => redeem(page)),
+        await runTaskWithTimer(TASK_NAMES.CELEBRATIONS, () =>
+          manageCelebrations(page)
+        )
       );
 
       console.log(
@@ -96,6 +108,12 @@ const finalizeBrowser = async () => {
 };
 
 const runTaskWithTimer = async (taskName, task) => {
+  const taskStatus = await isActive(taskName);
+  if (!taskStatus) {
+    console.log(`Task "${taskName}" is not active. Skipping.`);
+    return { nextExecutionTime: Infinity, skip: true };
+  }
+
   if (!taskStats[taskName]) {
     taskStats[taskName] = { totalDuration: 0, count: 0 };
   }
