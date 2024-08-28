@@ -21,6 +21,7 @@ const goAdventure = async (page) => {
     console.log(
       `Hero is not at home (${heroStatusClass}), await ${formatTime(ADVENTURE_INTERVAL)}`
     );
+    updateNextAdventureTime();
     return { nextExecutionTime: ADVENTURE_INTERVAL, skip: true };
   }
   const heroAdventures = await getHeroAdventures(page);
@@ -28,6 +29,7 @@ const goAdventure = async (page) => {
     console.log(
       `There are no adventures (${heroAdventures}), await ${formatTime(ADVENTURE_INTERVAL)}`
     );
+    updateNextAdventureTime();
     return { nextExecutionTime: ADVENTURE_INTERVAL, skip: true };
   }
 
