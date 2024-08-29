@@ -26,7 +26,12 @@ const upsert = async (priority, building, targetLevel) => {
   }
 
   const filter = { priority, building };
-  const update = { priority, building, targetLevel };
+  const update = {
+    priority: priority,
+    building: building,
+    buildingAuxName: building.name,
+    targetLevel: targetLevel,
+  };
   const options = { new: true, upsert: true };
 
   return await PriorityBuildingModel.findOneAndUpdate(filter, update, options);

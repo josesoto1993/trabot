@@ -12,6 +12,10 @@ const PriorityBuildingSchema = new mongoose.Schema({
     ref: "BuildingType",
     required: true,
   },
+  buildingAuxName: {
+    type: String,
+    required: true,
+  },
   targetLevel: {
     type: mongoose.Schema.Types.ObjectId,
     type: Number,
