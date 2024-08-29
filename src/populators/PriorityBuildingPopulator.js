@@ -105,7 +105,7 @@ const getMidPriorityBuildings = async () => {
     },
     {
       building: await getBuildingType(BUILDING_NAMES.ACADEMY),
-      targetLevel: 20,
+      targetLevel: 10,
     },
   ];
 };
@@ -140,6 +140,10 @@ const getLowPriorityBuildings = async () => {
     {
       building: await getBuildingType(BUILDING_NAMES.TRADE_OFFICE),
       targetLevel: 10,
+    },
+    {
+      building: await getBuildingType(BUILDING_NAMES.ACADEMY),
+      targetLevel: 20,
     },
     {
       building: await getBuildingType(BUILDING_NAMES.EMBASSY),
