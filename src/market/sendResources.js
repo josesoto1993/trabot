@@ -2,8 +2,8 @@ const { goBuilding } = require("../village/goVillage");
 const { formatTime } = require("../utils/timePrint");
 const { typeInSelector, CLICK_DELAY } = require("../browser/browserService");
 const { addTrade } = require("./ongoingTrades");
-const BuildingTypes = require("../constants/buildingTypes");
-const MarketTabs = require("../constants/marketTabs");
+const MARKET_TABS = require("../constants/marketTabs");
+const BUILDING_NAMES = require("../constants/buildingNames");
 
 const MARKET_WAIT_POSSIBLE_ERROR = 1 * 1000;
 
@@ -31,13 +31,9 @@ const sendResources = async (page, trade) => {
 
 const goMarket = async (village) => {
   const marketTabSearchParam = {
-    [MarketTabs.QueryParamKey]: MarketTabs.SendResources,
+    [MARKET_TABS.QUERY_PARAM_KEY]: MARKET_TABS.SEND_RESOURCES,
   };
-  await goBuilding(
-    village,
-    BuildingTypes["Marketplace"].name,
-    marketTabSearchParam
-  );
+  await goBuilding(village, BUILDING_NAMES.MARKETPLACE, marketTabSearchParam);
 };
 
 const setDestination = async (page, to) => {
@@ -58,10 +54,18 @@ const setResources = async (page, resources) => {
   console.log("set resources");
   await page.waitForSelector('input[name="lumber"]');
 
-  await typeInSelector('input[name="lumber"]', resources.lumber);
-  await typeInSelector('input[name="clay"]', resources.clay);
-  await typeInSelector('input[name="iron"]', resources.iron);
-  await typeInSelector('input[name="crop"]', resources.crop);
+  if (resources.lumber > 0) {
+    await typeInSelector('input[name="lumber"]', resources.lumber);
+  }
+  if (resources.clay > 0) {
+    await typeInSelector('input[name="clay"]', resources.clay);
+  }
+  if (resources.iron > 0) {
+    await typeInSelector('input[name="iron"]', resources.iron);
+  }
+  if (resources.crop > 0) {
+    await typeInSelector('input[name="crop"]', resources.crop);
+  }
 };
 
 const verify = async (page) => {

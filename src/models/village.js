@@ -31,7 +31,11 @@ class Village {
     stableTime = null,
     workshopTime = null,
     upgradeTroopTime = null,
-    capital = false
+    capital = false,
+    skipOverflow = false,
+    skipDeficit = false,
+    skipCreation = false,
+    skipUpgrade = false
   ) {
     this.id = id;
     this.name = name;
@@ -54,6 +58,10 @@ class Village {
     this.workshopTime = workshopTime;
     this.upgradeTroopTime = upgradeTroopTime;
     this.capital = capital;
+    this.skipOverflow = skipOverflow;
+    this.skipDeficit = skipDeficit;
+    this.skipCreation = skipCreation;
+    this.skipUpgrade = skipUpgrade;
   }
 
   toString() {

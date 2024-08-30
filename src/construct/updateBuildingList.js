@@ -1,6 +1,6 @@
 const { upgradeExistingBuilding } = require("./upgradeExistingBuilding");
-const BuildingTypes = require("../constants/buildingTypes");
 const ConstructionStatus = require("../constants/constructionStatus");
+const { getBuildingType } = require("../services/buildingTypeService");
 
 const updateBuildingList = async (
   page,
@@ -30,8 +30,8 @@ const filterBuildingsToUpgrade = (village, buildingsToUpgrade) => {
   for (const buildingToUpgrade of buildingsToUpgrade) {
     const matchingVillageBuildings = village.buildings.filter(
       (villageBuilding) =>
-        villageBuilding.name === buildingToUpgrade.type.name &&
-        villageBuilding.level < buildingToUpgrade.level &&
+        villageBuilding.name === buildingToUpgrade.building.name &&
+        villageBuilding.level < buildingToUpgrade.targetLevel &&
         villageBuilding.constructionStatus === ConstructionStatus.readyToUpgrade
     );
 
@@ -53,7 +53,7 @@ const upgradeBuilding = async (page, village, building) => {
     `Upgrading building ${building.name} in village ${village.name} from level ${building.level}`
   );
 
-  const buildingType = BuildingTypes[building.name];
+  const buildingType = await getBuildingType(building.name);
   const upgradeTime = await upgradeExistingBuilding(
     page,
     village.id,

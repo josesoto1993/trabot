@@ -7,8 +7,6 @@ const {
   updatePlayerVillageBuildFinishAt,
 } = require("../player/playerHandler");
 
-const UPGRADE_DELAY = 3 * 1000;
-
 const upgradeExistingBuilding = async (
   page,
   villageId,

@@ -35,7 +35,7 @@ const goBuilding = async (village, buildingName, searchParams = {}) => {
   const buildingUrl = new URL(TRAVIAN_BUILD_VIEW);
   buildingUrl.searchParams.append("newdid", village.id);
   buildingUrl.searchParams.append("id", villageBuilding.slotId);
-  buildingUrl.searchParams.append("gid", villageBuilding.id);
+  buildingUrl.searchParams.append("gid", villageBuilding.structureId);
 
   for (const [key, value] of Object.entries(searchParams)) {
     if (value !== null && value !== undefined) {

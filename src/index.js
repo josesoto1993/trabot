@@ -1,4 +1,5 @@
 require("dotenv").config();
+const mongoose = require("mongoose");
 
 const { formatTime, formatTimeMillis } = require("./utils/timePrint");
 const { open, close } = require("./browser/browserService");
@@ -13,8 +14,26 @@ const manageOverflow = require("./market/manageOverflow");
 const manageDeficit = require("./market/manageDeficit");
 const manageCelebrations = require("./celebration/celebration");
 const { updateVillages, getPlayer } = require("./player/playerHandler");
+const populate = require("./populators/populator");
+const TASK_NAMES = require("./constants/taskNames");
+const { isActive } = require("./services/taskService");
 
 const taskStats = {};
+
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(async () => {
+    console.log("Connected to MongoDB Atlas");
+    await populate();
+  })
+  .then(() => {
+    console.log("Starting main application");
+    return main();
+  })
+  .catch((error) => {
+    console.error("Error:", error);
+    process.exit(1);
+  });
 
 const main = async () => {
   let page = await initializeBrowser();
@@ -38,15 +57,25 @@ const mainLoop = async (page) => {
       console.log(`\n\n\n---------------- loop ${loopNumber} ----------------`);
 
       nextLoop = Math.min(
-        await runTaskWithTimer("Deficit", () => manageDeficit(page)),
-        await runTaskWithTimer("Overflow", () => manageOverflow(page)),
-        await runTaskWithTimer("Attack Farms", () => attackFarms(page)),
-        await runTaskWithTimer("Train Troops", () => trainTroops(page)),
-        await runTaskWithTimer("Upgrade Troops", () => upgradeTroops(page)),
-        await runTaskWithTimer("Go Adventure", () => goAdventure(page)),
-        await runTaskWithTimer("Build", () => build(page)),
-        await runTaskWithTimer("Redeem", () => redeem(page)),
-        await runTaskWithTimer("Celebrations", () => manageCelebrations(page))
+        await runTaskWithTimer(TASK_NAMES.DEFICIT, () => manageDeficit(page)),
+        await runTaskWithTimer(TASK_NAMES.OVERFLOW, () => manageOverflow(page)),
+        await runTaskWithTimer(TASK_NAMES.ATTACK_FARMS, () =>
+          attackFarms(page)
+        ),
+        await runTaskWithTimer(TASK_NAMES.TRAIN_TROOPS, () =>
+          trainTroops(page)
+        ),
+        await runTaskWithTimer(TASK_NAMES.UPGRADE_TROOPS, () =>
+          upgradeTroops(page)
+        ),
+        await runTaskWithTimer(TASK_NAMES.GO_ADVENTURE, () =>
+          goAdventure(page)
+        ),
+        await runTaskWithTimer(TASK_NAMES.BUILD, () => build(page)),
+        await runTaskWithTimer(TASK_NAMES.REDEEM, () => redeem(page)),
+        await runTaskWithTimer(TASK_NAMES.CELEBRATIONS, () =>
+          manageCelebrations(page)
+        )
       );
 
       console.log(
@@ -79,6 +108,12 @@ const finalizeBrowser = async () => {
 };
 
 const runTaskWithTimer = async (taskName, task) => {
+  const taskStatus = await isActive(taskName);
+  if (!taskStatus) {
+    console.log(`\n---------------- ${taskName} skip ----------------`);
+    return Infinity;
+  }
+
   if (!taskStats[taskName]) {
     taskStats[taskName] = { totalDuration: 0, count: 0 };
   }
@@ -109,8 +144,6 @@ const runTaskWithTimer = async (taskName, task) => {
     return nextExecutionTime;
   } catch (error) {
     console.error(`Error during ${taskName} task:`, error);
-    return { nextExecutionTime: 0, skip: true };
+    return 0;
   }
 };
-
-main();

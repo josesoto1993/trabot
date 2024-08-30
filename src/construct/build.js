@@ -9,10 +9,8 @@ const upgradeResources = require("./upgradeResources");
 const createFundamentals = require("./createFundamentals");
 const updateBuildingList = require("./updateBuildingList");
 const { formatTime, formatTimeMillis } = require("../utils/timePrint");
-const HighPriorityBuildings = require("../constants/highPriorityBuilding");
-const MidPriorityBuildings = require("../constants/midPriorityBuilding");
-const LowPriorityBuildings = require("../constants/lowPriorityBuilding");
-const { SkipCreation, SkipUpgrade } = require("../constants/skipBuild");
+const { getAllByPriority } = require("../services/PriorityBuildingService");
+const PRIORITY_LEVELS = require("../constants/priorityLevels");
 
 const DEFAULT_INTERVAL = 15 * 60;
 let totalBuilds = 0;
@@ -59,10 +57,7 @@ const processVillagesBuild = async (page) => {
   await updateVillagesOverviewInfo(page);
   const villages = getVillages();
   for (const village of villages) {
-    if (
-      SkipUpgrade.includes(village.name) &&
-      SkipCreation.includes(village.name)
-    ) {
+    if (village.skipUpgrade && village.skipCreation) {
       console.log(`Skip ${village.name} build and upgrade`);
       updatePlayerVillageBuildFinishAt(village.id, DEFAULT_INTERVAL * 999);
       continue;
@@ -81,7 +76,7 @@ const processVillagesBuild = async (page) => {
 };
 
 const processVillageBuild = async (page, village) => {
-  if (!village.capital && !SkipCreation.includes(village.name)) {
+  if (!village.capital && !village.skipCreation) {
     const fundamentalsCreated = await createFundamentals(page, village);
     if (fundamentalsCreated) {
       totalBuilds += 1;
@@ -89,17 +84,18 @@ const processVillageBuild = async (page, village) => {
     }
   }
 
-  if (SkipUpgrade.includes(village.name)) {
-    console.log(`Nothing to update in ${village.name}`);
+  if (village.skipUpgrade) {
+    console.log(`Skip upgrade in ${village.name}`);
     updatePlayerVillageBuildFinishAt(village.id, DEFAULT_INTERVAL);
     return;
   }
 
+  const highPriorityBuilding = await getAllByPriority(PRIORITY_LEVELS.HIGH);
   const highUpgraded = await updateBuildingList(
     page,
     village,
-    HighPriorityBuildings,
-    "high"
+    highPriorityBuilding,
+    PRIORITY_LEVELS.HIGH
   );
   if (highUpgraded) {
     totalBuilds += 1;
@@ -112,22 +108,24 @@ const processVillageBuild = async (page, village) => {
     return;
   }
 
+  const midPriorityBuilding = await getAllByPriority(PRIORITY_LEVELS.MID);
   const midUpgraded = await updateBuildingList(
     page,
     village,
-    MidPriorityBuildings,
-    "mid"
+    midPriorityBuilding,
+    PRIORITY_LEVELS.MID
   );
   if (midUpgraded) {
     totalBuilds += 1;
     return;
   }
 
+  const lowPriorityBuilding = await getAllByPriority(PRIORITY_LEVELS.LOW);
   const lowUpgraded = await updateBuildingList(
     page,
     village,
-    LowPriorityBuildings,
-    "low"
+    lowPriorityBuilding,
+    PRIORITY_LEVELS.LOW
   );
   if (lowUpgraded) {
     totalBuilds += 1;

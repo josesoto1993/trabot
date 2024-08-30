@@ -94,7 +94,7 @@ const updatePlayerBuilding = (villageId, slotId, buildingType, level) => {
   }
 
   const newBuilding = new Building(
-    buildingType.id,
+    buildingType.structureId,
     slotId,
     buildingType.name,
     level,

@@ -2,15 +2,17 @@ const { typeInSelector } = require("../browser/browserService");
 const { formatTime, formatDateTime } = require("../utils/timePrint");
 const { getVillages } = require("../player/playerHandler");
 const { goBuilding } = require("../village/goVillage");
-const BuildingTypes = require("../constants/buildingTypes");
-const TrainList = require("../constants/trainList");
+const { getTrainList } = require("../services/trainService");
+const BUILDING_NAMES = require("../constants/buildingNames");
 
 const UNITS_TO_TRAIN = "999";
 const MAX_TRAIN_TIME = 4 * 60 * 60;
 const MIN_TRAIN_DELAY = 5 * 60;
 
 const trainTroops = async (page) => {
-  const skip = shouldSkip();
+  const trainList = await getTrainList();
+
+  const skip = shouldSkip(trainList);
   if (skip) {
     return skip;
   }
@@ -18,7 +20,7 @@ const trainTroops = async (page) => {
   const villages = getVillages();
 
   let anyTrainPerformed = false;
-  for (const train of TrainList) {
+  for (const train of trainList) {
     const village = villages.find(
       (village) => village.name === train.villageName
     );
@@ -28,7 +30,10 @@ const trainTroops = async (page) => {
     }
   }
 
-  const nextExecutionTime = Math.max(getNextTrainRemaining(), MIN_TRAIN_DELAY);
+  const nextExecutionTime = Math.max(
+    getNextTrainRemaining(trainList),
+    MIN_TRAIN_DELAY
+  );
 
   return {
     nextExecutionTime: nextExecutionTime,
@@ -36,34 +41,34 @@ const trainTroops = async (page) => {
   };
 };
 
-const shouldSkip = () => {
-  const remainingTime = getNextTrainRemaining();
+const shouldSkip = (trainList) => {
+  const remainingTime = getNextTrainRemaining(trainList);
   return remainingTime > 0
     ? { nextExecutionTime: remainingTime, skip: true }
     : null;
 };
 
-const getNextTrainRemaining = () => {
+const getNextTrainRemaining = (trainList) => {
   const villages = getVillages();
 
   const minTroopTime = villages.reduce((minTime, village) => {
-    for (const train of TrainList) {
+    for (const train of trainList) {
       if (village.name === train.villageName) {
         const buildingName = train.unit.building.name;
 
-        if (buildingName === BuildingTypes.Barracks.name) {
+        if (buildingName === BUILDING_NAMES.BARRACKS) {
           minTime = Math.min(minTime, village.barracksTime);
         }
-        if (buildingName === BuildingTypes.Stable.name) {
+        if (buildingName === BUILDING_NAMES.STABLE) {
           minTime = Math.min(minTime, village.stableTime);
         }
-        if (buildingName === BuildingTypes.Workshop.name) {
+        if (buildingName === BUILDING_NAMES.WORKSHOP) {
           minTime = Math.min(minTime, village.workshopTime);
         }
       }
     }
     return minTime;
-  }, Infinity);
+  }, MAX_TRAIN_TIME + MIN_TRAIN_DELAY);
   return minTroopTime - Date.now() / 1000 - MAX_TRAIN_TIME;
 };
 
@@ -142,13 +147,13 @@ const updateVillageTroopTime = (village, unit, finalRemainingTime) => {
   const buildingName = unit.building.name;
   const finishTime = finalRemainingTime + Date.now() / 1000;
 
-  if (buildingName === BuildingTypes["Barracks"].name) {
+  if (buildingName === BUILDING_NAMES.BARRACKS) {
     village.barracksTime = finishTime;
   }
-  if (buildingName === BuildingTypes["Stable"].name) {
+  if (buildingName === BUILDING_NAMES.STABLE) {
     village.stableTime = finishTime;
   }
-  if (buildingName === BuildingTypes["Workshop"].name) {
+  if (buildingName === BUILDING_NAMES.WORKSHOP) {
     village.workshopTime = finishTime;
   }
 
