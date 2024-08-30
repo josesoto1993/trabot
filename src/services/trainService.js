@@ -18,15 +18,18 @@ const getTrainList = async () => {
 };
 
 const clearVillage = async (villageName) => {
-  await TrainModel.deleteMany({ villageName });
+  const filter = { villageName };
+  await TrainModel.deleteMany(filter);
 };
 
 const removeTrain = async (villageName, unitName) => {
-  await TrainModel.deleteOne({ villageName, unitName });
+  const filter = { villageName, unitName };
+  await TrainModel.deleteOne(filter);
 };
 
 const trainsInVillage = async (villageName) => {
-  await TrainModel.find({ villageName });
+  const filter = { villageName };
+  await TrainModel.find(filter);
 };
 
 const insertTrain = async (villageName, unitName) => {

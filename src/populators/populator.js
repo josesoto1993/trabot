@@ -4,6 +4,7 @@ const populatePriorityBuildings = require("./PriorityBuildingPopulator");
 const populateTasks = require("./taskPopulator");
 const ensureTrainCollectionExists = require("./trainPopulator");
 const populateUnits = require("./unitPopulator");
+const ensureUpgradeCollectionExists = require("./upgradePopulator");
 
 const populate = async () => {
   console.log("Start population");
@@ -15,6 +16,7 @@ const populate = async () => {
 
   await populateUnits();
   await ensureTrainCollectionExists();
+  await ensureUpgradeCollectionExists();
   console.log("End population");
 };
 

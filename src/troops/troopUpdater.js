@@ -4,8 +4,8 @@ const { getVillages } = require("../player/playerHandler");
 const { goBuilding } = require("../village/goVillage");
 const {
   getUpgradeList,
-  removeFromUpgradeList,
-} = require("../constants/troopsToUpgrade");
+  removeUpgrade,
+} = require("../services/upgradeUnitService");
 const BUILDING_NAMES = require("../constants/buildingNames");
 
 const MIN_UPGRADE_DELAY = 5 * 60;
@@ -32,12 +32,12 @@ const upgradeTroops = async (page) => {
       console.log(
         `Cant upgrade ${village.name}-${upgrade.unit.name} as does not have Smithy`
       );
-      removeFromUpgradeList(upgrade.unit.name);
+      await removeUpgrade(upgrade.villageName, upgrade.unit.name);
       continue;
     }
 
-    const trainPerformed = await performUpgrade(page, upgrade.unit, village);
-    if (trainPerformed) {
+    const upgradePerformed = await performUpgrade(page, upgrade.unit, village);
+    if (upgradePerformed) {
       anyUpgradePerformed = true;
     }
   }
@@ -92,8 +92,7 @@ const performUpgrade = async (page, unit, village) => {
       console.log(
         `No need to upgrade [${village.name} / ${unit.name}], as it is level 20`
       );
-
-      await removeFromUpgradeList(unit.name);
+      await removeUpgrade(village.name, unit.name);
 
       return false;
     }
