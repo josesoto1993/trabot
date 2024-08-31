@@ -1,15 +1,16 @@
+import { Page } from "puppeteer";
 import { goPage, CLICK_DELAY } from "../browser/browserService";
 import { TRAVIAN_FARM_LIST } from "../constants/links";
 import { formatTime } from "../utils/timePrint";
+import { TaskResult } from "..";
 
-let lastAttackTime = 0;
-let randomAttackInterval = 0;
-let attackCount = 1;
-const MIN_ATTACK_INTERVAL = 5 * 60;
-const RANDOM_INTERVAL_VARIATION_MILLIS = 0.5 * 60 * 1000;
+let lastAttackTime: number = 0;
+let randomAttackInterval: number = 0;
+let attackCount: number = 1;
+const MIN_ATTACK_INTERVAL: number = 5 * 60;
 
-const attackFarms = async (page) => {
-  const remainingTime = getremainingTime();
+const attackFarms = async (page: Page): Promise<TaskResult> => {
+  const remainingTime = getRemainingTime();
   if (remainingTime > 0) {
     return { nextExecutionTime: remainingTime, skip: true };
   }
@@ -21,29 +22,22 @@ const attackFarms = async (page) => {
     updateNextAttackTime();
   }
 
-  return { nextExecutionTime: getremainingTime(), skip: false };
+  return { nextExecutionTime: getRemainingTime(), skip: false };
 };
 
-const getremainingTime = () => {
+const getRemainingTime = (): number => {
   const currentTime = Date.now();
   const timePassed = (currentTime - lastAttackTime) / 1000;
   return MIN_ATTACK_INTERVAL + randomAttackInterval - timePassed;
 };
 
-const updateNextAttackTime = () => {
-  let randomAttackIntervalMillis = Math.floor(
-    Math.random() * RANDOM_INTERVAL_VARIATION_MILLIS * 2 -
-      RANDOM_INTERVAL_VARIATION_MILLIS
-  );
-  randomAttackInterval = randomAttackIntervalMillis / 1000;
-  console.log(
-    `Next attack in ${formatTime(MIN_ATTACK_INTERVAL + randomAttackInterval)}`
-  );
+const updateNextAttackTime = (): void => {
+  console.log(`Next attack in ${formatTime(MIN_ATTACK_INTERVAL)}`);
   lastAttackTime = Date.now();
   attackCount = attackCount + 1;
 };
 
-const performAttack = async (page) => {
+const performAttack = async (page: Page): Promise<boolean> => {
   try {
     await goPage(TRAVIAN_FARM_LIST);
 
@@ -62,12 +56,12 @@ const performAttack = async (page) => {
   }
 };
 
-const waitForButtonsToLoad = async (page) => {
+const waitForButtonsToLoad = async (page: Page): Promise<void> => {
   await page.waitForSelector("button.startAllFarmLists");
   console.log("Buttons load successfully.");
 };
 
-const clickButtons = async (page) => {
+const clickButtons = async (page: Page): Promise<void> => {
   const buttons = await page.$$("button.startAllFarmLists:not(.disabled)");
 
   console.log(`There are ${buttons.length} buttons`);
@@ -78,4 +72,4 @@ const clickButtons = async (page) => {
   }
 };
 
-module.exports = attackFarms;
+export default attackFarms;

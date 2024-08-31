@@ -11,7 +11,7 @@ if (!USERNAME || !PASSWORD) {
   throw new Error("Environment variables USERNAME and PASSWORD must be set.");
 }
 
-export const login = async (page: Page): Promise<void> => {
+const login = async (page: Page): Promise<void> => {
   try {
     await goPage(TRAVIAN_BASE);
 
@@ -55,3 +55,5 @@ const submit = async (page: Page): Promise<void> => {
     console.error("Error submitting login form:", error);
   }
 };
+
+export default login;

@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 
 import { formatTime, formatTimeMillis } from "./utils/timePrint";
 import { open, close } from "./browser/browserService";
-import { login } from "./browser/loginService";
-const attackFarms = require("./attackFarms/attackFarms");
+import login from "./browser/loginService";
+import attackFarms from "./attackFarms/attackFarms";
 const trainTroops = require("./troops/troopCreator");
 const upgradeTroops = require("./troops/troopUpdater");
 const goAdventure = require("./hero/heroAdventure");
@@ -19,6 +19,11 @@ import { TaskNames } from "./constants/taskNames";
 const { isActive } = require("./services/taskService");
 
 const taskStats = {};
+
+export interface TaskResult {
+  nextExecutionTime: number;
+  skip: boolean;
+}
 
 mongoose
   .connect(process.env.MONGODB_URI)
