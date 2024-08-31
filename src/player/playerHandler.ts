@@ -115,7 +115,7 @@ const updatePlayerField = (villageId, slotId, level) => {
   }
 
   const fieldIndex = village.resourceFields.findIndex(
-    (field) => field.id === slotId
+    (field) => field.slotId === slotId
   );
   if (fieldIndex === -1) {
     throw new Error(
