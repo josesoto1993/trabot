@@ -1,6 +1,6 @@
 const { goBuilding } = require("../village/goVillage");
-const { formatTime } = require("../utils/timePrint");
-const { typeInSelector, CLICK_DELAY } = require("../browser/browserService");
+import { formatTime } from "../utils/timePrint";
+import { typeInSelector, CLICK_DELAY } from "../browser/browserService";
 const { addTrade } = require("./ongoingTrades");
 import { MarketTabs } from "../constants/marketTabs";
 import { BuildingNames } from "../constants/buildingNames";

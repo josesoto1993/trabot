@@ -1,4 +1,4 @@
-const { goPage } = require("../browser/browserService");
+import { goPage } from "../browser/browserService";
 import {
   TRAVIAN_RESOURCES_VIEW,
   TRAVIAN_BUILDING_VIEW,

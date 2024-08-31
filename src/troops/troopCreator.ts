@@ -1,5 +1,5 @@
-const { typeInSelector } = require("../browser/browserService");
-const { formatTime, formatDateTime } = require("../utils/timePrint");
+import { typeInSelector } from "../browser/browserService";
+import { formatTime, formatDateTime } from "../utils/timePrint";
 const { getVillages } = require("../player/playerHandler");
 const { goBuilding } = require("../village/goVillage");
 const { getTrainList } = require("../services/trainService");

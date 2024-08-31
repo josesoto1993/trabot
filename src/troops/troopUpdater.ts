@@ -1,5 +1,5 @@
-const { CLICK_DELAY } = require("../browser/browserService");
-const { formatTime, formatDateTime } = require("../utils/timePrint");
+import { CLICK_DELAY } from "../browser/browserService";
+import { formatTime, formatDateTime } from "../utils/timePrint";
 const { getVillages } = require("../player/playerHandler");
 const { goBuilding } = require("../village/goVillage");
 const {

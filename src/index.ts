@@ -2,8 +2,8 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 
 import { formatTime, formatTimeMillis } from "./utils/timePrint";
-const { open, close } = require("./browser/browserService");
-const login = require("./browser/loginService");
+import { open, close } from "./browser/browserService";
+import { login } from "./browser/loginService";
 const attackFarms = require("./attackFarms/attackFarms");
 const trainTroops = require("./troops/troopCreator");
 const upgradeTroops = require("./troops/troopUpdater");

@@ -1,7 +1,7 @@
 const sendResources = require("./sendResources");
 const Resources = require("../models/resources");
 const Trade = require("../models/trade");
-const { formatTime } = require("../utils/timePrint");
+import { formatTime } from "../utils/timePrint";
 const {
   getVillages,
   updateVillagesOverviewInfo,

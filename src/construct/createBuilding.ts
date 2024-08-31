@@ -1,5 +1,5 @@
 const { URL } = require("url");
-const { goPage, CLICK_DELAY } = require("../browser/browserService");
+import { goPage, CLICK_DELAY } from "../browser/browserService";
 import { TRAVIAN_BUILD_VIEW } from "../constants/links";
 const {
   updatePlayerBuilding,

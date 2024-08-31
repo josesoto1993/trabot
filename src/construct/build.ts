@@ -8,7 +8,7 @@ const {
 const upgradeResources = require("./upgradeResources");
 const createFundamentals = require("./createFundamentals");
 const updateBuildingList = require("./updateBuildingList");
-const { formatTime, formatTimeMillis } = require("../utils/timePrint");
+import { formatTime, formatTimeMillis } from "../utils/timePrint";
 const { getAllByPriority } = require("../services/PriorityBuildingService");
 import { PriorityLevels } from "../constants/priorityLevels";
 

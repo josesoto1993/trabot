@@ -1,6 +1,6 @@
-const { goPage, CLICK_DELAY } = require("../browser/browserService");
+import { goPage, CLICK_DELAY } from "../browser/browserService";
 import { TRAVIAN_FARM_LIST } from "../constants/links";
-const { formatTime } = require("../utils/timePrint");
+import { formatTime } from "../utils/timePrint";
 
 let lastAttackTime = 0;
 let randomAttackInterval = 0;

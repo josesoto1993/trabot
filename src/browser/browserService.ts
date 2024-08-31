@@ -1,13 +1,14 @@
-const puppeteer = require("puppeteer");
+import puppeteer, { Browser, Page } from "puppeteer";
 
-let browser;
-let page;
+let browser: Browser | null = null;
+let page: Page | null = null;
 
-const WINDOW_WIDTH = parseInt(process.env.WINDOW_WIDTH, 10) || 1366;
-const WINDOW_HEIGHT = parseInt(process.env.WINDOW_HEIGHT, 10) || 768;
-const CLICK_DELAY = 3 * 1000;
+const WINDOW_WIDTH: number = parseInt(process.env.WINDOW_WIDTH || "1366", 10);
+const WINDOW_HEIGHT: number = parseInt(process.env.WINDOW_HEIGHT || "768", 10);
+const TYPE_DELAY: number = 100;
+export const CLICK_DELAY: number = 3 * 1000;
 
-const open = async () => {
+export const open = async (): Promise<Page> => {
   if (!browser) {
     browser = await puppeteer.launch({ headless: false });
   }
@@ -15,9 +16,9 @@ const open = async () => {
     page = await browser.newPage();
   }
   const pages = await browser.pages();
-  for (const otherPages of pages) {
-    if (otherPages !== page) {
-      await otherPages.close();
+  for (const otherPage of pages) {
+    if (otherPage !== page) {
+      await otherPage.close();
     }
   }
 
@@ -26,7 +27,7 @@ const open = async () => {
   return page;
 };
 
-const close = async () => {
+export const close = async (): Promise<void> => {
   if (browser) {
     await browser.close();
     browser = null;
@@ -34,7 +35,7 @@ const close = async () => {
   }
 };
 
-const goPage = async (url) => {
+export const goPage = async (url: string | URL): Promise<void> => {
   const urlString = url.toString();
   console.log(`Go to page ${urlString}`);
   if (!page) {
@@ -43,14 +44,13 @@ const goPage = async (url) => {
   await page.goto(urlString);
 };
 
-const typeInSelector = async (selector, text) => {
-  await page.type(selector, text.toString(), { delay: 100 });
-};
-
-module.exports = {
-  open,
-  close,
-  goPage,
-  typeInSelector,
-  CLICK_DELAY,
+export const typeInSelector = async (
+  selector: string,
+  text: string | number
+): Promise<void> => {
+  if (!page) {
+    throw new Error("Browser is not open");
+  }
+  const options = { delay: TYPE_DELAY };
+  await page.type(selector, text.toString(), options);
 };

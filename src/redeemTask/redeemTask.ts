@@ -1,7 +1,7 @@
 const { URL } = require("url");
 const getVillagesInfo = require("../village/listVillagesSimple");
-const { goPage, CLICK_DELAY } = require("../browser/browserService");
-const { formatTime } = require("../utils/timePrint");
+import { goPage, CLICK_DELAY } from "../browser/browserService";
+import { formatTime } from "../utils/timePrint";
 import { TRAVIAN_TASK_VIEW } from "../constants/links";
 import { TaskTabs } from "../constants/taskTabs";
 

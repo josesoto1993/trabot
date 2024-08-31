@@ -2,9 +2,9 @@ const {
   getVillages,
   updateVillagesOverviewInfo,
 } = require("../player/playerHandler");
-const { formatTime } = require("../utils/timePrint");
+import { formatTime } from "../utils/timePrint";
 const { goBuilding } = require("../village/goVillage");
-const { CLICK_DELAY } = require("../browser/browserService");
+import { CLICK_DELAY } from "../browser/browserService";
 import { BuildingNames } from "../constants/buildingNames";
 
 const CELEBRATION_TIME_GAP = 4 * 60 * 60;

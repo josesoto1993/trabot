@@ -1,7 +1,7 @@
-const { goPage, CLICK_DELAY } = require("../browser/browserService");
+import { goPage, CLICK_DELAY } from "../browser/browserService";
 const { getClassOfHeroIcon, getHeroAdventures } = require("./heroStatus");
 import { TRAVIAN_HERO_ADVENTURES } from "../constants/links";
-const { formatTime } = require("../utils/timePrint");
+import { formatTime } from "../utils/timePrint";
 import { HeroIconStatus } from "../constants/heroIconStatus";
 
 const ADVENTURE_BUTTON_SELECTOR_TIMEOUT_MILLIS = 15000;

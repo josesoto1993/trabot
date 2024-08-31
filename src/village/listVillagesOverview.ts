@@ -1,4 +1,4 @@
-const { goPage } = require("../browser/browserService");
+import { goPage } from "../browser/browserService";
 const getVillagesInfo = require("./listVillagesSimple");
 const { getIncomingResources } = require("../market/ongoingTrades");
 import { OverviewTabs } from "../constants/overviewTabs";

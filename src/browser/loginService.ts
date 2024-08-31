@@ -1,16 +1,17 @@
-const { goPage, typeInSelector } = require("./browserService");
+import { Page } from "puppeteer";
+import { goPage, typeInSelector } from "../browser/browserService";
 import { TRAVIAN_BASE } from "../constants/links";
-const { formatTime } = require("../utils/timePrint");
+import { formatTime } from "../utils/timePrint";
 
-const USERNAME = process.env.TARVIAN_USERNAME;
-const PASSWORD = process.env.TARVIAN_PASSWORD;
-const START_DELAY = 15;
+const USERNAME: string | undefined = process.env.TARVIAN_USERNAME;
+const PASSWORD: string | undefined = process.env.TARVIAN_PASSWORD;
+const START_DELAY: number = 15;
 
 if (!USERNAME || !PASSWORD) {
   throw new Error("Environment variables USERNAME and PASSWORD must be set.");
 }
 
-const login = async (page) => {
+export const login = async (page: Page): Promise<void> => {
   try {
     await goPage(TRAVIAN_BASE);
 
@@ -26,27 +27,27 @@ const login = async (page) => {
   }
 };
 
-const writeUser = async (page) => {
+const writeUser = async (page: Page): Promise<void> => {
   try {
     await page.waitForSelector('input[name="name"]');
-    await typeInSelector('input[name="name"]', USERNAME);
+    await typeInSelector('input[name="name"]', USERNAME as string);
     console.log("Username entered.");
   } catch (error) {
     console.error("Error entering username:", error);
   }
 };
 
-const writePassword = async (page) => {
+const writePassword = async (page: Page): Promise<void> => {
   try {
     await page.waitForSelector('input[name="password"]');
-    await typeInSelector('input[name="password"]', PASSWORD);
+    await typeInSelector('input[name="password"]', PASSWORD as string);
     console.log("Password entered.");
   } catch (error) {
     console.error("Error entering password:", error);
   }
 };
 
-const submit = async (page) => {
+const submit = async (page: Page): Promise<void> => {
   try {
     await page.click('button[type="submit"]');
     console.log("Login form submitted.");
@@ -54,5 +55,3 @@ const submit = async (page) => {
     console.error("Error submitting login form:", error);
   }
 };
-
-module.exports = login;

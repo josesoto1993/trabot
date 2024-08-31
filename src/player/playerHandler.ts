@@ -4,7 +4,7 @@ const getVillagesOverviewInfo = require("../village/listVillagesOverview");
 const getBuildingData = require("../village/buildingsData");
 const getResourceFieldsData = require("../village/resourceFieldsData");
 import { ConstructionStatus } from "../constants/constructionStatus";
-const { formatTimeMillis } = require("../utils/timePrint");
+import { formatTimeMillis } from "../utils/timePrint";
 
 let player = new Player([]);
 
