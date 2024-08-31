@@ -1,12 +1,20 @@
-const TrainModel = require("../schemas/trainSchema");
-const { getUnit } = require("./unitService");
+import TrainModel, { ITrainSchema } from "../schemas/trainSchema";
+import { getUnit, IUnit } from "./unitService";
 
-const getTrainList = async () => {
-  const trainList = await TrainModel.find();
+interface ITrainUnit {
+  villageName: string;
+  unit: IUnit;
+}
+
+export const getTrainList = async (): Promise<ITrainUnit[]> => {
+  const trainList: ITrainSchema[] = await TrainModel.find().exec();
 
   const populatedTrainList = await Promise.all(
     trainList.map(async (train) => {
       const unit = await getUnit(train.unitName);
+      if (!unit) {
+        throw new Error(`Unit "${train.unitName}" not found`);
+      }
       return {
         villageName: train.villageName,
         unit: unit,
@@ -17,22 +25,30 @@ const getTrainList = async () => {
   return populatedTrainList;
 };
 
-const clearVillage = async (villageName) => {
+export const clearVillage = async (villageName: string): Promise<void> => {
   const filter = { villageName };
-  await TrainModel.deleteMany(filter);
+  await TrainModel.deleteMany(filter).exec();
 };
 
-const removeTrain = async (villageName, unitName) => {
+export const removeTrain = async (
+  villageName: string,
+  unitName: string
+): Promise<void> => {
   const filter = { villageName, unitName };
-  await TrainModel.deleteOne(filter);
+  await TrainModel.deleteOne(filter).exec();
 };
 
-const trainsInVillage = async (villageName) => {
+const trainsInVillage = async (
+  villageName: string
+): Promise<ITrainSchema[]> => {
   const filter = { villageName };
-  await TrainModel.find(filter);
+  return await TrainModel.find(filter).exec();
 };
 
-const insertTrain = async (villageName, unitName) => {
+export const insertTrain = async (
+  villageName: string,
+  unitName: string
+): Promise<ITrainSchema> => {
   const unit = await getUnit(unitName);
   if (!unit) {
     throw new Error(`Unit "${unitName}" not found`);
@@ -40,12 +56,16 @@ const insertTrain = async (villageName, unitName) => {
 
   const existingTrainsInVillage = await trainsInVillage(villageName);
 
-  const conflictingTrains = existingTrainsInVillage.filter(async (train) => {
-    const existingUnit = await getUnit(train.unitName);
-    return existingUnit.building._id.equals(unit.building._id);
-  });
+  const conflictingTrains = await Promise.all(
+    existingTrainsInVillage.map(async (train) => {
+      const existingUnit = await getUnit(train.unitName);
+      return existingUnit && existingUnit.building.name === unit.building.name
+        ? train
+        : null;
+    })
+  );
 
-  for (const conflict of conflictingTrains) {
+  for (const conflict of conflictingTrains.filter(Boolean)) {
     await removeTrain(villageName, conflict.unitName);
   }
 
@@ -53,11 +73,4 @@ const insertTrain = async (villageName, unitName) => {
   await newTrain.save();
 
   return newTrain;
-};
-
-module.exports = {
-  getTrainList,
-  clearVillage,
-  removeTrain,
-  insertTrain,
 };

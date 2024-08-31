@@ -1,11 +1,22 @@
-const UpgradeUnitModel = require("../schemas/upgradeUnitSchema");
+import { getUnit, IUnit } from "./unitService";
+import UpgradeUnitModel, {
+  IUpgradeUnitSchema,
+} from "../schemas/upgradeUnitSchema";
 
-const getUpgradeList = async () => {
-  const upgradeList = await UpgradeUnitModel.find();
+interface IUpgradeUnit {
+  villageName: string;
+  unit: IUnit;
+}
 
-  const populatedUpgradeList = await Promise.all(
+export const getUpgradeList = async (): Promise<IUpgradeUnit[]> => {
+  const upgradeList = await UpgradeUnitModel.find().exec();
+
+  const populatedUpgradeList: IUpgradeUnit[] = await Promise.all(
     upgradeList.map(async (upgrade) => {
       const unit = await getUnit(upgrade.unitName);
+      if (!unit) {
+        throw new Error(`Unit "${upgrade.unitName}" not found`);
+      }
       return {
         villageName: upgrade.villageName,
         unit: unit,
@@ -16,32 +27,28 @@ const getUpgradeList = async () => {
   return populatedUpgradeList;
 };
 
-const clearVillage = async (villageName) => {
+export const clearVillage = async (villageName: string): Promise<void> => {
   const filter = { villageName };
-  await UpgradeUnitModel.deleteMany(filter);
+  await UpgradeUnitModel.deleteMany(filter).exec();
 };
 
-const removeUpgrade = async (villageName, unitName) => {
+export const removeUpgrade = async (
+  villageName: string,
+  unitName: string
+): Promise<void> => {
   const filter = { villageName, unitName };
-  await TrainModel.deleteOne(filter);
+  await UpgradeUnitModel.deleteOne(filter).exec();
 };
 
-const insertUpgrade = async (villageName, unitName) => {
+export const insertUpgrade = async (
+  villageName: string,
+  unitName: string
+): Promise<IUpgradeUnitSchema> => {
   const unit = await getUnit(unitName);
   if (!unit) {
     throw new Error(`Unit "${unitName}" not found`);
   }
 
-  const filter = { villageName, unitName };
-  const newUpgrade = new TrainModel(filter);
-  await newUpgrade.save();
-
-  return newUpgrade;
-};
-
-module.exports = {
-  getUpgradeList,
-  clearVillage,
-  removeUpgrade,
-  insertUpgrade,
+  const newUpgrade = new UpgradeUnitModel({ villageName, unitName });
+  return await newUpgrade.save();
 };

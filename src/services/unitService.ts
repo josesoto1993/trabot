@@ -1,28 +1,34 @@
-const UnitModel = require("../schemas/unitSchema");
+import UnitModel, { IUnitSchema } from "../schemas/unitSchema";
+import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
 
-let cachedUnits = null;
+export interface IUnit extends IUnitSchema {
+  building: IBuildingTypeSchema;
+}
 
-const loadUnits = async () => {
+let cachedUnits: Record<string, IUnit> | null = null;
+
+const loadUnits = async (): Promise<Record<string, IUnit>> => {
   if (!cachedUnits) {
-    const units = await UnitModel.find().populate("building");
+    const units = await UnitModel.find().populate("building").exec();
     cachedUnits = {};
     units.forEach((unit) => {
-      cachedUnits[unit.name] = unit;
+      const unitWithBuilding = unit as IUnit;
+      cachedUnits[unitWithBuilding.name] = unitWithBuilding;
     });
   }
   return cachedUnits;
 };
 
-const getUnits = async () => {
+export const getUnits = async (): Promise<Record<string, IUnit>> => {
   return await loadUnits();
 };
 
-const getUnit = async (name) => {
+export const getUnit = async (name: string): Promise<IUnit | undefined> => {
   const units = await getUnits();
   return units[name];
 };
 
-const upsertUnit = async (unitData) => {
+export const upsertUnit = async (unitData: IUnit): Promise<IUnit | null> => {
   const filter = { name: unitData.name };
   const update = {
     selector: unitData.selector,
@@ -30,15 +36,17 @@ const upsertUnit = async (unitData) => {
   };
   const options = { new: true, upsert: true };
 
-  const result = await UnitModel.findOneAndUpdate(filter, update, options);
+  const result = await UnitModel.findOneAndUpdate(
+    filter,
+    update,
+    options
+  ).exec();
 
   cleanCache();
 
-  return result;
+  return result as IUnit;
 };
 
-const cleanCache = () => {
+const cleanCache = (): void => {
   cachedUnits = null;
 };
-
-module.exports = { getUnits, getUnit, upsertUnit };

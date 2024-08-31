@@ -1,24 +1,34 @@
-const BuildingCategoryModel = require("../schemas/buildingCategorySchema");
+import BuildingCategoryModel, {
+  IBuildingCategorySchema,
+} from "../schemas/buildingCategorySchema";
 
-let cachedCategories = null;
+export interface IBuildingCategory extends IBuildingCategorySchema {}
 
-const loadBuildingCategories = async () => {
+let cachedCategories: Record<string, IBuildingCategory> | null = null;
+
+const loadBuildingCategories = async (): Promise<
+  Record<string, IBuildingCategory>
+> => {
   if (!cachedCategories) {
-    const categories = await BuildingCategoryModel.find();
+    const categories = await BuildingCategoryModel.find().exec();
     cachedCategories = {};
     categories.forEach((category) => {
-      cachedCategories[category.name] = category;
+      cachedCategories![category.name] = category;
     });
   }
   return cachedCategories;
 };
 
-const getBuildingCategory = async (name) => {
+export const getBuildingCategory = async (
+  name: string
+): Promise<IBuildingCategory | undefined> => {
   const categories = await loadBuildingCategories();
   return categories[name];
 };
 
-const upsertBuildingCategory = async (category) => {
+export const upsertBuildingCategory = async (
+  category: IBuildingCategory
+): Promise<IBuildingCategorySchema | null> => {
   const filter = { name: category.name };
   const update = { value: category.value };
   const options = { new: true, upsert: true, setDefaultsOnInsert: true };
@@ -27,7 +37,7 @@ const upsertBuildingCategory = async (category) => {
     filter,
     update,
     options
-  );
+  ).exec();
 
   cleanCache();
 
@@ -35,7 +45,5 @@ const upsertBuildingCategory = async (category) => {
 };
 
 const cleanCache = () => {
-  cachedBuildingTypes = null;
+  cachedCategories = null;
 };
-
-module.exports = { getBuildingCategory, upsertBuildingCategory };

@@ -1,26 +1,55 @@
-const PriorityBuildingModel = require("../schemas/PriorityBuildingSchema");
+import PriorityBuildingModel, {
+  IPriorityBuildingSchema,
+} from "../schemas/PriorityBuildingSchema";
 import { PriorityLevels } from "../constants/priorityLevels";
+import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
 
-const getAll = async () => {
-  return await PriorityBuildingModel.find().populate("building");
-};
+export interface IPriorityBuilding extends IPriorityBuildingSchema {
+  building: IBuildingTypeSchema;
+}
 
-const getAllByPriority = async (priority) => {
-  if (!Object.values(PriorityLevels).includes(priority)) {
-    throw new Error(`Invalid priority level: ${priority}`);
-  }
-
-  const filter = { priority };
-  return await PriorityBuildingModel.find(filter).populate({
+export const getAll = async (): Promise<IPriorityBuilding[]> => {
+  const options = {
     path: "building",
     populate: {
       path: "category",
       model: "BuildingCategory",
     },
-  });
+  };
+
+  const priorityBuildings = await PriorityBuildingModel.find()
+    .populate(options)
+    .exec();
+  return priorityBuildings as IPriorityBuilding[];
 };
 
-const upsert = async (priority, building, targetLevel) => {
+export const getAllByPriority = async (
+  priority: PriorityLevels
+): Promise<IPriorityBuilding[]> => {
+  if (!Object.values(PriorityLevels).includes(priority)) {
+    throw new Error(`Invalid priority level: ${priority}`);
+  }
+
+  const filter = { priority: priority };
+  const options = {
+    path: "building",
+    populate: {
+      path: "category",
+      model: "BuildingCategory",
+    },
+  };
+
+  const priorityBuildings = await PriorityBuildingModel.find(filter)
+    .populate(options)
+    .exec();
+  return priorityBuildings as IPriorityBuilding[];
+};
+
+export const upsert = async (
+  priority: PriorityLevels,
+  building: IBuildingTypeSchema,
+  targetLevel: number
+): Promise<IPriorityBuildingSchema | null> => {
   if (!Object.values(PriorityLevels).includes(priority)) {
     throw new Error(`Invalid priority level: ${priority}`);
   }
@@ -28,27 +57,27 @@ const upsert = async (priority, building, targetLevel) => {
   const filter = { priority, building };
   const update = {
     priority: priority,
-    building: building,
+    building: building._id,
     buildingAuxName: building.name,
     targetLevel: targetLevel,
   };
   const options = { new: true, upsert: true };
 
-  return await PriorityBuildingModel.findOneAndUpdate(filter, update, options);
+  return await PriorityBuildingModel.findOneAndUpdate(
+    filter,
+    update,
+    options
+  ).exec();
 };
 
-const remove = async (priority, building) => {
+export const remove = async (
+  priority: PriorityLevels,
+  building: IBuildingTypeSchema
+): Promise<IPriorityBuildingSchema | null> => {
   if (!Object.values(PriorityLevels).includes(priority)) {
     throw new Error(`Invalid priority level: ${priority}`);
   }
 
-  const filter = { priority, building };
-  return await PriorityBuildingModel.findOneAndDelete(filter);
-};
-
-module.exports = {
-  getAll,
-  getAllByPriority,
-  upsert,
-  remove,
+  const filter = { priority, building: building._id };
+  return await PriorityBuildingModel.findOneAndDelete(filter).exec();
 };

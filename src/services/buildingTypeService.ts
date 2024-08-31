@@ -1,33 +1,49 @@
-const BuildingTypeModel = require("../schemas/buildingTypeSchema");
+import BuildingTypeModel, {
+  IBuildingTypeSchema,
+} from "../schemas/buildingTypeSchema";
+import { IBuildingCategorySchema } from "../schemas/buildingCategorySchema";
 
-let cachedBuildingTypes = null;
+export interface IBuildingType extends IBuildingTypeSchema {
+  category: IBuildingCategorySchema;
+}
 
-const loadBuildingTypes = async () => {
+let cachedBuildingTypes: Record<string, IBuildingType> | null = null;
+
+const loadBuildingTypes = async (): Promise<Record<string, IBuildingType>> => {
   if (!cachedBuildingTypes) {
-    const buildingTypes = await BuildingTypeModel.find().populate("category");
+    const buildingTypes = await BuildingTypeModel.find()
+      .populate("category")
+      .exec();
     cachedBuildingTypes = {};
     buildingTypes.forEach((buildingType) => {
-      cachedBuildingTypes[buildingType.name] = buildingType;
+      const buildingTypeWithCategory = buildingType as IBuildingType;
+      cachedBuildingTypes![buildingType.name] = buildingTypeWithCategory;
     });
   }
   return cachedBuildingTypes;
 };
 
-const getBuildingTypes = async () => {
+export const getBuildingTypes = async (): Promise<
+  Record<string, IBuildingType>
+> => {
   return await loadBuildingTypes();
 };
 
-const getBuildingType = async (name) => {
+export const getBuildingType = async (
+  name: string
+): Promise<IBuildingType | undefined> => {
   const buildingTypes = await getBuildingTypes();
   return buildingTypes[name];
 };
 
-const upsertBuildingType = async (buildingTypeData) => {
+export const upsertBuildingType = async (
+  buildingTypeData: IBuildingType
+): Promise<IBuildingTypeSchema | null> => {
   const filter = { name: buildingTypeData.name };
   const update = {
     structureId: buildingTypeData.structureId,
     category: buildingTypeData.category._id,
-    slot: buildingTypeData.slot,
+    slot: buildingTypeData.slot ?? null,
   };
   const options = { new: true, upsert: true };
 
@@ -35,15 +51,13 @@ const upsertBuildingType = async (buildingTypeData) => {
     filter,
     update,
     options
-  );
+  ).exec();
 
   cleanCache();
 
   return result;
 };
 
-const cleanCache = () => {
+const cleanCache = (): void => {
   cachedBuildingTypes = null;
 };
-
-module.exports = { getBuildingTypes, getBuildingType, upsertBuildingType };
