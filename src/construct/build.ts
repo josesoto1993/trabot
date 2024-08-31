@@ -47,7 +47,7 @@ const getNextBuildFinishAt = () => {
   const villages = getVillages();
 
   const minBuildFinishAt = Math.min(
-    ...villages.map((village) => village.buildFinishAt)
+    ...villages.map((village) => village.buildFinishTime)
   );
 
   return (minBuildFinishAt - currentTime) / 1000;
@@ -63,9 +63,9 @@ const processVillagesBuild = async (page) => {
       continue;
     }
 
-    if (village.buildFinishAt >= Date.now()) {
+    if (village.buildFinishTime >= Date.now()) {
       console.log(
-        `skip village ${village.name}, next build try: ${formatTimeMillis(village.buildFinishAt - Date.now())}`
+        `skip village ${village.name}, next build try: ${formatTimeMillis(village.buildFinishTime - Date.now())}`
       );
       continue;
     }

@@ -1,8 +1,10 @@
+import { Page } from "puppeteer";
 import { goPage } from "../browser/browserService";
-const getVillagesInfo = require("./listVillagesSimple");
-const { getIncomingResources } = require("../market/ongoingTrades");
+import { getVillagesInfo } from "./listVillagesSimple";
+import { getIncomingResources } from "../market/ongoingTrades";
 import { OverviewTabs } from "../constants/overviewTabs";
-const Resources = require("../models/resources");
+import Resources from "../models/resources";
+import Village from "../models/village";
 
 const ROW_SELECTOR = "#content table tbody tr";
 const CONSUMPTION_TABLE_SELECTOR = "#content div.troops_wrapper table";
@@ -21,7 +23,7 @@ const capacitySelectors = {
   crop: "td.max4",
 };
 
-const getVillagesOverviewInfo = async (page) => {
+const getVillagesOverviewInfo = async (page: Page): Promise<Village[]> => {
   try {
     const merchantsTable = await getOverviewMerchants(page);
     const resourcesTable = await getOverviewResources(
@@ -50,10 +52,11 @@ const getVillagesOverviewInfo = async (page) => {
       village.capacity = capacityTable[village.name];
       village.ongoingResources = getIncomingResources(village.name);
       village.availableMerchants =
-        merchantsTable[village.name].availableMerchants;
-      village.maxMerchants = merchantsTable[village.name].maxMerchants;
-      village.celebrationTime = cultureTable[village.name].celebrationTime;
-      village.consumption = consumptionTable[village.name];
+        merchantsTable[village.name]?.availableMerchants ?? 0;
+      village.maxMerchants = merchantsTable[village.name]?.maxMerchants ?? 0;
+      village.celebrationTime =
+        cultureTable[village.name]?.celebrationTime ?? 0;
+      village.consumption = consumptionTable[village.name] ?? 0;
     }
 
     return villages;
@@ -63,44 +66,39 @@ const getVillagesOverviewInfo = async (page) => {
   }
 };
 
-const getOverviewMerchants = async (page) => {
+const getOverviewMerchants = async (
+  page: Page
+): Promise<
+  Record<string, { availableMerchants: number; maxMerchants: number }>
+> => {
   await goPage(OverviewTabs.OVERVIEW);
   await page.waitForSelector(ROW_SELECTOR);
 
-  const merchantsRaw = await page.evaluate((rowSelector) => {
+  const merchantsRaw = await page.evaluate((rowSelector: string) => {
     const rows = document.querySelectorAll(rowSelector);
 
-    const result = {};
+    const result: Record<
+      string,
+      { availableMerchants: number; maxMerchants: number }
+    > = {};
     rows.forEach((row) => {
       const villageLink = row.querySelector("td.vil a");
       if (!villageLink) {
         return;
       }
 
-      const villageName = villageLink.textContent.trim();
+      const villageName = villageLink.textContent?.trim() ?? "";
       if (!result[villageName]) {
-        result[villageName] = {};
+        result[villageName] = { availableMerchants: 0, maxMerchants: 0 };
       }
 
       const merchantElement = row.querySelector("td.tra.lc a");
       if (merchantElement) {
-        console.log(
-          "village find merchantElement.textContent: ",
-          merchantElement.textContent
-        );
-        console.log(
-          "village find merchantElement.textContent.trim(): ",
-          merchantElement.textContent.trim()
-        );
-        const availableText = merchantElement.textContent
-          .trim()
-          .replace(/[^\d\/]/g, "");
-        console.log("village find availableText: ", availableText);
+        const availableText =
+          merchantElement.textContent?.trim().replace(/[^\d\/]/g, "") ?? "";
         const [available, max] = availableText.split("/").map(Number);
-        console.log("village find available: ", available);
-        console.log("village find max: ", max);
-        result[villageName].availableMerchants = available ? available : 0;
-        result[villageName].maxMerchants = max ? max : 0;
+        result[villageName].availableMerchants = available || 0;
+        result[villageName].maxMerchants = max || 0;
       }
     });
     return result;
@@ -109,89 +107,87 @@ const getOverviewMerchants = async (page) => {
   return merchantsRaw;
 };
 
-const getOverviewCelebrations = async (page) => {
+const getOverviewCelebrations = async (
+  page: Page
+): Promise<Record<string, { celebrationTime: number }>> => {
   await goPage(OverviewTabs.CULTUREPOINTS);
   await page.waitForSelector(ROW_SELECTOR);
 
-  const celebrationsRaw = await page.evaluate((rowSelector) => {
+  const celebrationsRaw = await page.evaluate((rowSelector: string) => {
     const rows = document.querySelectorAll(rowSelector);
 
-    const result = {};
+    const result: Record<string, { celebrationTime: number }> = {};
     rows.forEach((row) => {
       const villageLink = row.querySelector("td.vil a");
       if (!villageLink) {
         return;
       }
 
-      const villageName = villageLink.textContent.trim();
+      const villageName = villageLink.textContent?.trim() ?? "";
       if (!result[villageName]) {
-        result[villageName] = {};
+        result[villageName] = { celebrationTime: 0 };
       }
 
       const celebrationElement = row.querySelector("td.cel a span");
-      let value = null;
+      let value: number | null = null;
       if (celebrationElement) {
         if (celebrationElement.classList.contains("timer")) {
-          const durationText = celebrationElement.textContent.trim();
+          const durationText = celebrationElement.textContent?.trim() ?? "";
           const [hours, minutes, seconds] = durationText.split(":").map(Number);
-          value = hours * 3600 + minutes * 60 + seconds;
+          value = (hours || 0) * 3600 + (minutes || 0) * 60 + (seconds || 0);
         } else if (celebrationElement.classList.contains("dot")) {
           value = 0;
         }
       }
 
-      result[villageName].celebrationTime = value;
+      result[villageName].celebrationTime = value ?? 0;
     });
     return result;
   }, ROW_SELECTOR);
 
   return celebrationsRaw;
 };
-0;
 
-const getOverviewConsumption = async (page) => {
+const getOverviewConsumption = async (
+  page: Page
+): Promise<Record<string, number>> => {
   await goPage(OverviewTabs.TROOPS_INVILLAGE);
   await page.waitForSelector(CONSUMPTION_TABLE_SELECTOR);
 
-  const consumptionRaw = await page.evaluate((rowSelector) => {
+  const consumptionRaw = await page.evaluate((rowSelector: string) => {
     const rows = document.querySelectorAll(rowSelector);
 
-    let errorCount = 0;
-    const result = {};
+    const result: Record<string, number> = {};
     rows.forEach((row) => {
       const villageNameElement = row.querySelector("thead tr th");
       if (!villageNameElement) {
-        result[errorCount] = "no villageNameElement";
         return;
       }
 
-      const villageName = villageNameElement
-        ? villageNameElement.textContent.trim()
-        : null;
-
+      const villageName = villageNameElement.textContent?.trim() ?? "";
       if (!villageName) {
-        result[errorCount] = "no villageName";
+        result[villageName] = -1;
         return;
       }
 
       const upkeepBody = row.querySelector("tbody.upkeep");
       if (!upkeepBody) {
-        result[villageName] = "no upkeepBody";
+        result[villageName] = -1;
         return;
       }
 
       const consumptionRow = upkeepBody.querySelector("tr");
-      const spanElements = consumptionRow.querySelectorAll(
+      const spanElements = consumptionRow?.querySelectorAll(
         "td div.consumption span"
       );
       if (!spanElements) {
-        result[villageName] = "no spanElements";
+        result[villageName] = -1;
         return;
       }
 
       const consumption = Array.from(spanElements).reduce((sum, span) => {
         const value = parseInt(
-          span.textContent.trim().replace(/[^0-9]/g, ""),
+          span.textContent?.trim().replace(/[^0-9]/g, "") ?? "0",
           10
         );
         return sum + (isNaN(value) ? 0 : value);
@@ -205,24 +201,28 @@ const getOverviewConsumption = async (page) => {
   return consumptionRaw;
 };
 
-const getOverviewResources = async (page, tableUrl, selectors) => {
+const getOverviewResources = async (
+  page: Page,
+  tableUrl: string,
+  selectors: Record<string, string>
+): Promise<Record<string, Resources>> => {
   await goPage(tableUrl);
   await page.waitForSelector(ROW_SELECTOR);
 
   const resourcesRaw = await page.evaluate(
-    (selectors, rowSelector) => {
+    (selectors: Record<string, string>, rowSelector: string) => {
       const rows = document.querySelectorAll(rowSelector);
-      const cleanNumber = (element) =>
-        parseInt(element.textContent.trim().replace(/[^\d]/g, ""), 10);
+      const cleanNumber = (element: Element | null) =>
+        parseInt(element?.textContent?.trim().replace(/[^\d]/g, "") ?? "0", 10);
 
-      const result = {};
+      const result: Record<string, Record<string, number>> = {};
       rows.forEach((row) => {
         const villageLink = row.querySelector("td.vil a");
         if (!villageLink) {
           return;
         }
 
-        const villageName = villageLink.textContent.trim();
+        const villageName = villageLink.textContent?.trim() ?? "";
         if (!result[villageName]) {
           result[villageName] = {};
         }
@@ -241,17 +241,19 @@ const getOverviewResources = async (page, tableUrl, selectors) => {
   return rawToResourceObject(resourcesRaw);
 };
 
-const rawToResourceObject = (resourcesRaw) => {
-  const resourcesByVillage = {};
+const rawToResourceObject = (
+  resourcesRaw: Record<string, Record<string, number>>
+): Record<string, Resources> => {
+  const resourcesByVillage: Record<string, Resources> = {};
   for (const [villageName, resourceData] of Object.entries(resourcesRaw)) {
     resourcesByVillage[villageName] = new Resources(
-      resourceData.lumber,
-      resourceData.clay,
-      resourceData.iron,
-      resourceData.crop
+      resourceData.lumber ?? 0,
+      resourceData.clay ?? 0,
+      resourceData.iron ?? 0,
+      resourceData.crop ?? 0
     );
   }
   return resourcesByVillage;
 };
 
-module.exports = getVillagesOverviewInfo;
+export default getVillagesOverviewInfo;

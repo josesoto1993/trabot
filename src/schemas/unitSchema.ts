@@ -2,12 +2,17 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
 
 export interface IUnitSchema extends Document {
+  _id: mongoose.Schema.Types.ObjectId;
   name: string;
   selector: string;
   building: mongoose.Schema.Types.ObjectId | IBuildingTypeSchema;
 }
 
 const UnitSchema: Schema<IUnitSchema> = new Schema({
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
   name: {
     type: String,
     required: true,

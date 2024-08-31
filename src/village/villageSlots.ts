@@ -1,7 +1,15 @@
-const getActualVillages = async (page) => {
+import { Page } from "puppeteer";
+import Village from "../models/village";
+
+interface VillageSlotInfo {
+  actualVillages: number;
+  maxVillages: number;
+}
+
+const getActualVillagesCount = async (page: Page): Promise<number> => {
   try {
     const slotText = await getVillageSlotsInfo(page);
-    const { villages } = parseVillageSlots(slotText);
+    const { actualVillages: villages } = parseVillageSlots(slotText);
     return villages;
   } catch (error) {
     console.error("Error getting number of actual villages:", error);
@@ -9,18 +17,7 @@ const getActualVillages = async (page) => {
   }
 };
 
-const getMaxVillages = async (page) => {
-  try {
-    const slotText = await getVillageSlotsInfo(page);
-    const { maxVillages } = parseVillageSlots(slotText);
-    return maxVillages;
-  } catch (error) {
-    console.error("Error getting maximum number of villages:", error);
-    throw error;
-  }
-};
-
-const getVillageSlotsInfo = async (page) => {
+const getVillageSlotsInfo = async (page: Page): Promise<string> => {
   try {
     await page.waitForSelector(
       "#sidebarBoxVillagelist div.content div.expansionSlotInfo div.boxTitle span.slots"
@@ -28,7 +25,7 @@ const getVillageSlotsInfo = async (page) => {
 
     const slotText = await page.$eval(
       "#sidebarBoxVillagelist div.content div.expansionSlotInfo div.boxTitle span.slots",
-      (el) => el.textContent.trim()
+      (el) => el.textContent?.trim() ?? ""
     );
 
     return slotText;
@@ -38,13 +35,13 @@ const getVillageSlotsInfo = async (page) => {
   }
 };
 
-const parseVillageSlots = (slotText) => {
+const parseVillageSlots = (slotText: string): VillageSlotInfo => {
   const cleanedText = slotText.replace(/[^\d\/]/g, "");
 
   const slotMatch = cleanedText.match(/(\d+)\/(\d+)/);
   if (slotMatch) {
     return {
-      villages: parseInt(slotMatch[1], 10),
+      actualVillages: parseInt(slotMatch[1], 10),
       maxVillages: parseInt(slotMatch[2], 10),
     };
   } else {
@@ -54,23 +51,19 @@ const parseVillageSlots = (slotText) => {
   }
 };
 
-const validateActiveVillages = (villages) => {
+export const validateActiveVillages = (villages: Village[]): void => {
   const activeVillages = villages.filter((village) => village.active);
   if (activeVillages.length !== 1) {
     throw new Error("There should be exactly one active village.");
   }
 };
 
-const validateVillagesCount = async (page, villages) => {
-  const expectedVillagesCount = await getActualVillages(page);
+export const validateVillagesCount = async (
+  page: Page,
+  villages: Village[]
+): Promise<void> => {
+  const expectedVillagesCount = await getActualVillagesCount(page);
   if (villages.length !== expectedVillagesCount) {
     throw new Error("Mismatch in number of villages.");
   }
-};
-
-module.exports = {
-  getActualVillages,
-  getMaxVillages,
-  validateActiveVillages,
-  validateVillagesCount,
 };

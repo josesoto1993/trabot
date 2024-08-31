@@ -2,6 +2,7 @@ import BuildingTypeModel, {
   IBuildingTypeSchema,
 } from "../schemas/buildingTypeSchema";
 import { IBuildingCategorySchema } from "../schemas/buildingCategorySchema";
+import mongoose from "mongoose";
 
 export interface IBuildingType extends IBuildingTypeSchema {
   category: IBuildingCategorySchema;
@@ -36,13 +37,16 @@ export const getBuildingType = async (
   return buildingTypes[name];
 };
 
-export const upsertBuildingType = async (
-  buildingTypeData: IBuildingType
-): Promise<IBuildingTypeSchema | null> => {
+export const upsertBuildingType = async (buildingTypeData: {
+  structureId: number;
+  name: string;
+  category: mongoose.Schema.Types.ObjectId;
+  slot?: number | null;
+}): Promise<IBuildingTypeSchema | null> => {
   const filter = { name: buildingTypeData.name };
   const update = {
     structureId: buildingTypeData.structureId,
-    category: buildingTypeData.category._id,
+    category: buildingTypeData.category,
     slot: buildingTypeData.slot ?? null,
   };
   const options = { new: true, upsert: true };

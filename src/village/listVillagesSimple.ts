@@ -1,17 +1,25 @@
-const Village = require("../models/village");
-const {
-  validateActiveVillages,
-  validateVillagesCount,
-} = require("./villageSlots");
+import { Page } from "puppeteer";
+import Village from "../models/village";
+import { validateActiveVillages, validateVillagesCount } from "./villageSlots";
 
 const VILLAGES_SIDEBAR = "div.villageList div.dropContainer";
 
-const getVillagesInfo = async (page) => {
+interface VillageData {
+  id: string;
+  name: string | null;
+  coordinateX: number;
+  coordinateY: number;
+  active: boolean;
+}
+
+export const getVillagesInfo = async (page: Page): Promise<Village[]> => {
   try {
     await waitForVillageList(page);
 
     const villages = await getVillagesFromPage(page);
-    villages[0].capital = true;
+    if (villages.length > 0) {
+      villages[0].capital = true;
+    }
 
     validateActiveVillages(villages);
     await validateVillagesCount(page, villages);
@@ -23,7 +31,7 @@ const getVillagesInfo = async (page) => {
   }
 };
 
-const waitForVillageList = async (page) => {
+const waitForVillageList = async (page: Page): Promise<void> => {
   try {
     await page.waitForSelector(VILLAGES_SIDEBAR);
   } catch (error) {
@@ -32,32 +40,35 @@ const waitForVillageList = async (page) => {
   }
 };
 
-const getVillagesFromPage = async (page) => {
+const getVillagesFromPage = async (page: Page): Promise<Village[]> => {
   try {
-    const villagesData = await page.$$eval(VILLAGES_SIDEBAR, (nodes) => {
-      return nodes.map((node) => {
-        const listEntry = node.querySelector("div.listEntry");
-        const coordinatesGrid = node.querySelector("span.coordinatesGrid");
+    const villagesData: VillageData[] = await page.$$eval(
+      VILLAGES_SIDEBAR,
+      (nodes) => {
+        return nodes.map((node) => {
+          const listEntry = node.querySelector("div.listEntry");
+          const coordinatesGrid = node.querySelector("span.coordinatesGrid");
 
-        if (!listEntry || !coordinatesGrid) {
-          throw new Error("Required elements not found.");
-        }
+          if (!listEntry || !coordinatesGrid) {
+            throw new Error("Required elements not found.");
+          }
 
-        const id = coordinatesGrid.getAttribute("data-did");
-        const name = coordinatesGrid.getAttribute("data-villagename");
-        const coordinateX = parseInt(
-          coordinatesGrid.getAttribute("data-x"),
-          10
-        );
-        const coordinateY = parseInt(
-          coordinatesGrid.getAttribute("data-y"),
-          10
-        );
-        const active = listEntry.classList.contains("active");
+          const id = coordinatesGrid.getAttribute("data-did");
+          const name = coordinatesGrid.getAttribute("data-villagename");
+          const coordinateX = parseInt(
+            coordinatesGrid.getAttribute("data-x"),
+            10
+          );
+          const coordinateY = parseInt(
+            coordinatesGrid.getAttribute("data-y"),
+            10
+          );
+          const active = listEntry.classList.contains("active");
 
-        return { id, name, coordinateX, coordinateY, active };
-      });
-    });
+          return { id, name, coordinateX, coordinateY, active };
+        });
+      }
+    );
 
     return villagesData.map(
       (villageData) =>
@@ -74,5 +85,3 @@ const getVillagesFromPage = async (page) => {
     throw error;
   }
 };
-
-module.exports = getVillagesInfo;

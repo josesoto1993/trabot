@@ -57,7 +57,7 @@ export const upsert = async (
   const filter = { priority, building };
   const update = {
     priority: priority,
-    building: building._id,
+    building: building,
     buildingAuxName: building.name,
     targetLevel: targetLevel,
   };
@@ -78,6 +78,6 @@ export const remove = async (
     throw new Error(`Invalid priority level: ${priority}`);
   }
 
-  const filter = { priority, building: building._id };
+  const filter = { priority, building };
   return await PriorityBuildingModel.findOneAndDelete(filter).exec();
 };

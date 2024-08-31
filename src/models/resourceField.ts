@@ -1,14 +1,17 @@
+import { ConstructionStatus } from "../constants/constructionStatus";
+import { FieldType } from "../constants/fieldType";
+
 class ResourceField {
-  slotId: string;
+  slotId: number;
   level: number;
-  constructionStatus: string;
+  constructionStatus: ConstructionStatus;
   fieldType: string;
 
   constructor(
-    slotId: string,
+    slotId: number,
     level: number,
-    constructionStatus: string,
-    fieldType: string
+    constructionStatus: ConstructionStatus,
+    fieldType: FieldType
   ) {
     this.slotId = slotId;
     this.level = level;

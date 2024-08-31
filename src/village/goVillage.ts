@@ -4,8 +4,9 @@ import {
   TRAVIAN_BUILDING_VIEW,
   TRAVIAN_BUILD_VIEW,
 } from "../constants/links";
+import Village from "../models/village";
 
-const goVillageResView = async (village) => {
+export const goVillageResView = async (village: Village): Promise<void> => {
   const villageUrl = new URL(TRAVIAN_RESOURCES_VIEW);
   villageUrl.searchParams.append("newdid", village.id);
 
@@ -13,7 +14,9 @@ const goVillageResView = async (village) => {
   console.log(`Navigated to village resources view: ${village.name}`);
 };
 
-const goVillageBuildingView = async (village) => {
+export const goVillageBuildingView = async (
+  village: Village
+): Promise<void> => {
   const villageUrl = new URL(TRAVIAN_BUILDING_VIEW);
   villageUrl.searchParams.append("newdid", village.id);
 
@@ -21,7 +24,14 @@ const goVillageBuildingView = async (village) => {
   console.log(`Navigated to village building view: ${village.name}`);
 };
 
-const goBuilding = async (village, buildingName, searchParams = {}) => {
+export const goBuilding = async (
+  village: Village,
+  buildingName: string,
+  searchParams: Record<
+    string,
+    string | number | boolean | null | undefined
+  > = {}
+): Promise<void> => {
   const villageBuilding = village.buildings.find(
     (building) => building.name === buildingName
   );
@@ -34,16 +44,17 @@ const goBuilding = async (village, buildingName, searchParams = {}) => {
 
   const buildingUrl = new URL(TRAVIAN_BUILD_VIEW);
   buildingUrl.searchParams.append("newdid", village.id);
-  buildingUrl.searchParams.append("id", villageBuilding.slotId);
-  buildingUrl.searchParams.append("gid", villageBuilding.structureId);
+  buildingUrl.searchParams.append("id", villageBuilding.slotId.toString());
+  buildingUrl.searchParams.append(
+    "gid",
+    villageBuilding.structureId.toString()
+  );
 
   for (const [key, value] of Object.entries(searchParams)) {
     if (value !== null && value !== undefined) {
-      buildingUrl.searchParams.append(key, value);
+      buildingUrl.searchParams.append(key, String(value));
     }
   }
 
   await goPage(buildingUrl);
 };
-
-module.exports = { goVillageResView, goVillageBuildingView, goBuilding };

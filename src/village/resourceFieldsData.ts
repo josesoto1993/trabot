@@ -1,19 +1,22 @@
+import { Page } from "puppeteer";
 import { FieldType } from "../constants/fieldType";
 import { ConstructionStatus } from "../constants/constructionStatus";
-const { goVillageResView } = require("./goVillage");
+import { goVillageResView } from "./goVillage";
+import ResourceField from "../models/resourceField";
+import Village from "../models/village";
 
-const ResourceField = require("../models/resourceField");
-
-const getResourceFieldsData = async (page, village) => {
+export const getResourceFieldsData = async (
+  page: Page,
+  village: Village
+): Promise<ResourceField[]> => {
   await goVillageResView(village);
-  await page.waitForSelector("#resourceFieldContainer");
 
   const resourceFields = await getResourceFieldsRawData(page);
-
   return resourceFieldsRawToObject(resourceFields);
 };
 
-const getResourceFieldsRawData = async (page) => {
+const getResourceFieldsRawData = async (page: Page): Promise<string[][]> => {
+  await page.waitForSelector("#resourceFieldContainer");
   return await page.$$eval(`#resourceFieldContainer a`, (nodes) => {
     return nodes
       .filter((node) => !node.classList.contains("villageCenter"))
@@ -21,8 +24,8 @@ const getResourceFieldsRawData = async (page) => {
   });
 };
 
-const resourceFieldsRawToObject = (raw) => {
-  return raw.map((classes) => {
+const resourceFieldsRawToObject = (rows: string[][]): ResourceField[] => {
+  return rows.map((classes) => {
     const fieldId = getFieldId(classes);
     const fieldLvl = getFieldLevel(classes);
     const constructionStatus = getConstructionStatus(classes);
@@ -32,7 +35,7 @@ const resourceFieldsRawToObject = (raw) => {
   });
 };
 
-const getFieldId = (classes) => {
+const getFieldId = (classes: string[]): number => {
   const buildingSlotClass = classes.find((cls) =>
     cls.startsWith("buildingSlot")
   );
@@ -50,7 +53,7 @@ const getFieldId = (classes) => {
   return id;
 };
 
-const getFieldLevel = (classes) => {
+const getFieldLevel = (classes: string[]): number => {
   const levelClass = classes.find(
     (cls) =>
       cls.startsWith("level") && !isNaN(parseInt(cls.replace("level", ""), 10))
@@ -74,7 +77,7 @@ const getFieldLevel = (classes) => {
   return level;
 };
 
-const getConstructionStatus = (classes) => {
+const getConstructionStatus = (classes: string[]): ConstructionStatus => {
   if (classes.includes(ConstructionStatus.MAX_LEVEL)) {
     return ConstructionStatus.MAX_LEVEL;
   } else if (classes.includes(ConstructionStatus.NOT_ENOUGH_RESOURCES)) {
@@ -85,7 +88,7 @@ const getConstructionStatus = (classes) => {
   return ConstructionStatus.NOT_ENOUGH_STORAGE;
 };
 
-const getFieldType = (classes) => {
+const getFieldType = (classes: string[]): FieldType => {
   if (classes.includes(FieldType.CROP)) {
     return FieldType.CROP;
   } else if (classes.includes(FieldType.CLAY)) {
@@ -97,5 +100,3 @@ const getFieldType = (classes) => {
   }
   throw new Error(`Field type not found for classes: ${classes.join(", ")}`);
 };
-
-module.exports = getResourceFieldsData;

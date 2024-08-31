@@ -140,9 +140,9 @@ const updatePlayerVillageBuildFinishAt = (villageId, durationInSeconds) => {
     return;
   }
 
-  const actualFinishAt = Math.max(Date.now(), village.buildFinishAt || 0);
-  village.buildFinishAt = actualFinishAt + durationInSeconds * 1000;
-  const remainingTime = village.buildFinishAt - Date.now();
+  const actualFinishAt = Math.max(Date.now(), village.buildFinishTime || 0);
+  village.buildFinishTime = actualFinishAt + durationInSeconds * 1000;
+  const remainingTime = village.buildFinishTime - Date.now();
 
   console.log(
     `Village ${village.name} busy with building for the next ${formatTimeMillis(remainingTime)}`

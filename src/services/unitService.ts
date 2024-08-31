@@ -28,11 +28,13 @@ export const getUnit = async (name: string): Promise<IUnit | undefined> => {
   return units[name];
 };
 
-export const upsertUnit = async (unitData: IUnit): Promise<IUnit | null> => {
+export const upsertUnit = async (
+  unitData: IUnitSchema
+): Promise<IUnit | null> => {
   const filter = { name: unitData.name };
   const update = {
     selector: unitData.selector,
-    building: unitData.building._id,
+    building: unitData.building,
   };
   const options = { new: true, upsert: true };
 

@@ -1,37 +1,51 @@
+import { Page } from "puppeteer";
 import { ConstructionStatus } from "../constants/constructionStatus";
-const { goVillageBuildingView } = require("./goVillage");
-const Building = require("../models/building");
-const {
+import { goVillageBuildingView } from "./goVillage";
+import Building from "../models/building";
+import {
   getBuildingTypes,
   upsertBuildingType,
-} = require("../services/buildingTypeService");
-const { getBuildingCategory } = require("../services/buildingCategoryService");
+} from "../services/buildingTypeService";
+import { getBuildingCategory } from "../services/buildingCategoryService";
 import { BuildingCategory } from "../constants/buildingCategories";
+import Village from "../models/village";
+import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
 
-const getBuildingData = async (page, village) => {
+interface BuildingRawData {
+  aid: string;
+  gid: string;
+  name: string;
+  level: number;
+  anchorClasses: string[];
+}
+
+export const getBuildingData = async (
+  page: Page,
+  village: Village
+): Promise<Building[]> => {
   await goVillageBuildingView(village);
-  await page.waitForSelector("#villageContent");
 
-  const buildings = await getBuildingRawData(page);
+  const rawBuildings = await getBuildingRawData(page);
 
-  return await buildingsRawToObject(buildings);
+  return await buildingsRawToObject(rawBuildings);
 };
 
-const getBuildingRawData = async (page) => {
+const getBuildingRawData = async (page: Page): Promise<BuildingRawData[]> => {
+  await page.waitForSelector("#villageContent");
   return await page.$$eval("#villageContent .buildingSlot", (nodes) => {
     return nodes.map((node) => {
       const anchor = node.querySelector("a.level");
 
-      let level = anchor ? parseInt(anchor.getAttribute("data-level"), 10) : 0;
+      let level = anchor ? parseInt(anchor.getAttribute("data-level")!, 10) : 0;
 
       if (anchor && anchor.classList.contains("underConstruction")) {
         level += 1;
       }
 
       return {
-        aid: node.getAttribute("data-aid"),
-        gid: node.getAttribute("data-gid"),
-        name: node.getAttribute("data-name"),
+        aid: node.getAttribute("data-aid")!,
+        gid: node.getAttribute("data-gid")!,
+        name: node.getAttribute("data-name")!,
         level: level,
         anchorClasses: anchor ? Array.from(anchor.classList) : [],
       };
@@ -39,33 +53,40 @@ const getBuildingRawData = async (page) => {
   });
 };
 
-const buildingsRawToObject = async (raw) => {
+const buildingsRawToObject = async (
+  raw: BuildingRawData[]
+): Promise<Building[]> => {
   const buildings = raw.map((data) => {
     const slotId = parseInt(data.aid, 10);
     const structureId = parseInt(data.gid, 10);
     const name = data.name;
-    const level = parseInt(data.level, 10);
+    const level = parseInt(data.level.toString(), 10);
     const constructionStatus = getConstructionStatus(data.anchorClasses);
 
     return new Building(structureId, slotId, name, level, constructionStatus);
   });
 
   const buildingTypes = await getBuildingTypes();
-  buildings
-    .filter(
-      (building) =>
-        !Object.values(buildingTypes).some(
-          (buildingType) => building.structureId === buildingType.structureId
-        )
-    )
-    .forEach((newBuildingType) => {
-      addNewBuildingType(newBuildingType.structureId, newBuildingType.name);
-    });
+  await Promise.all(
+    buildings
+      .filter(
+        (building) =>
+          !Object.values(buildingTypes).some(
+            (buildingType) => building.structureId === buildingType.structureId
+          )
+      )
+      .map(async (newBuildingType) => {
+        await addNewBuildingType(
+          newBuildingType.structureId,
+          newBuildingType.name
+        );
+      })
+  );
 
   return buildings;
 };
 
-const getConstructionStatus = (classes) => {
+const getConstructionStatus = (classes: string[]): ConstructionStatus => {
   if (classes.includes(ConstructionStatus.MAX_LEVEL)) {
     return ConstructionStatus.MAX_LEVEL;
   } else if (classes.includes(ConstructionStatus.NOT_ENOUGH_RESOURCES)) {
@@ -76,7 +97,10 @@ const getConstructionStatus = (classes) => {
   return ConstructionStatus.NOT_ENOUGH_STORAGE;
 };
 
-const addNewBuildingType = async (structureId, name) => {
+const addNewBuildingType = async (
+  structureId: number,
+  name: string
+): Promise<void> => {
   const buildingCategory = await getBuildingCategory(
     BuildingCategory.UNDEFINED
   );
@@ -89,7 +113,7 @@ const addNewBuildingType = async (structureId, name) => {
   const buildingTypeData = {
     structureId,
     name,
-    category: buildingCategory,
+    category: buildingCategory._id,
     slot: null,
   };
 
@@ -99,5 +123,3 @@ const addNewBuildingType = async (structureId, name) => {
     `Added or updated building type: ${name} with id: ${structureId}`
   );
 };
-
-module.exports = getBuildingData;
