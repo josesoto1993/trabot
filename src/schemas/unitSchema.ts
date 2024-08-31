@@ -1,6 +1,13 @@
-const mongoose = require("mongoose");
+import mongoose, { Document, Model, Schema } from "mongoose";
+import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
 
-const UnitSchema = new mongoose.Schema({
+export interface IUnitSchema extends Document {
+  name: string;
+  selector: string;
+  building: mongoose.Schema.Types.ObjectId | IBuildingTypeSchema;
+}
+
+const UnitSchema: Schema<IUnitSchema> = new Schema({
   name: {
     type: String,
     required: true,
@@ -18,6 +25,9 @@ const UnitSchema = new mongoose.Schema({
   },
 });
 
-const UnitModel = mongoose.model("Unit", UnitSchema);
+const UnitModel: Model<IUnitSchema> = mongoose.model<IUnitSchema>(
+  "Unit",
+  UnitSchema
+);
 
-module.exports = UnitModel;
+export default UnitModel;

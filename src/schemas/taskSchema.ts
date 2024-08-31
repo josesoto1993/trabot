@@ -1,7 +1,12 @@
-const mongoose = require("mongoose");
+import mongoose, { Document, Model, Schema } from "mongoose";
 import { TaskNames } from "../constants/taskNames";
 
-const TaskSchema = new mongoose.Schema({
+export interface ITaskSchema extends Document {
+  name: keyof typeof TaskNames;
+  isActive: boolean;
+}
+
+const TaskSchema: Schema<ITaskSchema> = new Schema({
   name: {
     type: String,
     enum: Object.values(TaskNames),
@@ -13,6 +18,9 @@ const TaskSchema = new mongoose.Schema({
   },
 });
 
-const TaskModel = mongoose.model("Task", TaskSchema);
+const TaskModel: Model<ITaskSchema> = mongoose.model<ITaskSchema>(
+  "Task",
+  TaskSchema
+);
 
-module.exports = TaskModel;
+export default TaskModel;

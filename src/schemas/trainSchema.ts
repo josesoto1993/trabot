@@ -1,6 +1,11 @@
-const mongoose = require("mongoose");
+import mongoose, { Document, Model, Schema } from "mongoose";
 
-const TrainSchema = new mongoose.Schema({
+export interface ITrainSchema extends Document {
+  villageName: string;
+  unitName: string;
+}
+
+const TrainSchema: Schema<ITrainSchema> = new Schema({
   villageName: {
     type: String,
     required: true,
@@ -11,6 +16,9 @@ const TrainSchema = new mongoose.Schema({
   },
 });
 
-const TrainModel = mongoose.model("Train", TrainSchema);
+const TrainModel: Model<ITrainSchema> = mongoose.model<ITrainSchema>(
+  "Train",
+  TrainSchema
+);
 
-module.exports = TrainModel;
+export default TrainModel;

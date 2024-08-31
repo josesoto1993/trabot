@@ -1,7 +1,15 @@
-const mongoose = require("mongoose");
+import mongoose, { Document, Model, Schema } from "mongoose";
 import { PriorityLevels } from "../constants/priorityLevels";
+import { IBuildingTypeSchema } from "./buildingTypeSchema";
 
-const PriorityBuildingSchema = new mongoose.Schema({
+export interface IPriorityBuildingSchema extends Document {
+  priority: keyof typeof PriorityLevels;
+  building: mongoose.Schema.Types.ObjectId | IBuildingTypeSchema;
+  buildingAuxName: string;
+  targetLevel: number;
+}
+
+const PriorityBuildingSchema: Schema<IPriorityBuildingSchema> = new Schema({
   priority: {
     type: String,
     required: true,
@@ -22,9 +30,10 @@ const PriorityBuildingSchema = new mongoose.Schema({
   },
 });
 
-const PriorityBuildingModel = mongoose.model(
-  "PriorityBuilding",
-  PriorityBuildingSchema
-);
+const PriorityBuildingModel: Model<IPriorityBuildingSchema> =
+  mongoose.model<IPriorityBuildingSchema>(
+    "PriorityBuilding",
+    PriorityBuildingSchema
+  );
 
-module.exports = PriorityBuildingModel;
+export default PriorityBuildingModel;

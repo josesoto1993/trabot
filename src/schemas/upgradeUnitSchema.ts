@@ -1,6 +1,11 @@
-const mongoose = require("mongoose");
+import mongoose, { Document, Model, Schema } from "mongoose";
 
-const UpgradeUnitSchema = new mongoose.Schema({
+export interface IUpgradeUnitSchema extends Document {
+  villageName: string;
+  unitName: string;
+}
+
+const UpgradeUnitSchema: Schema<IUpgradeUnitSchema> = new Schema({
   villageName: {
     type: String,
     required: true,
@@ -11,6 +16,7 @@ const UpgradeUnitSchema = new mongoose.Schema({
   },
 });
 
-const UpgradeUnitModel = mongoose.model("UpgradeUnit", UpgradeUnitSchema);
+const UpgradeUnitModel: Model<IUpgradeUnitSchema> =
+  mongoose.model<IUpgradeUnitSchema>("UpgradeUnit", UpgradeUnitSchema);
 
-module.exports = UpgradeUnitModel;
+export default UpgradeUnitModel;

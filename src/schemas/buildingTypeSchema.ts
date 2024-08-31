@@ -1,6 +1,14 @@
-const mongoose = require("mongoose");
+import mongoose, { Document, Model, Schema } from "mongoose";
+import { IBuildingCategorySchema } from "./buildingCategorySchema";
 
-const BuildingTypeSchema = new mongoose.Schema({
+export interface IBuildingTypeSchema extends Document {
+  structureId: number;
+  name: string;
+  category: mongoose.Schema.Types.ObjectId | IBuildingCategorySchema;
+  slot?: number | null;
+}
+
+const BuildingTypeSchema: Schema<IBuildingTypeSchema> = new Schema({
   structureId: {
     type: Number,
     required: true,
@@ -22,6 +30,7 @@ const BuildingTypeSchema = new mongoose.Schema({
   },
 });
 
-const BuildingTypeModel = mongoose.model("BuildingType", BuildingTypeSchema);
+const BuildingTypeModel: Model<IBuildingTypeSchema> =
+  mongoose.model<IBuildingTypeSchema>("BuildingType", BuildingTypeSchema);
 
-module.exports = BuildingTypeModel;
+export default BuildingTypeModel;

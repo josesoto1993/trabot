@@ -1,6 +1,11 @@
-const mongoose = require("mongoose");
+import mongoose, { Document, Model, Schema } from "mongoose";
 
-const BuildingCategorySchema = new mongoose.Schema({
+export interface IBuildingCategorySchema extends Document {
+  name: string;
+  value: number;
+}
+
+const BuildingCategorySchema: Schema<IBuildingCategorySchema> = new Schema({
   name: {
     type: String,
     required: true,
@@ -12,9 +17,10 @@ const BuildingCategorySchema = new mongoose.Schema({
   },
 });
 
-const BuildingCategoryModel = mongoose.model(
-  "BuildingCategory",
-  BuildingCategorySchema
-);
+const BuildingCategoryModel: Model<IBuildingCategorySchema> =
+  mongoose.model<IBuildingCategorySchema>(
+    "BuildingCategory",
+    BuildingCategorySchema
+  );
 
-module.exports = BuildingCategoryModel;
+export default BuildingCategoryModel;
