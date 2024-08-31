@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
-const PRIORITY_LEVELS = require("../constants/priorityLevels");
+import { PriorityLevels } from "../constants/priorityLevels";
 
 const PriorityBuildingSchema = new mongoose.Schema({
   priority: {
     type: String,
     required: true,
-    enum: Object.values(PRIORITY_LEVELS),
+    enum: Object.values(PriorityLevels),
   },
   building: {
     type: mongoose.Schema.Types.ObjectId,
@@ -17,7 +17,6 @@ const PriorityBuildingSchema = new mongoose.Schema({
     required: true,
   },
   targetLevel: {
-    type: mongoose.Schema.Types.ObjectId,
     type: Number,
     required: true,
   },

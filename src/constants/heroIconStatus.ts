@@ -1,9 +1,11 @@
-const HeroIconStatus = {
-  running: "heroRunning",
-  home: "heroHome",
-  dead: "heroDead",
-  reviving: "heroReviving",
-  reinforcing: "heroReinforcing",
-};
+export enum HeroIconStatus {
+  RUNNING = "heroRunning",
+  HOME = "heroHome",
+  DEAD = "heroDead",
+  REVIVING = "heroReviving",
+  REINFORCING = "heroReinforcing",
+}
 
-module.exports = HeroIconStatus;
+export const HeroIconStatusKeys = Object.keys(
+  HeroIconStatus
+) as (keyof typeof HeroIconStatus)[];

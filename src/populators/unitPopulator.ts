@@ -1,7 +1,7 @@
 const { upsertUnit } = require("../services/unitService");
 const { getBuildingType } = require("../services/buildingTypeService");
-const BUILDING_NAMES = require("../constants/buildingNames");
-const UNIT_NAMES = require("../constants/unitsNames");
+import { BuildingNames } from "../constants/buildingNames";
+import { UnitNames } from "../constants/unitsNames";
 
 const populateUnits = async () => {
   console.log("start populating units");
@@ -19,64 +19,64 @@ const populateUnits = async () => {
 };
 
 const getBaseUnits = async () => {
-  const barracks = await getBuildingType(BUILDING_NAMES.BARRACKS);
-  const stable = await getBuildingType(BUILDING_NAMES.STABLE);
-  const workshop = await getBuildingType(BUILDING_NAMES.WORKSHOP);
-  const residence = await getBuildingType(BUILDING_NAMES.RESIDENCE);
+  const barracks = await getBuildingType(BuildingNames.BARRACKS);
+  const stable = await getBuildingType(BuildingNames.STABLE);
+  const workshop = await getBuildingType(BuildingNames.WORKSHOP);
+  const residence = await getBuildingType(BuildingNames.RESIDENCE);
 
   return [
     {
-      name: UNIT_NAMES.PHALANX,
+      name: UnitNames.PHALANX,
       selector: "t1",
       building: barracks,
     },
     {
-      name: UNIT_NAMES.SWORDSMAN,
+      name: UnitNames.SWORDSMAN,
       selector: "t2",
       building: barracks,
     },
     {
-      name: UNIT_NAMES.PATHFINDER,
+      name: UnitNames.PATHFINDER,
       selector: "t3",
       building: stable,
     },
     {
-      name: UNIT_NAMES.THEUTATES_THUNDER,
+      name: UnitNames.THEUTATES_THUNDER,
       selector: "t4",
       building: stable,
     },
     {
-      name: UNIT_NAMES.DRUIDRIDER,
+      name: UnitNames.DRUIDRIDER,
       selector: "t5",
       building: stable,
     },
     {
-      name: UNIT_NAMES.HAEDUAN,
+      name: UnitNames.HAEDUAN,
       selector: "t6",
       building: stable,
     },
     {
-      name: UNIT_NAMES.RAM,
+      name: UnitNames.RAM,
       selector: "t7",
       building: workshop,
     },
     {
-      name: UNIT_NAMES.TREBUCHET,
+      name: UnitNames.TREBUCHET,
       selector: "t8",
       building: workshop,
     },
     {
-      name: UNIT_NAMES.CHIEFTAIN,
+      name: UnitNames.CHIEFTAIN,
       selector: "t9",
       building: residence,
     },
     {
-      name: UNIT_NAMES.SETTLER,
+      name: UnitNames.SETTLER,
       selector: "t10",
       building: residence,
     },
     {
-      name: UNIT_NAMES.TRAPS,
+      name: UnitNames.TRAPS,
       selector: "t911",
       building: residence,
     },

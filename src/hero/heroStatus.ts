@@ -1,6 +1,9 @@
 const fs = require("fs");
 const path = require("path");
-const HeroIconStatus = require("../constants/heroIconStatus");
+import {
+  HeroIconStatus,
+  HeroIconStatusKeys,
+} from "../constants/heroIconStatus";
 
 const getClassOfHeroIcon = async (page) => {
   const heroStatusSelector = ".heroStatus a i";
@@ -18,39 +21,26 @@ const getClassOfHeroIcon = async (page) => {
   }
 };
 
-const parseClassOfHeroIcon = (classToFind) => {
-  const heroStatus = Object.keys(HeroIconStatus).find(
+const parseClassOfHeroIcon = (classToFind: string): string | undefined => {
+  const heroStatusKey = HeroIconStatusKeys.find(
     (key) => HeroIconStatus[key] === classToFind
   );
 
-  if (heroStatus) {
-    console.log("Hero status found:", heroStatus);
-    return HeroIconStatus[heroStatus];
+  if (heroStatusKey) {
+    console.log("Hero status found:", heroStatusKey);
+    return HeroIconStatus[heroStatusKey];
   } else {
     console.log("No matching hero status found for class:", classToFind);
     return addNewClassOfHeroIcon(classToFind);
   }
 };
 
-const addNewClassOfHeroIcon = (newStatusValue) => {
-  const newStatusKey = `Status${Object.keys(HeroIconStatus).length + 1}`;
-  HeroIconStatus[newStatusKey] = newStatusValue;
-
-  const heroStatusPath = path.resolve(
-    __dirname,
-    "../constants/heroIconStatus.js"
-  );
-
-  const updatedContent = `const HeroStatus = ${JSON.stringify(HeroIconStatus, null, 2)};
-  
-  module.exports = HeroStatus ;`;
-
-  fs.writeFileSync(heroStatusPath, updatedContent, "utf8");
-
-  console.log(
-    `Added new hero status: ${newStatusKey} with class: ${newStatusValue}`
-  );
-  return newStatusKey;
+const addNewClassOfHeroIcon = (newStatusValue: string): string => {
+  const logFilePath = path.resolve(__dirname, "src/todo/newHeroStatus.txt");
+  const logMessage = `New hero status found: ${newStatusValue}\n`;
+  fs.appendFileSync(logFilePath, logMessage, "utf8");
+  console.log(logMessage);
+  return newStatusValue;
 };
 
 const getHeroAdventures = async (page) => {

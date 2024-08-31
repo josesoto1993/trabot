@@ -1,5 +1,5 @@
 const { upgradeExistingBuilding } = require("./upgradeExistingBuilding");
-const ConstructionStatus = require("../constants/constructionStatus");
+import { ConstructionStatus } from "../constants/constructionStatus";
 const { getBuildingType } = require("../services/buildingTypeService");
 
 const updateBuildingList = async (
@@ -32,7 +32,8 @@ const filterBuildingsToUpgrade = (village, buildingsToUpgrade) => {
       (villageBuilding) =>
         villageBuilding.name === buildingToUpgrade.building.name &&
         villageBuilding.level < buildingToUpgrade.targetLevel &&
-        villageBuilding.constructionStatus === ConstructionStatus.readyToUpgrade
+        villageBuilding.constructionStatus ===
+          ConstructionStatus.READY_TO_UPGRADE
     );
 
     filteredBuildings.push(...matchingVillageBuildings);

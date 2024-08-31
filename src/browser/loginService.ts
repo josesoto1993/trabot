@@ -1,5 +1,5 @@
 const { goPage, typeInSelector } = require("./browserService");
-const { TRAVIAN_BASE } = require("../constants/links");
+import { TRAVIAN_BASE } from "../constants/links";
 const { formatTime } = require("../utils/timePrint");
 
 const USERNAME = process.env.TARVIAN_USERNAME;

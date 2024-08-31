@@ -1,5 +1,5 @@
 const { goPage, CLICK_DELAY } = require("../browser/browserService");
-const { TRAVIAN_FARM_LIST } = require("../constants/links");
+import { TRAVIAN_FARM_LIST } from "../constants/links";
 const { formatTime } = require("../utils/timePrint");
 
 let lastAttackTime = 0;

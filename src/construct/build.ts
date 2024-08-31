@@ -10,7 +10,7 @@ const createFundamentals = require("./createFundamentals");
 const updateBuildingList = require("./updateBuildingList");
 const { formatTime, formatTimeMillis } = require("../utils/timePrint");
 const { getAllByPriority } = require("../services/PriorityBuildingService");
-const PRIORITY_LEVELS = require("../constants/priorityLevels");
+import { PriorityLevels } from "../constants/priorityLevels";
 
 const DEFAULT_INTERVAL = 15 * 60;
 let totalBuilds = 0;
@@ -90,12 +90,12 @@ const processVillageBuild = async (page, village) => {
     return;
   }
 
-  const highPriorityBuilding = await getAllByPriority(PRIORITY_LEVELS.HIGH);
+  const highPriorityBuilding = await getAllByPriority(PriorityLevels.HIGH);
   const highUpgraded = await updateBuildingList(
     page,
     village,
     highPriorityBuilding,
-    PRIORITY_LEVELS.HIGH
+    PriorityLevels.HIGH
   );
   if (highUpgraded) {
     totalBuilds += 1;
@@ -108,24 +108,24 @@ const processVillageBuild = async (page, village) => {
     return;
   }
 
-  const midPriorityBuilding = await getAllByPriority(PRIORITY_LEVELS.MID);
+  const midPriorityBuilding = await getAllByPriority(PriorityLevels.MID);
   const midUpgraded = await updateBuildingList(
     page,
     village,
     midPriorityBuilding,
-    PRIORITY_LEVELS.MID
+    PriorityLevels.MID
   );
   if (midUpgraded) {
     totalBuilds += 1;
     return;
   }
 
-  const lowPriorityBuilding = await getAllByPriority(PRIORITY_LEVELS.LOW);
+  const lowPriorityBuilding = await getAllByPriority(PriorityLevels.LOW);
   const lowUpgraded = await updateBuildingList(
     page,
     village,
     lowPriorityBuilding,
-    PRIORITY_LEVELS.LOW
+    PriorityLevels.LOW
   );
   if (lowUpgraded) {
     totalBuilds += 1;

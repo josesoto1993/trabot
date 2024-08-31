@@ -5,7 +5,7 @@ const {
 const { formatTime } = require("../utils/timePrint");
 const { goBuilding } = require("../village/goVillage");
 const { CLICK_DELAY } = require("../browser/browserService");
-const BUILDING_NAMES = require("../constants/buildingNames");
+import { BuildingNames } from "../constants/buildingNames";
 
 const CELEBRATION_TIME_GAP = 4 * 60 * 60;
 
@@ -71,7 +71,7 @@ const processVillagesCelebration = async (page) => {
 
 const processVillageCelebration = async (page, village) => {
   const villageTownHall = village.buildings.find(
-    (building) => building.name === BUILDING_NAMES.TOWN_HALL
+    (building) => building.name === BuildingNames.TOWN_HALL
   );
 
   if (!villageTownHall) {
@@ -97,7 +97,7 @@ const processVillageCelebration = async (page, village) => {
 
 const celebrate = async (page, village) => {
   console.log(`celebrate village ${village.name}`);
-  await goBuilding(village, BUILDING_NAMES.TOWN_HALL);
+  await goBuilding(village, BuildingNames.TOWN_HALL);
   return await selectCelebration(page);
 };
 

@@ -1,10 +1,10 @@
-const TASK_NAMES = require("../constants/taskNames");
+import { TaskNames } from "../constants/taskNames";
 const { isActive, upsert } = require("../services/taskService");
 
 const populateTasks = async () => {
   console.log("start populate tasks");
 
-  for (const taskName of Object.values(TASK_NAMES)) {
+  for (const taskName of Object.values(TaskNames)) {
     try {
       const taskStatus = await isActive(taskName);
       if (taskStatus === null) {

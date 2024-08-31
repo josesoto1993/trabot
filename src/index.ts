@@ -15,7 +15,7 @@ const manageDeficit = require("./market/manageDeficit");
 const manageCelebrations = require("./celebration/celebration");
 const { updateVillages, getPlayer } = require("./player/playerHandler");
 const populate = require("./populators/populator");
-const TASK_NAMES = require("./constants/taskNames");
+import { TaskNames } from "./constants/taskNames";
 const { isActive } = require("./services/taskService");
 
 const taskStats = {};
@@ -57,23 +57,17 @@ const mainLoop = async (page) => {
       console.log(`\n\n\n---------------- loop ${loopNumber} ----------------`);
 
       nextLoop = Math.min(
-        await runTaskWithTimer(TASK_NAMES.DEFICIT, () => manageDeficit(page)),
-        await runTaskWithTimer(TASK_NAMES.OVERFLOW, () => manageOverflow(page)),
-        await runTaskWithTimer(TASK_NAMES.ATTACK_FARMS, () =>
-          attackFarms(page)
-        ),
-        await runTaskWithTimer(TASK_NAMES.TRAIN_TROOPS, () =>
-          trainTroops(page)
-        ),
-        await runTaskWithTimer(TASK_NAMES.UPGRADE_TROOPS, () =>
+        await runTaskWithTimer(TaskNames.DEFICIT, () => manageDeficit(page)),
+        await runTaskWithTimer(TaskNames.OVERFLOW, () => manageOverflow(page)),
+        await runTaskWithTimer(TaskNames.ATTACK_FARMS, () => attackFarms(page)),
+        await runTaskWithTimer(TaskNames.TRAIN_TROOPS, () => trainTroops(page)),
+        await runTaskWithTimer(TaskNames.UPGRADE_TROOPS, () =>
           upgradeTroops(page)
         ),
-        await runTaskWithTimer(TASK_NAMES.GO_ADVENTURE, () =>
-          goAdventure(page)
-        ),
-        await runTaskWithTimer(TASK_NAMES.BUILD, () => build(page)),
-        await runTaskWithTimer(TASK_NAMES.REDEEM, () => redeem(page)),
-        await runTaskWithTimer(TASK_NAMES.CELEBRATIONS, () =>
+        await runTaskWithTimer(TaskNames.GO_ADVENTURE, () => goAdventure(page)),
+        await runTaskWithTimer(TaskNames.BUILD, () => build(page)),
+        await runTaskWithTimer(TaskNames.REDEEM, () => redeem(page)),
+        await runTaskWithTimer(TaskNames.CELEBRATIONS, () =>
           manageCelebrations(page)
         )
       );
@@ -107,7 +101,7 @@ const finalizeBrowser = async () => {
   }
 };
 
-const runTaskWithTimer = async (taskName, task) => {
+const runTaskWithTimer = async (taskName: TaskNames, task) => {
   const taskStatus = await isActive(taskName);
   if (!taskStatus) {
     console.log(`\n---------------- ${taskName} skip ----------------`);

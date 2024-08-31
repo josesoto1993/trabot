@@ -6,7 +6,7 @@ const {
   getUpgradeList,
   removeUpgrade,
 } = require("../services/upgradeUnitService");
-const BUILDING_NAMES = require("../constants/buildingNames");
+import { BuildingNames } from "../constants/buildingNames";
 
 const MIN_UPGRADE_DELAY = 5 * 60;
 
@@ -26,7 +26,7 @@ const upgradeTroops = async (page) => {
     );
 
     const villageSmithy = village.buildings.find(
-      (building) => building.name === BUILDING_NAMES.SMITHY
+      (building) => building.name === BuildingNames.SMITHY
     );
     if (!villageSmithy) {
       console.log(
@@ -76,7 +76,7 @@ const getNextUpgradeRemaining = (upgradeList) => {
 
 const performUpgrade = async (page, unit, village) => {
   try {
-    await goBuilding(village, BUILDING_NAMES.SMITHY);
+    await goBuilding(village, BuildingNames.SMITHY);
     const remainingTime = await getRemainingTime(page);
 
     if (remainingTime !== 0) {

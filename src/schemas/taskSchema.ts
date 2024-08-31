@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
-const TASK_NAMES = require("../constants/taskNames");
+import { TaskNames } from "../constants/taskNames";
 
 const TaskSchema = new mongoose.Schema({
   name: {
     type: String,
-    enum: Object.values(TASK_NAMES),
+    enum: Object.values(TaskNames),
     required: true,
   },
   isActive: {

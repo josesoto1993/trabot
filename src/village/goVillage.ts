@@ -1,9 +1,9 @@
 const { goPage } = require("../browser/browserService");
-const {
+import {
   TRAVIAN_RESOURCES_VIEW,
   TRAVIAN_BUILDING_VIEW,
   TRAVIAN_BUILD_VIEW,
-} = require("../constants/links");
+} from "../constants/links";
 
 const goVillageResView = async (village) => {
   const villageUrl = new URL(TRAVIAN_RESOURCES_VIEW);

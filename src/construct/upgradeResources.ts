@@ -1,7 +1,7 @@
 const { upgradeExistingField } = require("./upgradeExistingBuilding");
 
-const ConstructionStatus = require("../constants/constructionStatus");
-const FieldTypePriority = require("../constants/fieldTypePriority");
+import { ConstructionStatus } from "../constants/constructionStatus";
+import { FieldTypePriority } from "../constants/fieldTypePriority";
 const CAPITAL_FIELDS_ENABLE = process.env.CAPITAL_FIELDS_ENABLE === "true";
 
 const RESOURCE_MAX_LEVEL = 10;
@@ -35,7 +35,7 @@ const getPossibleResourcesToUpgrade = (village) => {
 
   const possibleResourcesToUpgrade = resourceFields.filter(
     (field) =>
-      field.constructionStatus === ConstructionStatus.readyToUpgrade &&
+      field.constructionStatus === ConstructionStatus.READY_TO_UPGRADE &&
       (field.level < RESOURCE_MAX_LEVEL || CAPITAL_FIELDS_ENABLE)
   );
 

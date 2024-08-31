@@ -2,8 +2,8 @@ const { goBuilding } = require("../village/goVillage");
 const { formatTime } = require("../utils/timePrint");
 const { typeInSelector, CLICK_DELAY } = require("../browser/browserService");
 const { addTrade } = require("./ongoingTrades");
-const MARKET_TABS = require("../constants/marketTabs");
-const BUILDING_NAMES = require("../constants/buildingNames");
+import { MarketTabs } from "../constants/marketTabs";
+import { BuildingNames } from "../constants/buildingNames";
 
 const MARKET_WAIT_POSSIBLE_ERROR = 1 * 1000;
 
@@ -31,9 +31,9 @@ const sendResources = async (page, trade) => {
 
 const goMarket = async (village) => {
   const marketTabSearchParam = {
-    [MARKET_TABS.QUERY_PARAM_KEY]: MARKET_TABS.SEND_RESOURCES,
+    [MarketTabs.QUERY_PARAM_KEY]: MarketTabs.SEND_RESOURCES,
   };
-  await goBuilding(village, BUILDING_NAMES.MARKETPLACE, marketTabSearchParam);
+  await goBuilding(village, BuildingNames.MARKETPLACE, marketTabSearchParam);
 };
 
 const setDestination = async (page, to) => {

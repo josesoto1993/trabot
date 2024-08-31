@@ -1,5 +1,5 @@
-const FieldType = require("../constants/fieldType");
-const ConstructionStatus = require("../constants/constructionStatus");
+import { FieldType } from "../constants/fieldType";
+import { ConstructionStatus } from "../constants/constructionStatus";
 const { goVillageResView } = require("./goVillage");
 
 const ResourceField = require("../models/resourceField");
@@ -75,25 +75,25 @@ const getFieldLevel = (classes) => {
 };
 
 const getConstructionStatus = (classes) => {
-  if (classes.includes(ConstructionStatus.maxLevel)) {
-    return ConstructionStatus.maxLevel;
-  } else if (classes.includes(ConstructionStatus.notEnoughResources)) {
-    return ConstructionStatus.notEnoughResources;
-  } else if (classes.includes(ConstructionStatus.readyToUpgrade)) {
-    return ConstructionStatus.readyToUpgrade;
+  if (classes.includes(ConstructionStatus.MAX_LEVEL)) {
+    return ConstructionStatus.MAX_LEVEL;
+  } else if (classes.includes(ConstructionStatus.NOT_ENOUGH_RESOURCES)) {
+    return ConstructionStatus.NOT_ENOUGH_RESOURCES;
+  } else if (classes.includes(ConstructionStatus.READY_TO_UPGRADE)) {
+    return ConstructionStatus.READY_TO_UPGRADE;
   }
-  return ConstructionStatus.notEnoughStorage;
+  return ConstructionStatus.NOT_ENOUGH_STORAGE;
 };
 
 const getFieldType = (classes) => {
-  if (classes.includes(FieldType.crop)) {
-    return FieldType.crop;
-  } else if (classes.includes(FieldType.clay)) {
-    return FieldType.clay;
-  } else if (classes.includes(FieldType.iron)) {
-    return FieldType.iron;
-  } else if (classes.includes(FieldType.wood)) {
-    return FieldType.wood;
+  if (classes.includes(FieldType.CROP)) {
+    return FieldType.CROP;
+  } else if (classes.includes(FieldType.CLAY)) {
+    return FieldType.CLAY;
+  } else if (classes.includes(FieldType.IRON)) {
+    return FieldType.IRON;
+  } else if (classes.includes(FieldType.WOOD)) {
+    return FieldType.WOOD;
   }
   throw new Error(`Field type not found for classes: ${classes.join(", ")}`);
 };

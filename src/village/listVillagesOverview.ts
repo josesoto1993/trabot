@@ -1,7 +1,7 @@
 const { goPage } = require("../browser/browserService");
 const getVillagesInfo = require("./listVillagesSimple");
 const { getIncomingResources } = require("../market/ongoingTrades");
-const OVERVIEW_TABS = require("../constants/overviewTabs");
+import { OverviewTabs } from "../constants/overviewTabs";
 const Resources = require("../models/resources");
 
 const ROW_SELECTOR = "#content table tbody tr";
@@ -26,17 +26,17 @@ const getVillagesOverviewInfo = async (page) => {
     const merchantsTable = await getOverviewMerchants(page);
     const resourcesTable = await getOverviewResources(
       page,
-      OVERVIEW_TABS.RESOURCES_RESOURCES,
+      OverviewTabs.RESOURCES_RESOURCES,
       resourceSelectors
     );
     const productionTable = await getOverviewResources(
       page,
-      OVERVIEW_TABS.RESOURCES_PRODUCTION,
+      OverviewTabs.RESOURCES_PRODUCTION,
       resourceSelectors
     );
     const capacityTable = await getOverviewResources(
       page,
-      OVERVIEW_TABS.RESOURCES_CAPACITY,
+      OverviewTabs.RESOURCES_CAPACITY,
       capacitySelectors
     );
     const cultureTable = await getOverviewCelebrations(page);
@@ -64,7 +64,7 @@ const getVillagesOverviewInfo = async (page) => {
 };
 
 const getOverviewMerchants = async (page) => {
-  await goPage(OVERVIEW_TABS.OVERVIEW);
+  await goPage(OverviewTabs.OVERVIEW);
   await page.waitForSelector(ROW_SELECTOR);
 
   const merchantsRaw = await page.evaluate((rowSelector) => {
@@ -110,7 +110,7 @@ const getOverviewMerchants = async (page) => {
 };
 
 const getOverviewCelebrations = async (page) => {
-  await goPage(OVERVIEW_TABS.CULTUREPOINTS);
+  await goPage(OverviewTabs.CULTUREPOINTS);
   await page.waitForSelector(ROW_SELECTOR);
 
   const celebrationsRaw = await page.evaluate((rowSelector) => {
@@ -150,7 +150,7 @@ const getOverviewCelebrations = async (page) => {
 0;
 
 const getOverviewConsumption = async (page) => {
-  await goPage(OVERVIEW_TABS.TROOPS_INVILLAGE);
+  await goPage(OverviewTabs.TROOPS_INVILLAGE);
   await page.waitForSelector(CONSUMPTION_TABLE_SELECTOR);
 
   const consumptionRaw = await page.evaluate((rowSelector) => {

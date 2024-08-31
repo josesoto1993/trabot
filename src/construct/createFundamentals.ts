@@ -1,11 +1,11 @@
 const createBuilding = require("./createBuilding");
 const { getBuildingCategory } = require("../services/buildingCategoryService");
 const { getAllByPriority } = require("../services/PriorityBuildingService");
-const PRIORITY_LEVELS = require("../constants/priorityLevels");
-const BUILDING_CATEGORIES = require("../constants/buildingCategories");
+import { PriorityLevels } from "../constants/priorityLevels";
+import { BuildingCategory } from "../constants/buildingCategories";
 
 const createFundamentals = async (page, village) => {
-  const fundamentals = await getAllByPriority(PRIORITY_LEVELS.FUNDAMENTAL);
+  const fundamentals = await getAllByPriority(PriorityLevels.FUNDAMENTAL);
   for (const fundamental of fundamentals) {
     const fundamentalBuilding = fundamental.building;
     const buildingExists = village.buildings.some(
@@ -56,8 +56,8 @@ const createFundamentalBuilding = async (
   );
 };
 
-async function getAvailableSlotId(fundamentalBuilding, village) {
-  const otherCategory = await getBuildingCategory(BUILDING_CATEGORIES.OTHER);
+const getAvailableSlotId = async (fundamentalBuilding, village) => {
+  const otherCategory = await getBuildingCategory(BuildingCategory.OTHER);
   if (fundamentalBuilding.category._id.equals(otherCategory._id)) {
     return fundamentalBuilding.slot;
   }
@@ -68,6 +68,6 @@ async function getAvailableSlotId(fundamentalBuilding, village) {
       building.name === "null" ||
       building.name.trim() === ""
   )?.slotId;
-}
+};
 
 module.exports = createFundamentals;

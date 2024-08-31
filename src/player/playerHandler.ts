@@ -3,7 +3,7 @@ const Building = require("../models/building");
 const getVillagesOverviewInfo = require("../village/listVillagesOverview");
 const getBuildingData = require("../village/buildingsData");
 const getResourceFieldsData = require("../village/resourceFieldsData");
-const ConstructionStatus = require("../constants/constructionStatus");
+import { ConstructionStatus } from "../constants/constructionStatus";
 const { formatTimeMillis } = require("../utils/timePrint");
 
 let player = new Player([]);
@@ -98,7 +98,7 @@ const updatePlayerBuilding = (villageId, slotId, buildingType, level) => {
     slotId,
     buildingType.name,
     level,
-    ConstructionStatus.notEnoughResources
+    ConstructionStatus.NOT_ENOUGH_RESOURCES
   );
 
   village.buildings[buildingIndex] = newBuilding;

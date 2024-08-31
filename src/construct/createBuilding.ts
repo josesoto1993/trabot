@@ -1,6 +1,6 @@
 const { URL } = require("url");
 const { goPage, CLICK_DELAY } = require("../browser/browserService");
-const { TRAVIAN_BUILD_VIEW } = require("../constants/links");
+import { TRAVIAN_BUILD_VIEW } from "../constants/links";
 const {
   updatePlayerBuilding,
   updatePlayerVillageBuildFinishAt,

@@ -1,10 +1,8 @@
-const FieldType = require("./fieldType");
+import { FieldType } from "../constants/fieldType";
 
-const FieldTypePriority = {
-  [FieldType.clay]: 1,
-  [FieldType.wood]: 2,
-  [FieldType.iron]: 3,
-  [FieldType.crop]: 4,
+export const FieldTypePriority: Record<FieldType, number> = {
+  [FieldType.CLAY]: 1,
+  [FieldType.WOOD]: 2,
+  [FieldType.IRON]: 3,
+  [FieldType.CROP]: 4,
 };
-
-module.exports = FieldTypePriority;

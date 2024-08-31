@@ -1,7 +1,7 @@
-const PRIORITY_LEVELS = require("../constants/priorityLevels");
+import { PriorityLevels } from "../constants/priorityLevels";
 const { upsert } = require("../services/PriorityBuildingService");
 const { getBuildingType } = require("../services/buildingTypeService");
-const BUILDING_NAMES = require("../constants/buildingNames");
+import { BuildingNames } from "../constants/buildingNames";
 
 const populatePriorityBuildings = async () => {
   try {
@@ -13,19 +13,19 @@ const populatePriorityBuildings = async () => {
     const lowPriorityBuildings = await getLowPriorityBuildings();
 
     for (const { building, targetLevel } of fundamentalBuildings) {
-      await upsert(PRIORITY_LEVELS.FUNDAMENTAL, building, targetLevel);
+      await upsert(PriorityLevels.FUNDAMENTAL, building, targetLevel);
     }
 
     for (const { building, targetLevel } of highPriorityBuildings) {
-      await upsert(PRIORITY_LEVELS.HIGH, building, targetLevel);
+      await upsert(PriorityLevels.HIGH, building, targetLevel);
     }
 
     for (const { building, targetLevel } of midPriorityBuildings) {
-      await upsert(PRIORITY_LEVELS.MID, building, targetLevel);
+      await upsert(PriorityLevels.MID, building, targetLevel);
     }
 
     for (const { building, targetLevel } of lowPriorityBuildings) {
-      await upsert(PRIORITY_LEVELS.LOW, building, targetLevel);
+      await upsert(PriorityLevels.LOW, building, targetLevel);
     }
 
     console.log("finish populate priority buildings");
@@ -36,54 +36,54 @@ const populatePriorityBuildings = async () => {
 
 const getFundamentalBuildings = async () => {
   return [
-    await getBuildingType(BUILDING_NAMES.MAIN_BUILDING),
-    await getBuildingType(BUILDING_NAMES.RALLY_POINT),
-    await getBuildingType(BUILDING_NAMES.PALISADE),
-    await getBuildingType(BUILDING_NAMES.WAREHOUSE),
-    await getBuildingType(BUILDING_NAMES.GRANARY),
-    await getBuildingType(BUILDING_NAMES.MARKETPLACE),
-    await getBuildingType(BUILDING_NAMES.RESIDENCE),
-    await getBuildingType(BUILDING_NAMES.GRAIN_MILL),
-    await getBuildingType(BUILDING_NAMES.BRICKYARD),
-    await getBuildingType(BUILDING_NAMES.SAWMILL),
-    await getBuildingType(BUILDING_NAMES.IRON_FOUNDRY),
-    await getBuildingType(BUILDING_NAMES.ACADEMY),
-    await getBuildingType(BUILDING_NAMES.TOWN_HALL),
-    await getBuildingType(BUILDING_NAMES.BAKERY),
+    await getBuildingType(BuildingNames.MAIN_BUILDING),
+    await getBuildingType(BuildingNames.RALLY_POINT),
+    await getBuildingType(BuildingNames.PALISADE),
+    await getBuildingType(BuildingNames.WAREHOUSE),
+    await getBuildingType(BuildingNames.GRANARY),
+    await getBuildingType(BuildingNames.MARKETPLACE),
+    await getBuildingType(BuildingNames.RESIDENCE),
+    await getBuildingType(BuildingNames.GRAIN_MILL),
+    await getBuildingType(BuildingNames.BRICKYARD),
+    await getBuildingType(BuildingNames.SAWMILL),
+    await getBuildingType(BuildingNames.IRON_FOUNDRY),
+    await getBuildingType(BuildingNames.ACADEMY),
+    await getBuildingType(BuildingNames.TOWN_HALL),
+    await getBuildingType(BuildingNames.BAKERY),
   ].map((building) => ({ building, targetLevel: 1 }));
 };
 
 const getHighPriorityBuildings = async () => {
   return [
     {
-      building: await getBuildingType(BUILDING_NAMES.RESIDENCE),
+      building: await getBuildingType(BuildingNames.RESIDENCE),
       targetLevel: 10,
     },
     {
-      building: await getBuildingType(BUILDING_NAMES.MAIN_BUILDING),
+      building: await getBuildingType(BuildingNames.MAIN_BUILDING),
       targetLevel: 20,
     },
     {
-      building: await getBuildingType(BUILDING_NAMES.GRAIN_MILL),
+      building: await getBuildingType(BuildingNames.GRAIN_MILL),
       targetLevel: 5,
     },
     {
-      building: await getBuildingType(BUILDING_NAMES.BRICKYARD),
+      building: await getBuildingType(BuildingNames.BRICKYARD),
       targetLevel: 5,
     },
-    { building: await getBuildingType(BUILDING_NAMES.SAWMILL), targetLevel: 5 },
+    { building: await getBuildingType(BuildingNames.SAWMILL), targetLevel: 5 },
     {
-      building: await getBuildingType(BUILDING_NAMES.IRON_FOUNDRY),
+      building: await getBuildingType(BuildingNames.IRON_FOUNDRY),
       targetLevel: 5,
     },
-    { building: await getBuildingType(BUILDING_NAMES.BAKERY), targetLevel: 5 },
+    { building: await getBuildingType(BuildingNames.BAKERY), targetLevel: 5 },
     {
-      building: await getBuildingType(BUILDING_NAMES.WAREHOUSE),
+      building: await getBuildingType(BuildingNames.WAREHOUSE),
       targetLevel: 9,
     },
-    { building: await getBuildingType(BUILDING_NAMES.GRANARY), targetLevel: 8 },
+    { building: await getBuildingType(BuildingNames.GRANARY), targetLevel: 8 },
     {
-      building: await getBuildingType(BUILDING_NAMES.MARKETPLACE),
+      building: await getBuildingType(BuildingNames.MARKETPLACE),
       targetLevel: 3,
     },
   ];
@@ -92,19 +92,19 @@ const getHighPriorityBuildings = async () => {
 const getMidPriorityBuildings = async () => {
   return [
     {
-      building: await getBuildingType(BUILDING_NAMES.BARRACKS),
+      building: await getBuildingType(BuildingNames.BARRACKS),
       targetLevel: 3,
     },
     {
-      building: await getBuildingType(BUILDING_NAMES.TOWN_HALL),
+      building: await getBuildingType(BuildingNames.TOWN_HALL),
       targetLevel: 10,
     },
     {
-      building: await getBuildingType(BUILDING_NAMES.MARKETPLACE),
+      building: await getBuildingType(BuildingNames.MARKETPLACE),
       targetLevel: 10,
     },
     {
-      building: await getBuildingType(BUILDING_NAMES.ACADEMY),
+      building: await getBuildingType(BuildingNames.ACADEMY),
       targetLevel: 10,
     },
   ];
@@ -113,40 +113,40 @@ const getMidPriorityBuildings = async () => {
 const getLowPriorityBuildings = async () => {
   return [
     {
-      building: await getBuildingType(BUILDING_NAMES.WAREHOUSE),
+      building: await getBuildingType(BuildingNames.WAREHOUSE),
       targetLevel: 20,
     },
     {
-      building: await getBuildingType(BUILDING_NAMES.GRANARY),
+      building: await getBuildingType(BuildingNames.GRANARY),
       targetLevel: 20,
     },
     {
-      building: await getBuildingType(BUILDING_NAMES.MARKETPLACE),
+      building: await getBuildingType(BuildingNames.MARKETPLACE),
       targetLevel: 20,
     },
     {
-      building: await getBuildingType(BUILDING_NAMES.STONEMASONS_LODGE),
+      building: await getBuildingType(BuildingNames.STONEMASONS_LODGE),
       targetLevel: 20,
     },
-    { building: await getBuildingType(BUILDING_NAMES.PALACE), targetLevel: 20 },
+    { building: await getBuildingType(BuildingNames.PALACE), targetLevel: 20 },
     {
-      building: await getBuildingType(BUILDING_NAMES.RALLY_POINT),
+      building: await getBuildingType(BuildingNames.RALLY_POINT),
       targetLevel: 10,
     },
     {
-      building: await getBuildingType(BUILDING_NAMES.PALISADE),
+      building: await getBuildingType(BuildingNames.PALISADE),
       targetLevel: 10,
     },
     {
-      building: await getBuildingType(BUILDING_NAMES.TRADE_OFFICE),
+      building: await getBuildingType(BuildingNames.TRADE_OFFICE),
       targetLevel: 10,
     },
     {
-      building: await getBuildingType(BUILDING_NAMES.ACADEMY),
+      building: await getBuildingType(BuildingNames.ACADEMY),
       targetLevel: 20,
     },
     {
-      building: await getBuildingType(BUILDING_NAMES.EMBASSY),
+      building: await getBuildingType(BuildingNames.EMBASSY),
       targetLevel: 20,
     },
   ];

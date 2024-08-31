@@ -1,4 +1,4 @@
-const BUILDING_CATEGORIES = require("../constants/buildingCategories");
+import { BuildingCategory } from "../constants/buildingCategories";
 const {
   upsertBuildingCategory,
 } = require("../services/buildingCategoryService");
@@ -20,11 +20,11 @@ const populateBuildingCategories = async () => {
 
 const getBaseBuildingCategories = () => {
   return [
-    { name: BUILDING_CATEGORIES.INFRASTRUCTURE, value: 1 },
-    { name: BUILDING_CATEGORIES.MILITARY, value: 2 },
-    { name: BUILDING_CATEGORIES.RESOURCES, value: 3 },
-    { name: BUILDING_CATEGORIES.OTHER, value: 4 },
-    { name: BUILDING_CATEGORIES.UNDEFINED, value: -1 },
+    { name: BuildingCategory.INFRASTRUCTURE, value: 1 },
+    { name: BuildingCategory.MILITARY, value: 2 },
+    { name: BuildingCategory.RESOURCES, value: 3 },
+    { name: BuildingCategory.OTHER, value: 4 },
+    { name: BuildingCategory.UNDEFINED, value: -1 },
   ];
 };
 

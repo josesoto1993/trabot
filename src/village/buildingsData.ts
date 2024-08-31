@@ -1,4 +1,4 @@
-const ConstructionStatus = require("../constants/constructionStatus");
+import { ConstructionStatus } from "../constants/constructionStatus";
 const { goVillageBuildingView } = require("./goVillage");
 const Building = require("../models/building");
 const {
@@ -6,7 +6,7 @@ const {
   upsertBuildingType,
 } = require("../services/buildingTypeService");
 const { getBuildingCategory } = require("../services/buildingCategoryService");
-const BUILDING_CATEGORIES = require("../constants/buildingCategories");
+import { BuildingCategory } from "../constants/buildingCategories";
 
 const getBuildingData = async (page, village) => {
   await goVillageBuildingView(village);
@@ -66,25 +66,23 @@ const buildingsRawToObject = async (raw) => {
 };
 
 const getConstructionStatus = (classes) => {
-  if (classes.includes(ConstructionStatus.maxLevel)) {
-    return ConstructionStatus.maxLevel;
-  } else if (classes.includes(ConstructionStatus.notEnoughResources)) {
-    return ConstructionStatus.notEnoughResources;
-  } else if (classes.includes(ConstructionStatus.readyToUpgrade)) {
-    return ConstructionStatus.readyToUpgrade;
+  if (classes.includes(ConstructionStatus.MAX_LEVEL)) {
+    return ConstructionStatus.MAX_LEVEL;
+  } else if (classes.includes(ConstructionStatus.NOT_ENOUGH_RESOURCES)) {
+    return ConstructionStatus.NOT_ENOUGH_RESOURCES;
+  } else if (classes.includes(ConstructionStatus.READY_TO_UPGRADE)) {
+    return ConstructionStatus.READY_TO_UPGRADE;
   }
-  return ConstructionStatus.notEnoughStorage;
+  return ConstructionStatus.NOT_ENOUGH_STORAGE;
 };
 
 const addNewBuildingType = async (structureId, name) => {
   const buildingCategory = await getBuildingCategory(
-    BUILDING_CATEGORIES.UNDEFINED
+    BuildingCategory.UNDEFINED
   );
 
   if (!buildingCategory) {
-    console.error(
-      `Error: '${BUILDING_CATEGORIES.UNDEFINED}' category not found.`
-    );
+    console.error(`Error: '${BuildingCategory.UNDEFINED}' category not found.`);
     return;
   }
 

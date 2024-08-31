@@ -1,12 +1,12 @@
 const PriorityBuildingModel = require("../schemas/PriorityBuildingSchema");
-const PRIORITY_LEVELS = require("../constants/priorityLevels");
+import { PriorityLevels } from "../constants/priorityLevels";
 
 const getAll = async () => {
   return await PriorityBuildingModel.find().populate("building");
 };
 
 const getAllByPriority = async (priority) => {
-  if (!Object.values(PRIORITY_LEVELS).includes(priority)) {
+  if (!Object.values(PriorityLevels).includes(priority)) {
     throw new Error(`Invalid priority level: ${priority}`);
   }
 
@@ -21,7 +21,7 @@ const getAllByPriority = async (priority) => {
 };
 
 const upsert = async (priority, building, targetLevel) => {
-  if (!Object.values(PRIORITY_LEVELS).includes(priority)) {
+  if (!Object.values(PriorityLevels).includes(priority)) {
     throw new Error(`Invalid priority level: ${priority}`);
   }
 
@@ -38,7 +38,7 @@ const upsert = async (priority, building, targetLevel) => {
 };
 
 const remove = async (priority, building) => {
-  if (!Object.values(PRIORITY_LEVELS).includes(priority)) {
+  if (!Object.values(PriorityLevels).includes(priority)) {
     throw new Error(`Invalid priority level: ${priority}`);
   }
 

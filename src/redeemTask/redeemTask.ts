@@ -2,8 +2,8 @@ const { URL } = require("url");
 const getVillagesInfo = require("../village/listVillagesSimple");
 const { goPage, CLICK_DELAY } = require("../browser/browserService");
 const { formatTime } = require("../utils/timePrint");
-const { TRAVIAN_TASK_VIEW } = require("../constants/links");
-const TASK_TABS = require("../constants/taskTabs");
+import { TRAVIAN_TASK_VIEW } from "../constants/links";
+import { TaskTabs } from "../constants/taskTabs";
 
 let redeemTaskCount = 0;
 let lastRedeemTime = 0;
@@ -68,18 +68,18 @@ const redeemTask = async (page) => {
 };
 
 const redeemAllFromVillage = async (page, village) => {
-  await openTask(TASK_TABS.CITY_TAB, village.id);
+  await openTask(TaskTabs.CITY_TAB, village.id);
   return redeemAll(page);
 };
 
 const redeemAllFromUser = async (page) => {
-  await openTask(TASK_TABS.PLAYER_TAB, null);
+  await openTask(TaskTabs.PLAYER_TAB, null);
   return redeemAll(page);
 };
 
 const openTask = async (tab, villageId) => {
   const redeemUrl = new URL(TRAVIAN_TASK_VIEW);
-  redeemUrl.searchParams.append(TASK_TABS.QUERY_PARAM_KEY, tab);
+  redeemUrl.searchParams.append(TaskTabs.QUERY_PARAM_KEY, tab);
   if (villageId) {
     redeemUrl.searchParams.append("newdid", villageId);
   }

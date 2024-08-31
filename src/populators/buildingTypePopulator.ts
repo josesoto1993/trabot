@@ -1,7 +1,7 @@
 const { upsertBuildingType } = require("../services/buildingTypeService");
 const { getBuildingCategory } = require("../services/buildingCategoryService");
-const BUILDING_CATEGORIES = require("../constants/buildingCategories");
-const BUILDING_NAMES = require("../constants/buildingNames");
+import { BuildingCategory } from "../constants/buildingCategories";
+import { BuildingNames } from "../constants/buildingNames";
 
 const populateBuildingTypes = async () => {
   console.log("start populate building types");
@@ -30,159 +30,159 @@ const populateBuildingTypes = async () => {
 
 const getBaseBuildingTypes = async () => {
   const buildingCategoryOther = await getBuildingCategory(
-    BUILDING_CATEGORIES.OTHER
+    BuildingCategory.OTHER
   );
   const buildingCategoryMilitary = await getBuildingCategory(
-    BUILDING_CATEGORIES.MILITARY
+    BuildingCategory.MILITARY
   );
   const buildingCategoryResources = await getBuildingCategory(
-    BUILDING_CATEGORIES.RESOURCES
+    BuildingCategory.RESOURCES
   );
   const buildingCategoryInfrastructure = await getBuildingCategory(
-    BUILDING_CATEGORIES.INFRASTRUCTURE
+    BuildingCategory.INFRASTRUCTURE
   );
 
   const buildingTypes = [
     {
       structureId: 22,
-      name: BUILDING_NAMES.ACADEMY,
+      name: BuildingNames.ACADEMY,
       category: buildingCategoryMilitary,
     },
     {
       structureId: 9,
-      name: BUILDING_NAMES.BAKERY,
+      name: BuildingNames.BAKERY,
       category: buildingCategoryResources,
     },
     {
       structureId: 19,
-      name: BUILDING_NAMES.BARRACKS,
+      name: BuildingNames.BARRACKS,
       category: buildingCategoryMilitary,
     },
     {
       structureId: 6,
-      name: BUILDING_NAMES.BRICKYARD,
+      name: BuildingNames.BRICKYARD,
       category: buildingCategoryResources,
     },
     {
       structureId: 23,
-      name: BUILDING_NAMES.CRANNY,
+      name: BuildingNames.CRANNY,
       category: buildingCategoryInfrastructure,
     },
     {
       structureId: 18,
-      name: BUILDING_NAMES.EMBASSY,
+      name: BuildingNames.EMBASSY,
       category: buildingCategoryInfrastructure,
     },
     {
       structureId: 8,
-      name: BUILDING_NAMES.GRAIN_MILL,
+      name: BuildingNames.GRAIN_MILL,
       category: buildingCategoryResources,
     },
     {
       structureId: 11,
-      name: BUILDING_NAMES.GRANARY,
+      name: BuildingNames.GRANARY,
       category: buildingCategoryInfrastructure,
     },
     {
       structureId: 37,
-      name: BUILDING_NAMES.HEROS_MANSION,
+      name: BuildingNames.HEROS_MANSION,
       category: buildingCategoryMilitary,
     },
     {
       structureId: 46,
-      name: BUILDING_NAMES.HOSPITAL,
+      name: BuildingNames.HOSPITAL,
       category: buildingCategoryMilitary,
     },
     {
       structureId: 7,
-      name: BUILDING_NAMES.IRON_FOUNDRY,
+      name: BuildingNames.IRON_FOUNDRY,
       category: buildingCategoryResources,
     },
     {
       structureId: 15,
-      name: BUILDING_NAMES.MAIN_BUILDING,
+      name: BuildingNames.MAIN_BUILDING,
       category: buildingCategoryInfrastructure,
     },
     {
       structureId: 17,
-      name: BUILDING_NAMES.MARKETPLACE,
+      name: BuildingNames.MARKETPLACE,
       category: buildingCategoryInfrastructure,
     },
     {
       structureId: 26,
-      name: BUILDING_NAMES.PALACE,
+      name: BuildingNames.PALACE,
       category: buildingCategoryInfrastructure,
     },
     {
       structureId: 33,
-      name: BUILDING_NAMES.PALISADE,
+      name: BuildingNames.PALISADE,
       category: buildingCategoryOther,
       slot: 40,
     },
     {
       structureId: 16,
-      name: BUILDING_NAMES.RALLY_POINT,
+      name: BuildingNames.RALLY_POINT,
       category: buildingCategoryOther,
       slot: 39,
     },
     {
       structureId: 25,
-      name: BUILDING_NAMES.RESIDENCE,
+      name: BuildingNames.RESIDENCE,
       category: buildingCategoryInfrastructure,
     },
     {
       structureId: 5,
-      name: BUILDING_NAMES.SAWMILL,
+      name: BuildingNames.SAWMILL,
       category: buildingCategoryResources,
     },
     {
       structureId: 13,
-      name: BUILDING_NAMES.SMITHY,
+      name: BuildingNames.SMITHY,
       category: buildingCategoryMilitary,
     },
     {
       structureId: 20,
-      name: BUILDING_NAMES.STABLE,
+      name: BuildingNames.STABLE,
       category: buildingCategoryMilitary,
     },
     {
       structureId: 34,
-      name: BUILDING_NAMES.STONEMASONS_LODGE,
+      name: BuildingNames.STONEMASONS_LODGE,
       category: buildingCategoryInfrastructure,
     },
     {
       structureId: 36,
-      name: BUILDING_NAMES.TRAPPER,
+      name: BuildingNames.TRAPPER,
       category: buildingCategoryMilitary,
     },
     {
       structureId: 14,
-      name: BUILDING_NAMES.TOURNAMENT_SQUARE,
+      name: BuildingNames.TOURNAMENT_SQUARE,
       category: buildingCategoryMilitary,
     },
     {
       structureId: 24,
-      name: BUILDING_NAMES.TOWN_HALL,
+      name: BuildingNames.TOWN_HALL,
       category: buildingCategoryInfrastructure,
     },
     {
       structureId: 28,
-      name: BUILDING_NAMES.TRADE_OFFICE,
+      name: BuildingNames.TRADE_OFFICE,
       category: buildingCategoryInfrastructure,
     },
     {
       structureId: 27,
-      name: BUILDING_NAMES.TREASURY,
+      name: BuildingNames.TREASURY,
       category: buildingCategoryInfrastructure,
     },
     {
       structureId: 10,
-      name: BUILDING_NAMES.WAREHOUSE,
+      name: BuildingNames.WAREHOUSE,
       category: buildingCategoryInfrastructure,
     },
     {
       structureId: 21,
-      name: BUILDING_NAMES.WORKSHOP,
+      name: BuildingNames.WORKSHOP,
       category: buildingCategoryMilitary,
     },
   ];
