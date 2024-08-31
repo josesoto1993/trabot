@@ -1,11 +1,12 @@
-const fs = require("fs");
-const path = require("path");
+import { Page } from "puppeteer";
+import fs from "fs";
+import path from "path";
 import {
   HeroIconStatus,
   HeroIconStatusKeys,
 } from "../constants/heroIconStatus";
 
-const getClassOfHeroIcon = async (page) => {
+const getClassOfHeroIcon = async (page: Page): Promise<string | null> => {
   const heroStatusSelector = ".heroStatus a i";
   try {
     await page.waitForSelector(heroStatusSelector);
@@ -36,14 +37,14 @@ const parseClassOfHeroIcon = (classToFind: string): string | undefined => {
 };
 
 const addNewClassOfHeroIcon = (newStatusValue: string): string => {
-  const logFilePath = path.resolve(__dirname, "src/todo/newHeroStatus.txt");
+  const logFilePath = path.resolve(__dirname, "../src/todo/newHeroStatus.txt");
   const logMessage = `New hero status found: ${newStatusValue}\n`;
   fs.appendFileSync(logFilePath, logMessage, "utf8");
   console.log(logMessage);
   return newStatusValue;
 };
 
-const getHeroAdventures = async (page) => {
+const getHeroAdventures = async (page: Page): Promise<number> => {
   try {
     await page.waitForSelector("a.adventure");
 
@@ -62,7 +63,7 @@ const getHeroAdventures = async (page) => {
 
     if (contentDiv) {
       const contentValue = await page.evaluate(
-        (el) => parseInt(el.textContent, 10),
+        (el: HTMLElement) => parseInt(el.textContent || "0", 10),
         contentDiv
       );
       if (!isNaN(contentValue)) {
@@ -70,8 +71,6 @@ const getHeroAdventures = async (page) => {
       } else {
         throw new Error("Content value is not a number.");
       }
-    } else if (svgElement) {
-      return 0;
     } else {
       throw new Error("No relevant elements found within the adventure link.");
     }
@@ -81,7 +80,4 @@ const getHeroAdventures = async (page) => {
   }
 };
 
-module.exports = {
-  getClassOfHeroIcon,
-  getHeroAdventures,
-};
+export { getClassOfHeroIcon, getHeroAdventures };

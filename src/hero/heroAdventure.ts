@@ -1,15 +1,17 @@
+import { Page } from "puppeteer";
 import { goPage, CLICK_DELAY } from "../browser/browserService";
-const { getClassOfHeroIcon, getHeroAdventures } = require("./heroStatus");
+import { getClassOfHeroIcon, getHeroAdventures } from "./heroStatus";
 import { TRAVIAN_HERO_ADVENTURES } from "../constants/links";
 import { formatTime } from "../utils/timePrint";
 import { HeroIconStatus } from "../constants/heroIconStatus";
+import { TaskResult } from "../index";
 
-const ADVENTURE_BUTTON_SELECTOR_TIMEOUT_MILLIS = 15000;
-const ADVENTURE_INTERVAL = 15 * 60;
-let lastAdventureTime = 0;
+const ADVENTURE_BUTTON_SELECTOR_TIMEOUT_MILLIS: number = 15000;
+const ADVENTURE_INTERVAL: number = 15 * 60;
+let lastAdventureTime: number = 0;
 
-const goAdventure = async (page) => {
-  const remainingTime = getremainingTime();
+const goAdventure = async (page: Page): Promise<TaskResult> => {
+  const remainingTime = getRemainingTime();
   if (remainingTime > 0) {
     return { nextExecutionTime: remainingTime, skip: true };
   }
@@ -24,6 +26,7 @@ const goAdventure = async (page) => {
     updateNextAdventureTime();
     return { nextExecutionTime: ADVENTURE_INTERVAL, skip: true };
   }
+
   const heroAdventures = await getHeroAdventures(page);
   if (heroAdventures <= 0) {
     console.log(
@@ -41,17 +44,17 @@ const goAdventure = async (page) => {
   return { nextExecutionTime: ADVENTURE_INTERVAL, skip: false };
 };
 
-const getremainingTime = () => {
+const getRemainingTime = (): number => {
   const currentTime = Date.now();
   const timePassed = (currentTime - lastAdventureTime) / 1000;
   return ADVENTURE_INTERVAL - timePassed;
 };
 
-const updateNextAdventureTime = () => {
+const updateNextAdventureTime = (): void => {
   lastAdventureTime = Date.now();
 };
 
-const performAdventure = async (page) => {
+const performAdventure = async (page: Page): Promise<boolean> => {
   try {
     await goPage(TRAVIAN_HERO_ADVENTURES);
     await clickAdventureButton(page);
@@ -62,7 +65,7 @@ const performAdventure = async (page) => {
   }
 };
 
-const clickAdventureButton = async (page) => {
+const clickAdventureButton = async (page: Page): Promise<void> => {
   const adventureButtonSelector =
     ".adventureList tbody tr td .textButtonV2:not(.disabled)";
   try {
@@ -82,4 +85,4 @@ const clickAdventureButton = async (page) => {
   }
 };
 
-module.exports = goAdventure;
+export default goAdventure;

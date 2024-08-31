@@ -7,7 +7,7 @@ import login from "./browser/loginService";
 import attackFarms from "./attackFarms/attackFarms";
 const trainTroops = require("./troops/troopCreator");
 const upgradeTroops = require("./troops/troopUpdater");
-const goAdventure = require("./hero/heroAdventure");
+import goAdventure from "./hero/heroAdventure";
 const build = require("./construct/build");
 const redeem = require("./redeemTask/redeemTask");
 const manageOverflow = require("./market/manageOverflow");
