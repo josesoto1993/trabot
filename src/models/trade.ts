@@ -1,13 +1,20 @@
+import Village from "./village";
+import Resources from "./resources";
+
 class Trade {
-  constructor(from, to, resources) {
+  from: Village;
+  to: Village;
+  resources: Resources;
+
+  constructor(from: Village, to: Village, resources: Resources) {
     this.from = from;
     this.to = to;
     this.resources = resources;
   }
 
-  toString() {
+  toString(): string {
     return `Trade from ${this.from.name}[${this.from.availableMerchants}] to ${this.to.name}[${this.to.availableMerchants}] with ${this.resources}`;
   }
 }
 
-module.exports = Trade;
+export default Trade;

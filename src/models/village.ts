@@ -1,88 +1,78 @@
-const Resources = require("../models/resources");
+import Building from "./building";
+import ResourceField from "./resourceField";
+import Resources from "./resources";
 
 const DEFICIT_THRESHOLD = 0.4;
 const DEFICIT_THRESHOLD_NEGATIVE_PRODUCTION = 0.7;
 const DEFICIT_MAX_VALUE = 35000;
 const REQUEST_THRESHOLD = 0.6;
 const REQUEST_THRESHOLD_NEGATIVE_PRODUCTION = 0.8;
-
 const OVERFLOW_THRESHOLD = 0.8;
 const OVERFLOW_SAFE_LEVEL = 0.6;
 
 class Village {
+  id: string;
+  name: string;
+  coordinateX: number;
+  coordinateY: number;
+  active: boolean;
+  resources: Resources | null = new Resources(0, 0, 0, 0);
+  production: Resources | null = new Resources(0, 0, 0, 0);
+  capacity: Resources | null = new Resources(0, 0, 0, 0);
+  ongoingResources: Resources | null = new Resources(0, 0, 0, 0);
+  consumption: number | null = 0;
+  celebrationTime: Date | null = null;
+  availableMerchants: number | null = null;
+  maxMerchants: number | null = null;
+  resourceFields: ResourceField[] = [];
+  buildings: Building[] = [];
+  buildFinishAt: Date | null = null;
+  barracksTime: Date | null = null;
+  stableTime: Date | null = null;
+  workshopTime: Date | null = null;
+  upgradeTroopTime: Date | null = null;
+  capital: boolean = false;
+  skipOverflow: boolean = false;
+  skipDeficit: boolean = false;
+  skipCreation: boolean = false;
+  skipUpgrade: boolean = false;
+
   constructor(
-    id,
-    name,
-    coordinateX,
-    coordinateY,
-    active = false,
-    resources = null,
-    production = null,
-    capacity = null,
-    ongoingResources = null,
-    consumption = null,
-    celebrationTime = null,
-    availableMerchants = null,
-    maxMerchants = null,
-    resourceFields = [],
-    buildings = [],
-    buildFinishAt = null,
-    barracksTime = null,
-    stableTime = null,
-    workshopTime = null,
-    upgradeTroopTime = null,
-    capital = false,
-    skipOverflow = false,
-    skipDeficit = false,
-    skipCreation = false,
-    skipUpgrade = false
+    id: string,
+    name: string,
+    coordinateX: number,
+    coordinateY: number,
+    active: boolean = false
   ) {
     this.id = id;
     this.name = name;
     this.coordinateX = coordinateX;
     this.coordinateY = coordinateY;
     this.active = active;
-    this.resources = resources;
-    this.production = production;
-    this.capacity = capacity;
-    this.ongoingResources = ongoingResources;
-    this.consumption = consumption;
-    this.celebrationTime = celebrationTime;
-    this.availableMerchants = availableMerchants;
-    this.maxMerchants = maxMerchants;
-    this.resourceFields = resourceFields;
-    this.buildings = buildings;
-    this.buildFinishAt = buildFinishAt;
-    this.barracksTime = barracksTime;
-    this.stableTime = stableTime;
-    this.workshopTime = workshopTime;
-    this.upgradeTroopTime = upgradeTroopTime;
-    this.capital = capital;
-    this.skipOverflow = skipOverflow;
-    this.skipDeficit = skipDeficit;
-    this.skipCreation = skipCreation;
-    this.skipUpgrade = skipUpgrade;
   }
 
-  toString() {
+  toString(): string {
     return `Village(id: ${this.id}, name: ${this.name})`;
   }
 
-  getFutureResources = () => {
-    return Resources.add(this.resources, this.ongoingResources);
-  };
+  getFutureResources(): Resources {
+    return Resources.add(
+      this.resources || new Resources(0, 0, 0, 0),
+      this.ongoingResources || new Resources(0, 0, 0, 0)
+    );
+  }
 
-  getOverflowResources = () => {
+  getOverflowResources(): Resources {
     const overflowResources = new Resources(0, 0, 0, 0);
 
     Resources.getKeys().forEach((resourceType) => {
       const negativeProduction = this.getNetProduction()[resourceType] < 0;
       if (negativeProduction) {
-        return 0;
+        return;
       }
 
       const futureResources = this.getFutureResources()[resourceType];
-      const maxCapacity = this.capacity[resourceType];
+      const maxCapacity = this.capacity?.[resourceType] ?? 0;
 
       if (futureResources > maxCapacity * OVERFLOW_THRESHOLD) {
         overflowResources[resourceType] =
@@ -91,14 +81,14 @@ class Village {
     });
 
     return overflowResources;
-  };
+  }
 
-  getDeficitResources = () => {
+  getDeficitResources(): Resources {
     const deficitResources = new Resources(0, 0, 0, 0);
 
     Resources.getKeys().forEach((resourceType) => {
       const futureResources = this.getFutureResources()[resourceType];
-      const maxCapacity = this.capacity[resourceType];
+      const maxCapacity = this.capacity?.[resourceType] ?? 0;
       const negativeProduction = this.getNetProduction()[resourceType] < 0;
 
       const thresholdDeficit = this.getThresholdDeficit(
@@ -116,30 +106,36 @@ class Village {
     });
 
     return deficitResources;
-  };
+  }
 
-  getThresholdRequest = (maxCapacity, negativeProduction) => {
+  getThresholdRequest(
+    maxCapacity: number,
+    negativeProduction: boolean
+  ): number {
     if (negativeProduction) {
       return maxCapacity * REQUEST_THRESHOLD_NEGATIVE_PRODUCTION;
     } else {
       return Math.min(maxCapacity * REQUEST_THRESHOLD, DEFICIT_MAX_VALUE);
     }
-  };
+  }
 
-  getThresholdDeficit = (maxCapacity, negativeProduction) => {
+  getThresholdDeficit(
+    maxCapacity: number,
+    negativeProduction: boolean
+  ): number {
     if (negativeProduction) {
       return maxCapacity * DEFICIT_THRESHOLD_NEGATIVE_PRODUCTION;
     } else {
       return Math.min(maxCapacity * DEFICIT_THRESHOLD, DEFICIT_MAX_VALUE);
     }
-  };
+  }
 
-  getNetProduction = () => {
+  getNetProduction(): Resources {
     return Resources.subtract(
-      this.production,
-      new Resources(0, 0, 0, this.consumption)
+      this.production || new Resources(0, 0, 0, 0),
+      new Resources(0, 0, 0, this.consumption ?? 0)
     );
-  };
+  }
 }
 
-module.exports = Village;
+export default Village;

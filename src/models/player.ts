@@ -1,11 +1,15 @@
+import Village from "../models/village"; // Adjust the import path if needed
+
 class Player {
-  constructor(villages) {
+  villages: Village[];
+
+  constructor(villages: Village[]) {
     this.villages = villages;
   }
 
-  toString() {
+  toString(): string {
     return `Player(villages: ${this.villages.map((v) => v.name).join(", ")})`;
   }
 }
 
-module.exports = Player;
+export default Player;

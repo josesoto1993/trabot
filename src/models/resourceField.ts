@@ -1,14 +1,24 @@
 class ResourceField {
-  constructor(id, level, constructionStatus, fieldType) {
-    this.id = id;
+  slotId: string;
+  level: number;
+  constructionStatus: string;
+  fieldType: string;
+
+  constructor(
+    slotId: string,
+    level: number,
+    constructionStatus: string,
+    fieldType: string
+  ) {
+    this.slotId = slotId;
     this.level = level;
     this.constructionStatus = constructionStatus;
     this.fieldType = fieldType;
   }
 
-  toString() {
-    return `Field(id: ${this.id}, level: ${this.level}, constructionStatus: ${this.constructionStatus}, fieldType: ${this.fieldType})`;
+  toString(): string {
+    return `Field(slotId: ${this.slotId}, level: ${this.level}, constructionStatus: ${this.constructionStatus}, fieldType: ${this.fieldType})`;
   }
 }
 
-module.exports = ResourceField;
+export default ResourceField;
