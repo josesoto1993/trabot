@@ -1,13 +1,13 @@
-const formatTime = (rawSeconds) => {
+export const formatTime = (rawSeconds: number | null | undefined): string => {
   if (!rawSeconds) {
     return "nullTime";
   }
 
-  let seconds = Math.floor(rawSeconds) % 60;
-  let minutes = Math.floor(rawSeconds / 60) % 60;
-  let hours = Math.floor(rawSeconds / 3600);
+  let seconds: number = Math.floor(rawSeconds) % 60;
+  let minutes: number = Math.floor(rawSeconds / 60) % 60;
+  let hours: number = Math.floor(rawSeconds / 3600);
 
-  let formattedTime = "";
+  let formattedTime: string = "";
   if (hours > 0) {
     formattedTime += `${hours}h`;
   }
@@ -21,7 +21,9 @@ const formatTime = (rawSeconds) => {
   return formattedTime || "0s";
 };
 
-const formatTimeMillis = (milliseconds) => {
+export const formatTimeMillis = (
+  milliseconds: number | null | undefined
+): string => {
   if (!milliseconds) {
     return "nullTime";
   }
@@ -29,25 +31,21 @@ const formatTimeMillis = (milliseconds) => {
   return formatTime(milliseconds / 1000);
 };
 
-const formatDateTime = (rawSeconds) => {
+export const formatDateTime = (
+  rawSeconds: number | null | undefined
+): string => {
   if (!rawSeconds) {
     return "nullTime";
   }
 
-  const date = new Date(rawSeconds * 1000);
+  const date: Date = new Date(rawSeconds * 1000);
 
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const seconds = String(date.getSeconds()).padStart(2, "0");
+  const year: number = date.getFullYear();
+  const month: string = String(date.getMonth() + 1).padStart(2, "0");
+  const day: string = String(date.getDate()).padStart(2, "0");
+  const hours: string = String(date.getHours()).padStart(2, "0");
+  const minutes: string = String(date.getMinutes()).padStart(2, "0");
+  const seconds: string = String(date.getSeconds()).padStart(2, "0");
 
   return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
-};
-
-module.exports = {
-  formatTime,
-  formatTimeMillis,
-  formatDateTime,
 };

@@ -1,7 +1,7 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
 
-const { formatTime, formatTimeMillis } = require("./utils/timePrint");
+import { formatTime, formatTimeMillis } from "./utils/timePrint";
 const { open, close } = require("./browser/browserService");
 const login = require("./browser/loginService");
 const attackFarms = require("./attackFarms/attackFarms");
