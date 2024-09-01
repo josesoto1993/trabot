@@ -12,7 +12,7 @@ interface VillageData {
   active: boolean;
 }
 
-export const getVillagesInfo = async (page: Page): Promise<Village[]> => {
+const getVillagesInfo = async (page: Page): Promise<Village[]> => {
   try {
     await waitForVillageList(page);
 
@@ -85,3 +85,5 @@ const getVillagesFromPage = async (page: Page): Promise<Village[]> => {
     throw error;
   }
 };
+
+export default getVillagesInfo;
