@@ -10,7 +10,8 @@ const createFundamentals = require("./createFundamentals");
 const updateBuildingList = require("./updateBuildingList");
 import { formatTime, formatTimeMillis } from "../utils/timePrint";
 const { getAllByPriority } = require("../services/PriorityBuildingService");
-import { PriorityLevels } from "../constants/priorityLevels";
+import PriorityLevels from "../constants/priorityLevels";
+import { TaskResult } from "../index";
 
 const DEFAULT_INTERVAL = 15 * 60;
 let totalBuilds = 0;
@@ -35,7 +36,7 @@ const build = async (page) => {
   };
 };
 
-const shouldSkip = () => {
+const shouldSkip = (): TaskResult | null => {
   const remainingTime = getNextBuildFinishAt();
   return remainingTime > 0
     ? { nextExecutionTime: remainingTime, skip: true }

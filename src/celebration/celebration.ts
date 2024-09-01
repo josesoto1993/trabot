@@ -8,6 +8,7 @@ import {
   updateVillagesOverviewInfo,
 } from "../player/playerHandler";
 import { TaskResult } from "../index";
+import Village from "../models/village";
 
 const CELEBRATION_TIME_GAP = 4 * 60 * 60;
 const AWAIT_MORE_RESOURCES_TIME = 15 * 60;
@@ -40,7 +41,7 @@ const manageCelebrations = async (page: Page): Promise<TaskResult> => {
   };
 };
 
-const shouldSkip = (): { nextExecutionTime: number; skip: boolean } | null => {
+const shouldSkip = (): TaskResult | null => {
   const remainingTimes = getVillages()
     .map((village) => village.celebrationTime)
     .filter((time): time is number => time !== null);
@@ -78,9 +79,9 @@ const processVillagesCelebration = async (page: Page) => {
   }
 };
 
-const processVillageCelebration = async (page: Page, village: any) => {
+const processVillageCelebration = async (page: Page, village: Village) => {
   const villageTownHall = village.buildings.find(
-    (building: any) => building.name === BuildingNames.TOWN_HALL
+    (building) => building.name === BuildingNames.TOWN_HALL
   );
 
   if (!villageTownHall) {
@@ -103,7 +104,10 @@ const processVillageCelebration = async (page: Page, village: any) => {
   village.celebrationTime = celebrationTime;
 };
 
-const celebrate = async (page: Page, village: any): Promise<number | null> => {
+const celebrate = async (
+  page: Page,
+  village: Village
+): Promise<number | null> => {
   console.log(`Celebrate village ${village.name}`);
   await goBuilding(village, BuildingNames.TOWN_HALL);
   return await selectCelebration(page);

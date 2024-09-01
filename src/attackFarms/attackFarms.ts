@@ -2,7 +2,7 @@ import { Page } from "puppeteer";
 import { goPage, CLICK_DELAY } from "../browser/browserService";
 import Links from "../constants/links";
 import { formatTime } from "../utils/timePrint";
-import { TaskResult } from "..";
+import { TaskResult } from "../index";
 
 let lastAttackTime: number = 0;
 let randomAttackInterval: number = 0;

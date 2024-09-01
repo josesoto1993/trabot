@@ -1,15 +1,19 @@
+import { Page } from "puppeteer";
 import { typeInSelector } from "../browser/browserService";
 import { formatTime, formatDateTime } from "../utils/timePrint";
-const { getVillages } = require("../player/playerHandler");
-const { goBuilding } = require("../village/goVillage");
-const { getTrainList } = require("../services/trainService");
+import { getVillages } from "../player/playerHandler";
+import { goBuilding } from "../village/goVillage";
+import { getTrainList, ITrainUnit } from "../services/trainService";
 import BuildingNames from "../constants/buildingNames";
+import Village from "../models/village";
+import { TaskResult } from "../index";
+import { IUnit } from "../services/unitService";
 
 const UNITS_TO_TRAIN = "999";
 const MAX_TRAIN_TIME = 4 * 60 * 60;
 const MIN_TRAIN_DELAY = 5 * 60;
 
-const trainTroops = async (page) => {
+const trainTroops = async (page: Page): Promise<TaskResult> => {
   const trainList = await getTrainList();
 
   const skip = shouldSkip(trainList);
@@ -21,9 +25,11 @@ const trainTroops = async (page) => {
 
   let anyTrainPerformed = false;
   for (const train of trainList) {
-    const village = villages.find(
-      (village) => village.name === train.villageName
-    );
+    const village = villages.find((v) => v.name === train.villageName);
+    if (!village) {
+      continue;
+    }
+
     const trainPerformed = await performTrain(page, train.unit, village);
     if (trainPerformed) {
       anyTrainPerformed = true;
@@ -41,17 +47,17 @@ const trainTroops = async (page) => {
   };
 };
 
-const shouldSkip = (trainList) => {
+const shouldSkip = (trainList: ITrainUnit[]): TaskResult | null => {
   const remainingTime = getNextTrainRemaining(trainList);
   return remainingTime > 0
     ? { nextExecutionTime: remainingTime, skip: true }
     : null;
 };
 
-const getNextTrainRemaining = (trainList) => {
+const getNextTrainRemaining = (trainList: ITrainUnit[]): number => {
   const villages = getVillages();
 
-  const minTroopTime = villages.reduce((minTime, village) => {
+  const minTroopTime = villages.reduce((minTime: number, village: Village) => {
     for (const train of trainList) {
       if (village.name === train.villageName) {
         const buildingName = train.unit.building.name;
@@ -69,10 +75,15 @@ const getNextTrainRemaining = (trainList) => {
     }
     return minTime;
   }, Infinity);
+
   return minTroopTime - Date.now() / 1000 - MAX_TRAIN_TIME;
 };
 
-const performTrain = async (page, unit, village) => {
+const performTrain = async (
+  page: Page,
+  unit: IUnit,
+  village: Village
+): Promise<boolean> => {
   try {
     await goBuilding(village, unit.building.name);
     const remainingTime = await getRemainingTime(page);
@@ -99,7 +110,7 @@ const performTrain = async (page, unit, village) => {
   }
 };
 
-const getRemainingTime = async (page) => {
+const getRemainingTime = async (page: Page): Promise<number> => {
   const troopsTimeoutMillis = 5 * 1000;
   const timerSelector = "td.dur span.timer";
   try {
@@ -107,7 +118,7 @@ const getRemainingTime = async (page) => {
       timeout: troopsTimeoutMillis,
     });
     const remainingTimes = await page.$$eval(timerSelector, (spans) =>
-      spans.map((span) => parseInt(span.getAttribute("value"), 10))
+      spans.map((span) => parseInt(span.getAttribute("value") || "0", 10))
     );
     const maxRemainingTime = Math.max(...remainingTimes);
     console.log(`Maximum remaining time: ${formatTime(maxRemainingTime)}`);
@@ -123,7 +134,10 @@ const getRemainingTime = async (page) => {
   }
 };
 
-const writeInputValueToMax = async (page, unitSelector) => {
+const writeInputValueToMax = async (
+  page: Page,
+  unitSelector: string
+): Promise<void> => {
   const inputName = `input[name="${unitSelector}"]`;
   try {
     await page.waitForSelector(inputName);
@@ -134,7 +148,7 @@ const writeInputValueToMax = async (page, unitSelector) => {
   }
 };
 
-const submit = async (page) => {
+const submit = async (page: Page): Promise<void> => {
   try {
     await page.click('button[type="submit"]');
     console.log("Train troops submitted.");
@@ -143,7 +157,11 @@ const submit = async (page) => {
   }
 };
 
-const updateVillageTroopTime = (village, unit, finalRemainingTime) => {
+const updateVillageTroopTime = (
+  village: Village,
+  unit: IUnit,
+  finalRemainingTime: number
+): void => {
   const buildingName = unit.building.name;
   const finishTime = finalRemainingTime + Date.now() / 1000;
 
@@ -162,4 +180,4 @@ const updateVillageTroopTime = (village, unit, finalRemainingTime) => {
   );
 };
 
-module.exports = trainTroops;
+export default trainTroops;

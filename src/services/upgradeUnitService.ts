@@ -3,7 +3,7 @@ import UpgradeUnitModel, {
   IUpgradeUnitSchema,
 } from "../schemas/upgradeUnitSchema";
 
-interface IUpgradeUnit {
+export interface IUpgradeUnit {
   villageName: string;
   unit: IUnit;
 }

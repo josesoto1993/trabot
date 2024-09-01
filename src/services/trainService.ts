@@ -1,7 +1,7 @@
 import TrainModel, { ITrainSchema } from "../schemas/trainSchema";
 import { getUnit, IUnit } from "./unitService";
 
-interface ITrainUnit {
+export interface ITrainUnit {
   villageName: string;
   unit: IUnit;
 }
