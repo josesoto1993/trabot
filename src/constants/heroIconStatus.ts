@@ -1,4 +1,4 @@
-export enum HeroIconStatus {
+enum HeroIconStatus {
   RUNNING = "heroRunning",
   HOME = "heroHome",
   DEAD = "heroDead",
@@ -9,3 +9,5 @@ export enum HeroIconStatus {
 export const HeroIconStatusKeys = Object.keys(
   HeroIconStatus
 ) as (keyof typeof HeroIconStatus)[];
+
+export default HeroIconStatus;

@@ -1,4 +1,4 @@
-export enum TaskNames {
+enum TaskNames {
   DEFICIT = "Deficit",
   OVERFLOW = "Overflow",
   ATTACK_FARMS = "Attack Farms",
@@ -9,3 +9,5 @@ export enum TaskNames {
   REDEEM = "Redeem",
   CELEBRATIONS = "Celebrations",
 }
+
+export default TaskNames;

@@ -5,7 +5,7 @@ import { goVillageResView } from "./goVillage";
 import ResourceField from "../models/resourceField";
 import Village from "../models/village";
 
-export const getResourceFieldsData = async (
+const getResourceFieldsData = async (
   page: Page,
   village: Village
 ): Promise<ResourceField[]> => {
@@ -100,3 +100,5 @@ const getFieldType = (classes: string[]): FieldType => {
   }
   throw new Error(`Field type not found for classes: ${classes.join(", ")}`);
 };
+
+export default getResourceFieldsData;

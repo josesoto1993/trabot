@@ -187,7 +187,7 @@ const getOverviewConsumption = async (
 
       const consumption = Array.from(spanElements).reduce((sum, span) => {
         const value = parseInt(
-          span.textContent?.trim().replace(/[^0-9]/g, "") ?? "0",
+          span.textContent?.trim().replace(/\D/g, "") ?? "0",
           10
         );
         return sum + (isNaN(value) ? 0 : value);

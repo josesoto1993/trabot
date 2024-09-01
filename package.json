@@ -40,11 +40,13 @@
   "homepage": "https://github.com/josesoto1993/trabot#readme",
   "dependencies": {
     "dotenv": "^16.4.5",
+    "lodash": "^4.17.21",
     "mongodb": "^6.8.0",
     "mongoose": "^8.5.3",
     "puppeteer": "^22.14.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.7",
     "@types/mongodb": "^4.0.7",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^22.5.1",

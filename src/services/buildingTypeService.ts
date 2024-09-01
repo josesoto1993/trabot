@@ -18,7 +18,7 @@ const loadBuildingTypes = async (): Promise<Record<string, IBuildingType>> => {
     cachedBuildingTypes = {};
     buildingTypes.forEach((buildingType) => {
       const buildingTypeWithCategory = buildingType as IBuildingType;
-      cachedBuildingTypes![buildingType.name] = buildingTypeWithCategory;
+      cachedBuildingTypes[buildingType.name] = buildingTypeWithCategory;
     });
   }
   return cachedBuildingTypes;

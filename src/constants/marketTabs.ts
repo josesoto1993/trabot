@@ -1,4 +1,4 @@
-export enum MarketTabs {
+enum MarketTabs {
   QUERY_PARAM_KEY = "t",
   MANAGEMENT = "4",
   SEND_RESOURCES = "5",
@@ -6,3 +6,5 @@ export enum MarketTabs {
   BUY = "1",
   OFFER = "2",
 }
+
+export default MarketTabs;

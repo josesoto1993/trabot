@@ -1,4 +1,4 @@
-export enum UnitNames {
+enum UnitNames {
   PHALANX = "Phalanx",
   SWORDSMAN = "Swordsman",
   PATHFINDER = "Pathfinder",
@@ -11,3 +11,5 @@ export enum UnitNames {
   SETTLER = "Settler",
   TRAPS = "Traps",
 }
+
+export default UnitNames;

@@ -6,7 +6,7 @@ const TRAVIAN_BUILDING_VIEW: string = `${TRAVIAN_BASE}/dorf2.php`;
 const TRAVIAN_BUILD_VIEW: string = `${TRAVIAN_BASE}/build.php`;
 const TRAVIAN_TASK_VIEW: string = `${TRAVIAN_BASE}/tasks`;
 
-export {
+const Links = {
   TRAVIAN_BASE,
   TRAVIAN_FARM_LIST,
   TRAVIAN_HERO_ADVENTURES,
@@ -15,3 +15,5 @@ export {
   TRAVIAN_BUILD_VIEW,
   TRAVIAN_TASK_VIEW,
 };
+
+export default Links;

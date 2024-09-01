@@ -16,10 +16,10 @@ class Village {
   coordinateX: number;
   coordinateY: number;
   active: boolean;
-  resources: Resources | null = new Resources(0, 0, 0, 0);
-  production: Resources | null = new Resources(0, 0, 0, 0);
-  capacity: Resources | null = new Resources(0, 0, 0, 0);
-  ongoingResources: Resources | null = new Resources(0, 0, 0, 0);
+  resources: Resources | null = null;
+  production: Resources | null = null;
+  capacity: Resources | null = null;
+  ongoingResources: Resources | null = null;
   consumption: number | null = 0;
   celebrationTime: number | null = null;
   availableMerchants: number | null = null;

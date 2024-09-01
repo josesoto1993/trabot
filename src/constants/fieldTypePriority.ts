@@ -1,4 +1,4 @@
-import { FieldType } from "../constants/fieldType";
+import FieldType from "../constants/fieldType";
 
 export const FieldTypePriority: Record<FieldType, number> = {
   [FieldType.CLAY]: 1,
@@ -6,3 +6,5 @@ export const FieldTypePriority: Record<FieldType, number> = {
   [FieldType.IRON]: 3,
   [FieldType.CROP]: 4,
 };
+
+export default FieldTypePriority;

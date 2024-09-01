@@ -1,4 +1,4 @@
-export enum BuildingNames {
+enum BuildingNames {
   ACADEMY = "Academy",
   BAKERY = "Bakery",
   BARRACKS = "Barracks",
@@ -28,3 +28,5 @@ export enum BuildingNames {
   WAREHOUSE = "Warehouse",
   WORKSHOP = "Workshop",
 }
+
+export default BuildingNames;

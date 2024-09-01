@@ -1,13 +1,15 @@
-import { TRAVIAN_BASE } from "../constants/links";
+import Links from "../constants/links";
 
-export const OverviewTabs = {
-  MAIN_URL: `${TRAVIAN_BASE}/village/statistics`,
-  OVERVIEW: `${TRAVIAN_BASE}/village/statistics/overview`,
-  RESOURCES_RESOURCES: `${TRAVIAN_BASE}/village/statistics/resources/resources`,
-  RESOURCES_WAREHOUSE: `${TRAVIAN_BASE}/village/statistics/resources/warehouse`,
-  RESOURCES_PRODUCTION: `${TRAVIAN_BASE}/village/statistics/resources/production`,
-  RESOURCES_CAPACITY: `${TRAVIAN_BASE}/village/statistics/resources/capacity`,
-  CULTUREPOINTS: `${TRAVIAN_BASE}/village/statistics/culturepoints`,
-  TROOPS_TRAINING: `${TRAVIAN_BASE}/village/statistics/troops/training`,
-  TROOPS_INVILLAGE: `${TRAVIAN_BASE}/village/statistics/troops/support`,
+const OverviewTabs = {
+  MAIN_URL: `${Links.TRAVIAN_BASE}/village/statistics`,
+  OVERVIEW: `${Links.TRAVIAN_BASE}/village/statistics/overview`,
+  RESOURCES_RESOURCES: `${Links.TRAVIAN_BASE}/village/statistics/resources/resources`,
+  RESOURCES_WAREHOUSE: `${Links.TRAVIAN_BASE}/village/statistics/resources/warehouse`,
+  RESOURCES_PRODUCTION: `${Links.TRAVIAN_BASE}/village/statistics/resources/production`,
+  RESOURCES_CAPACITY: `${Links.TRAVIAN_BASE}/village/statistics/resources/capacity`,
+  CULTUREPOINTS: `${Links.TRAVIAN_BASE}/village/statistics/culturepoints`,
+  TROOPS_TRAINING: `${Links.TRAVIAN_BASE}/village/statistics/troops/training`,
+  TROOPS_INVILLAGE: `${Links.TRAVIAN_BASE}/village/statistics/troops/support`,
 } as const;
+
+export default OverviewTabs;

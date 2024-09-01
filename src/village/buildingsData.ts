@@ -9,7 +9,6 @@ import {
 import { getBuildingCategory } from "../services/buildingCategoryService";
 import { BuildingCategory } from "../constants/buildingCategories";
 import Village from "../models/village";
-import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
 
 interface BuildingRawData {
   aid: string;
@@ -19,7 +18,7 @@ interface BuildingRawData {
   anchorClasses: string[];
 }
 
-export const getBuildingData = async (
+const getBuildingData = async (
   page: Page,
   village: Village
 ): Promise<Building[]> => {
@@ -36,16 +35,16 @@ const getBuildingRawData = async (page: Page): Promise<BuildingRawData[]> => {
     return nodes.map((node) => {
       const anchor = node.querySelector("a.level");
 
-      let level = anchor ? parseInt(anchor.getAttribute("data-level")!, 10) : 0;
+      let level = anchor ? parseInt(anchor.getAttribute("data-level"), 10) : 0;
 
       if (anchor && anchor.classList.contains("underConstruction")) {
         level += 1;
       }
 
       return {
-        aid: node.getAttribute("data-aid")!,
-        gid: node.getAttribute("data-gid")!,
-        name: node.getAttribute("data-name")!,
+        aid: node.getAttribute("data-aid"),
+        gid: node.getAttribute("data-gid"),
+        name: node.getAttribute("data-name"),
         level: level,
         anchorClasses: anchor ? Array.from(anchor.classList) : [],
       };
@@ -123,3 +122,5 @@ const addNewBuildingType = async (
     `Added or updated building type: ${name} with id: ${structureId}`
   );
 };
+
+export default getBuildingData;
