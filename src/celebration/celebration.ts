@@ -1,15 +1,24 @@
-const {
-  getVillages,
-  updateVillagesOverviewInfo,
-} = require("../player/playerHandler");
+import { ElementHandle, Page } from "puppeteer";
 import { formatTime } from "../utils/timePrint";
-const { goBuilding } = require("../village/goVillage");
+import { goBuilding } from "../village/goVillage";
 import { CLICK_DELAY } from "../browser/browserService";
 import BuildingNames from "../constants/buildingNames";
+import {
+  getVillages,
+  updateVillagesOverviewInfo,
+} from "../player/playerHandler";
+import { TaskResult } from "../index";
 
 const CELEBRATION_TIME_GAP = 4 * 60 * 60;
+const AWAIT_MORE_RESOURCES_TIME = 15 * 60;
 
-const manageCelebrations = async (page) => {
+interface CelebrationButton {
+  button: ElementHandle<HTMLButtonElement>;
+  celebrationTime: number | null;
+  exist: boolean;
+}
+
+const manageCelebrations = async (page: Page): Promise<TaskResult> => {
   const skip = shouldSkip();
   if (skip) {
     return skip;
@@ -22,19 +31,19 @@ const manageCelebrations = async (page) => {
   const nextExecutionTime = getNextCelebrationFinishAt() - CELEBRATION_TIME_GAP;
 
   console.log(
-    `Celebration process finish, next in ${formatTime(nextExecutionTime)}`
+    `Celebration process finished, next in ${formatTime(nextExecutionTime)}`
   );
 
   return {
-    nextExecutionTime: nextExecutionTime,
+    nextExecutionTime,
     skip: false,
   };
 };
 
-const shouldSkip = () => {
+const shouldSkip = (): { nextExecutionTime: number; skip: boolean } | null => {
   const remainingTimes = getVillages()
     .map((village) => village.celebrationTime)
-    .filter((time) => time !== null);
+    .filter((time): time is number => time !== null);
 
   const remainingTime =
     Math.min(...remainingTimes, Infinity) - CELEBRATION_TIME_GAP;
@@ -44,15 +53,15 @@ const shouldSkip = () => {
     : null;
 };
 
-const getNextCelebrationFinishAt = () => {
+const getNextCelebrationFinishAt = (): number => {
   const minCelebrationFinishAt = Math.min(
-    ...getVillages().map((village) => village.celebrationTime)
+    ...getVillages().map((village) => village.celebrationTime || Infinity)
   );
 
   return minCelebrationFinishAt;
 };
 
-const processVillagesCelebration = async (page) => {
+const processVillagesCelebration = async (page: Page) => {
   await updateVillagesOverviewInfo(page);
   const villages = getVillages();
   for (const village of villages) {
@@ -61,7 +70,7 @@ const processVillagesCelebration = async (page) => {
       village.celebrationTime > CELEBRATION_TIME_GAP
     ) {
       console.log(
-        `Village ${village.name} does not need celebration, remaning time ${formatTime(village.celebrationTime)} > desired ${formatTime(CELEBRATION_TIME_GAP)} `
+        `Village ${village.name} does not need celebration, remaining time ${formatTime(village.celebrationTime)} > desired ${formatTime(CELEBRATION_TIME_GAP)} `
       );
       continue;
     }
@@ -69,23 +78,22 @@ const processVillagesCelebration = async (page) => {
   }
 };
 
-const processVillageCelebration = async (page, village) => {
+const processVillageCelebration = async (page: Page, village: any) => {
   const villageTownHall = village.buildings.find(
-    (building) => building.name === BuildingNames.TOWN_HALL
+    (building: any) => building.name === BuildingNames.TOWN_HALL
   );
 
   if (!villageTownHall) {
     village.celebrationTime = CELEBRATION_TIME_GAP * 2;
     console.log(
-      `Village ${village.name} does not need celebration as does not have town hall, set time to ${village.celebrationTime}`
+      `Village ${village.name} does not need celebration as it does not have a town hall, set time to ${village.celebrationTime}`
     );
     return;
   }
 
   const celebrationTime = await celebrate(page, village);
   if (!celebrationTime) {
-    const awaitMoreResourcesTime = CELEBRATION_TIME_GAP + 15 * 60;
-    village.celebrationTime = awaitMoreResourcesTime;
+    village.celebrationTime = CELEBRATION_TIME_GAP + AWAIT_MORE_RESOURCES_TIME;
     console.log(
       `Set await resources celebration time ${village.celebrationTime} on ${village.name}`
     );
@@ -95,13 +103,13 @@ const processVillageCelebration = async (page, village) => {
   village.celebrationTime = celebrationTime;
 };
 
-const celebrate = async (page, village) => {
-  console.log(`celebrate village ${village.name}`);
+const celebrate = async (page: Page, village: any): Promise<number | null> => {
+  console.log(`Celebrate village ${village.name}`);
   await goBuilding(village, BuildingNames.TOWN_HALL);
   return await selectCelebration(page);
 };
 
-const selectCelebration = async (page) => {
+const selectCelebration = async (page: Page): Promise<number | null> => {
   const { smallCelebration, greatCelebration } = await getValidButtons(page);
 
   if (greatCelebration.exist && greatCelebration.button) {
@@ -127,11 +135,24 @@ const selectCelebration = async (page) => {
   }
 };
 
-const getValidButtons = async (page) => {
+const getValidButtons = async (
+  page: Page
+): Promise<{
+  smallCelebration: CelebrationButton;
+  greatCelebration: CelebrationButton;
+}> => {
   const researchSections = await page.$$("div.researches div.research");
 
-  let smallCelebration = { button: null, celebrationTime: null, exist: false };
-  let greatCelebration = { button: null, celebrationTime: null, exist: false };
+  let smallCelebration: CelebrationButton = {
+    button: null,
+    celebrationTime: null,
+    exist: false,
+  };
+  let greatCelebration: CelebrationButton = {
+    button: null,
+    celebrationTime: null,
+    exist: false,
+  };
 
   for (const researchSection of researchSections) {
     const titleElement = await researchSection.$("div.information div.title a");
@@ -164,7 +185,10 @@ const getValidButtons = async (page) => {
   return { smallCelebration, greatCelebration };
 };
 
-const getValidButton = async (page, researchSection) => {
+const getValidButton = async (
+  page: Page,
+  researchSection: ElementHandle<Element>
+): Promise<ElementHandle<HTMLButtonElement>> => {
   const button = await researchSection.$("div.information div.cta button");
   if (!button) {
     return null;
@@ -182,7 +206,10 @@ const getValidButton = async (page, researchSection) => {
   return button;
 };
 
-const getCelebrationTime = async (page, researchSection) => {
+const getCelebrationTime = async (
+  page: Page,
+  researchSection: ElementHandle<Element>
+): Promise<number> => {
   const durationElement = await researchSection.$(
     "div.cta div.duration span.value"
   );
@@ -194,7 +221,9 @@ const getCelebrationTime = async (page, researchSection) => {
   return hours * 3600 + minutes * 60 + seconds;
 };
 
-const getRemainingCelebrationTime = async (page) => {
+const getRemainingCelebrationTime = async (
+  page: Page
+): Promise<number | null> => {
   const durationElement = await page.$("table tbody tr td.dur span.timer");
 
   if (!durationElement) {
@@ -202,11 +231,11 @@ const getRemainingCelebrationTime = async (page) => {
   }
 
   const duration = await page.evaluate(
-    (el) => parseInt(el.getAttribute("value")),
+    (el) => parseInt(el.getAttribute("value") || "0", 10),
     durationElement
   );
 
   return isNaN(duration) ? null : duration;
 };
 
-module.exports = manageCelebrations;
+export default manageCelebrations;
