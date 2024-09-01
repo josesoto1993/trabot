@@ -1,9 +1,9 @@
 import { Page } from "puppeteer";
 import { goPage, CLICK_DELAY } from "../browser/browserService";
 import { getClassOfHeroIcon, getHeroAdventures } from "./heroStatus";
-import { TRAVIAN_HERO_ADVENTURES } from "../constants/links";
+import Links from "../constants/links";
 import { formatTime } from "../utils/timePrint";
-import { HeroIconStatus } from "../constants/heroIconStatus";
+import HeroIconStatus from "../constants/heroIconStatus";
 import { TaskResult } from "../index";
 
 const ADVENTURE_BUTTON_SELECTOR_TIMEOUT_MILLIS: number = 15000;
@@ -56,7 +56,7 @@ const updateNextAdventureTime = (): void => {
 
 const performAdventure = async (page: Page): Promise<boolean> => {
   try {
-    await goPage(TRAVIAN_HERO_ADVENTURES);
+    await goPage(Links.TRAVIAN_HERO_ADVENTURES);
     await clickAdventureButton(page);
     return true;
   } catch (error) {

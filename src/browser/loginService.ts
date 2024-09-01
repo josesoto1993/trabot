@@ -1,6 +1,6 @@
 import { Page } from "puppeteer";
 import { goPage, typeInSelector } from "../browser/browserService";
-import { TRAVIAN_BASE } from "../constants/links";
+import Links from "../constants/links";
 import { formatTime } from "../utils/timePrint";
 
 const USERNAME: string | undefined = process.env.TARVIAN_USERNAME;
@@ -13,7 +13,7 @@ if (!USERNAME || !PASSWORD) {
 
 const login = async (page: Page): Promise<void> => {
   try {
-    await goPage(TRAVIAN_BASE);
+    await goPage(Links.TRAVIAN_BASE);
 
     await writeUser(page);
     await writePassword(page);
@@ -30,7 +30,7 @@ const login = async (page: Page): Promise<void> => {
 const writeUser = async (page: Page): Promise<void> => {
   try {
     await page.waitForSelector('input[name="name"]');
-    await typeInSelector('input[name="name"]', USERNAME as string);
+    await typeInSelector('input[name="name"]', USERNAME);
     console.log("Username entered.");
   } catch (error) {
     console.error("Error entering username:", error);
@@ -40,7 +40,7 @@ const writeUser = async (page: Page): Promise<void> => {
 const writePassword = async (page: Page): Promise<void> => {
   try {
     await page.waitForSelector('input[name="password"]');
-    await typeInSelector('input[name="password"]', PASSWORD as string);
+    await typeInSelector('input[name="password"]', PASSWORD);
     console.log("Password entered.");
   } catch (error) {
     console.error("Error entering password:", error);

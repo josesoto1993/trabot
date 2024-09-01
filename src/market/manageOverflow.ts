@@ -1,20 +1,20 @@
-const sendResources = require("./sendResources");
+import { Page } from "puppeteer";
+import sendResources from "./sendResources";
 import { formatTime } from "../utils/timePrint";
-const Resources = require("../models/resources");
-const Trade = require("../models/trade");
-const {
+import Resources from "../models/resources";
+import Trade from "../models/trade";
+import {
   getVillages,
   updateVillagesOverviewInfo,
-} = require("../player/playerHandler");
+} from "../player/playerHandler";
+import Village from "../models/village";
+import { TaskResult } from "../index";
 
-const MERCHANTS_CAPACITY = process.env.MERCHANTS_CAPACITY;
-const RECEIVER_THRESHOLD = 0.7;
-const ROUNDING_SAFETY_FACTOR = 0.999;
 const OVERFLOW_INTERVAL = 4 * 60;
 
 let lastOverflowTime = 0;
 
-const manageOverflow = async (page) => {
+const manageOverflow = async (page: Page): Promise<TaskResult> => {
   const remainingTime = getRemainingTime();
   if (remainingTime > 0) {
     return { nextExecutionTime: remainingTime, skip: true };
@@ -32,20 +32,20 @@ const manageOverflow = async (page) => {
   return { nextExecutionTime: OVERFLOW_INTERVAL, skip: false };
 };
 
-const getRemainingTime = () => {
+const getRemainingTime = (): number => {
   const currentTime = Date.now();
   const timePassed = (currentTime - lastOverflowTime) / 1000;
   return OVERFLOW_INTERVAL - timePassed;
 };
 
-const updateNextOverflowTime = () => {
+const updateNextOverflowTime = (): void => {
   lastOverflowTime = Date.now();
 };
 
-const checkVillagesOverflow = async (page) => {
+const checkVillagesOverflow = async (page: Page): Promise<void> => {
   try {
     await updateVillagesOverviewInfo(page);
-    const villages = await getVillages();
+    const villages = getVillages();
 
     for (const village of villages) {
       if (village.skipOverflow) {
@@ -59,7 +59,11 @@ const checkVillagesOverflow = async (page) => {
   }
 };
 
-const checkVillageOverflow = async (page, village, villages) => {
+const checkVillageOverflow = async (
+  page: Page,
+  village: Village,
+  villages: Village[]
+): Promise<void> => {
   const excessResources = village.getOverflowResources();
 
   if (excessResources.getTotal() > MERCHANTS_CAPACITY) {
@@ -70,60 +74,45 @@ const checkVillageOverflow = async (page, village, villages) => {
 };
 
 const handleOverflowResources = async (
-  page,
-  villages,
-  village,
-  excessResources
-) => {
+  page: Page,
+  villages: Village[],
+  village: Village,
+  excessResources: Resources
+): Promise<void> => {
   console.log(
     `Village ${village.name} needs to send overflow resources ${excessResources}.`
   );
-  const limitedResources = limitResourcesToMarket(village, excessResources);
 
   const [targetVillage, resourcesToSend] = findReceivingVillageAndRes(
     villages,
-    limitedResources
+    excessResources
   );
 
   if (targetVillage) {
     console.log(
       `Village ${village.name} will send ${resourcesToSend} to village ${targetVillage.name}.`
     );
-    await sendExcessResources(page, village, targetVillage, resourcesToSend);
-    updateVillageResources(village, targetVillage, resourcesToSend);
+    const realResources = await sendExcessResources(
+      page,
+      village,
+      targetVillage,
+      resourcesToSend
+    );
+    updateVillageResources(village, targetVillage, realResources);
   } else {
-    console.log("ERROR!! Cannot handle excess resources:", limitedResources);
+    console.log("ERROR!! Cannot handle excess resources:", excessResources);
   }
 };
 
-const limitResourcesToMarket = (village, excessResources) => {
-  const maxCargo = village.availableMerchants * MERCHANTS_CAPACITY;
-  const totalExcess = excessResources.getTotal();
-
-  if (totalExcess <= maxCargo) {
-    return excessResources;
-  }
-
-  const factor = (maxCargo / totalExcess) * ROUNDING_SAFETY_FACTOR;
-  const realCargoToSend = Resources.factor(excessResources, factor);
-  console.log(
-    `Cargo ${totalExcess} exceeds max cargo ${maxCargo}, scaling to send ${realCargoToSend}.`
-  );
-  return realCargoToSend;
-};
-
-const findReceivingVillageAndRes = (villages, resourcesToSend) => {
-  const potentialRecipients = [];
+const findReceivingVillageAndRes = (
+  villages: Village[],
+  resourcesToSend: Resources
+): [Village | null, Resources | null] => {
+  const potentialRecipients: { village: Village; res: Resources }[] = [];
 
   for (const receivingVillage of villages) {
-    const receivingVillageRes = Resources.add(
-      receivingVillage.resources,
-      receivingVillage.ongoingResources
-    );
-
     const possibleDonation = calculatePossibleDonation(
-      receivingVillageRes,
-      receivingVillage.capacity,
+      receivingVillage,
       resourcesToSend
     );
 
@@ -145,36 +134,42 @@ const findReceivingVillageAndRes = (villages, resourcesToSend) => {
 };
 
 const calculatePossibleDonation = (
-  receiverResources,
-  receiverCapacity,
-  resourcesToReceive
-) => {
-  const possibleDonation = new Resources(0, 0, 0, 0);
+  receiverVillage: Village,
+  resourcesToReceive: Resources
+): Resources => {
+  const maxReceivableResources = receiverVillage.getMaxReceiveResources();
 
-  Resources.getKeys().forEach((resourceType) => {
-    const maxOnStorage = receiverCapacity[resourceType] * RECEIVER_THRESHOLD;
-
-    possibleDonation[resourceType] = Math.min(
-      resourcesToReceive[resourceType],
-      maxOnStorage - receiverResources[resourceType]
-    );
-
-    if (possibleDonation[resourceType] < 0) {
-      possibleDonation[resourceType] = 0;
-    }
-  });
+  const possibleDonation = Resources.getKeys().reduce(
+    (acc, resourceType) => {
+      acc[resourceType] = Math.min(
+        resourcesToReceive[resourceType],
+        maxReceivableResources[resourceType]
+      );
+      return acc;
+    },
+    new Resources(0, 0, 0, 0)
+  );
 
   return possibleDonation;
 };
 
-const sendExcessResources = async (page, fromVillage, toVillage, resources) => {
+const sendExcessResources = async (
+  page: Page,
+  fromVillage: Village,
+  toVillage: Village,
+  resources: Resources
+): Promise<Resources> => {
   const trade = new Trade(fromVillage, toVillage, resources);
-  await sendResources(page, trade);
+  return await sendResources(page, trade);
 };
 
-const updateVillageResources = (fromVillage, toVillage, resources) => {
+const updateVillageResources = (
+  fromVillage: Village,
+  toVillage: Village,
+  resources: Resources
+): void => {
   fromVillage.resources = Resources.subtract(fromVillage.resources, resources);
   toVillage.resources = Resources.add(toVillage.resources, resources);
 };
 
-module.exports = manageOverflow;
+export default manageOverflow;

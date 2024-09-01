@@ -13,7 +13,7 @@ const loadBuildingCategories = async (): Promise<
     const categories = await BuildingCategoryModel.find().exec();
     cachedCategories = {};
     categories.forEach((category) => {
-      cachedCategories![category.name] = category;
+      cachedCategories[category.name] = category;
     });
   }
   return cachedCategories;

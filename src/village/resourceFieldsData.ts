@@ -1,6 +1,6 @@
 import { Page } from "puppeteer";
-import { FieldType } from "../constants/fieldType";
-import { ConstructionStatus } from "../constants/constructionStatus";
+import FieldType from "../constants/fieldType";
+import ConstructionStatus from "../constants/constructionStatus";
 import { goVillageResView } from "./goVillage";
 import ResourceField from "../models/resourceField";
 import Village from "../models/village";

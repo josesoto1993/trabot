@@ -6,7 +6,7 @@ const {
   getUpgradeList,
   removeUpgrade,
 } = require("../services/upgradeUnitService");
-import { BuildingNames } from "../constants/buildingNames";
+import BuildingNames from "../constants/buildingNames";
 
 const MIN_UPGRADE_DELAY = 5 * 60;
 
@@ -194,7 +194,7 @@ const getSection = async (page, unitName) => {
         .replace(/[^a-zA-Z]/g, "")
         .toLowerCase();
 
-      if (titleText && titleText.includes(normalizedUnitName)) {
+      if (titleText?.includes(normalizedUnitName)) {
         return section;
       }
     }

@@ -15,7 +15,7 @@ const manageDeficit = require("./market/manageDeficit");
 const manageCelebrations = require("./celebration/celebration");
 const { updateVillages, getPlayer } = require("./player/playerHandler");
 const populate = require("./populators/populator");
-import { TaskNames } from "./constants/taskNames";
+import TaskNames from "./constants/taskNames";
 const { isActive } = require("./services/taskService");
 
 const taskStats = {};

@@ -1,5 +1,5 @@
 import { Page } from "puppeteer";
-import { ConstructionStatus } from "../constants/constructionStatus";
+import ConstructionStatus from "../constants/constructionStatus";
 import { goVillageBuildingView } from "./goVillage";
 import Building from "../models/building";
 import {
@@ -7,7 +7,7 @@ import {
   upsertBuildingType,
 } from "../services/buildingTypeService";
 import { getBuildingCategory } from "../services/buildingCategoryService";
-import { BuildingCategory } from "../constants/buildingCategories";
+import BuildingCategory from "../constants/buildingCategories";
 import Village from "../models/village";
 
 interface BuildingRawData {
@@ -37,7 +37,7 @@ const getBuildingRawData = async (page: Page): Promise<BuildingRawData[]> => {
 
       let level = anchor ? parseInt(anchor.getAttribute("data-level"), 10) : 0;
 
-      if (anchor && anchor.classList.contains("underConstruction")) {
+      if (anchor?.classList.contains("underConstruction")) {
         level += 1;
       }
 

@@ -1,17 +1,22 @@
-const { goBuilding } = require("../village/goVillage");
+import { Page } from "puppeteer";
+import Resources from "../models/resources";
+import Trade from "../models/trade";
+import { goBuilding } from "../village/goVillage";
 import { formatTime } from "../utils/timePrint";
 import { typeInSelector, CLICK_DELAY } from "../browser/browserService";
-const { addTrade } = require("./ongoingTrades");
-import { MarketTabs } from "../constants/marketTabs";
-import { BuildingNames } from "../constants/buildingNames";
+import { addTrade } from "./ongoingTrades";
+import MarketTabs from "../constants/marketTabs";
+import BuildingNames from "../constants/buildingNames";
+import Village from "../models/village";
 
-const MARKET_WAIT_POSSIBLE_ERROR = 1 * 1000;
+const ROUNDING_SAFETY_FACTOR = 0.999;
 
-const sendResources = async (page, trade) => {
+const sendResources = async (page: Page, trade: Trade): Promise<Resources> => {
   console.log(
     `Start send resources from ${trade.from.name} to ${trade.to.name}`
   );
   try {
+    trade.resources = limitResourcesToMarket(trade.from, trade.resources);
     await goMarket(trade.from);
     await setDestination(page, trade.to);
     await setResources(page, trade.resources);
@@ -22,56 +27,58 @@ const sendResources = async (page, trade) => {
     console.log(
       `${trade.toString()}. Executed successfully. Will take ${formatTime(tradeDuration)}`
     );
-    return tradeDuration;
+    return trade.resources;
   } catch (error) {
     console.error(`Error in sendResources for trade ${trade} :`, error);
-    return -1;
+    return new Resources(0, 0, 0, 0);
   }
 };
 
-const goMarket = async (village) => {
+const goMarket = async (village: Village): Promise<void> => {
   const marketTabSearchParam = {
     [MarketTabs.QUERY_PARAM_KEY]: MarketTabs.SEND_RESOURCES,
   };
   await goBuilding(village, BuildingNames.MARKETPLACE, marketTabSearchParam);
 };
 
-const setDestination = async (page, to) => {
+const setDestination = async (page: Page, to: Village): Promise<void> => {
   console.log("set destination");
   await page.waitForSelector("div.inputWrapper");
 
   await typeInSelector(
     "div.inputWrapper label.coordinateX input",
-    to.coordinateX
+    to.coordinateX.toString()
   );
   await typeInSelector(
     "div.inputWrapper label.coordinateY input",
-    to.coordinateY
+    to.coordinateY.toString()
   );
 };
 
-const setResources = async (page, resources) => {
+const setResources = async (
+  page: Page,
+  resources: Resources
+): Promise<void> => {
   console.log("set resources");
   await page.waitForSelector('input[name="lumber"]');
 
   if (resources.lumber > 0) {
-    await typeInSelector('input[name="lumber"]', resources.lumber);
+    await typeInSelector('input[name="lumber"]', resources.lumber.toString());
   }
   if (resources.clay > 0) {
-    await typeInSelector('input[name="clay"]', resources.clay);
+    await typeInSelector('input[name="clay"]', resources.clay.toString());
   }
   if (resources.iron > 0) {
-    await typeInSelector('input[name="iron"]', resources.iron);
+    await typeInSelector('input[name="iron"]', resources.iron.toString());
   }
   if (resources.crop > 0) {
-    await typeInSelector('input[name="crop"]', resources.crop);
+    await typeInSelector('input[name="crop"]', resources.crop.toString());
   }
 };
 
-const verify = async (page) => {
-  await new Promise((resolve) =>
-    setTimeout(resolve, MARKET_WAIT_POSSIBLE_ERROR)
-  );
+const verify = async (page: Page): Promise<void> => {
+  const waitPossibleError = 1 * 1000;
+  await new Promise((resolve) => setTimeout(resolve, waitPossibleError));
 
   const errorDivsText = await page.evaluate(() => {
     const divs = Array.from(document.querySelectorAll("div.error"));
@@ -89,7 +96,7 @@ const verify = async (page) => {
   }
 };
 
-const executeTrade = async (page) => {
+const executeTrade = async (page: Page): Promise<number> => {
   console.log("execute trade");
   await page.waitForSelector("button.send");
   const sendButton = await page.$("button.send");
@@ -103,14 +110,33 @@ const executeTrade = async (page) => {
   }
 };
 
-const getTradeDuration = async (page) => {
+const getTradeDuration = async (page: Page): Promise<number> => {
   const durationSelector = "div.targetWrapper div.duration span.value";
   await page.waitForSelector(durationSelector);
   return await page.$eval(durationSelector, (span) => {
-    const timeString = span.textContent.trim();
+    const timeString = span.textContent?.trim() || "00:00:00";
     const [hours, minutes, seconds] = timeString.split(":").map(Number);
     return hours * 3600 + minutes * 60 + seconds;
   });
 };
 
-module.exports = sendResources;
+const limitResourcesToMarket = (
+  village: Village,
+  resources: Resources
+): Resources => {
+  const maxCargo = village.getMaxCargo();
+  const totalExcess = resources.getTotal();
+
+  if (totalExcess <= maxCargo) {
+    return resources;
+  }
+
+  const factor = (maxCargo / totalExcess) * ROUNDING_SAFETY_FACTOR;
+  const realCargo = Resources.factor(resources, factor);
+  console.log(
+    `Cargo ${totalExcess} exceeds max cargo ${maxCargo}, scaling to send ${realCargo}.`
+  );
+  return realCargo;
+};
+
+export default sendResources;

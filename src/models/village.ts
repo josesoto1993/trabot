@@ -9,6 +9,10 @@ const REQUEST_THRESHOLD = 0.6;
 const REQUEST_THRESHOLD_NEGATIVE_PRODUCTION = 0.8;
 const OVERFLOW_THRESHOLD = 0.8;
 const OVERFLOW_SAFE_LEVEL = 0.6;
+const RECEIVER_THRESHOLD = 0.7;
+const DONOR_SAFE_LEVEL = 0.5;
+const DONOR_SAFE_VALUE = 40000;
+const MERCHANTS_CAPACITY = Number(process.env.MERCHANTS_CAPACITY);
 
 class Village {
   id: string;
@@ -24,6 +28,7 @@ class Village {
   celebrationTime: number | null = null;
   availableMerchants: number | null = null;
   maxMerchants: number | null = null;
+  merchantsCapacity: number = MERCHANTS_CAPACITY;
   resourceFields: ResourceField[] = [];
   buildings: Building[] = [];
   buildFinishTime: number | null = null;
@@ -55,11 +60,44 @@ class Village {
     return `Village(id: ${this.id}, name: ${this.name})`;
   }
 
+  getMaxCargo(): number {
+    return this.availableMerchants * this.merchantsCapacity;
+  }
+
   getFutureResources(): Resources {
     return Resources.add(
       this.resources || new Resources(0, 0, 0, 0),
       this.ongoingResources || new Resources(0, 0, 0, 0)
     );
+  }
+
+  getMaxReceiveResources(): Resources {
+    const possibleDonation = new Resources(0, 0, 0, 0);
+
+    Resources.getKeys().forEach((resourceType) => {
+      const maxToHave = this.capacity[resourceType] * RECEIVER_THRESHOLD;
+      const maxDonation = maxToHave - this.resources[resourceType];
+
+      possibleDonation[resourceType] = Math.max(maxDonation, 0);
+    });
+
+    return possibleDonation;
+  }
+
+  getMaxSendResources(): Resources {
+    const maxSendResources = new Resources(0, 0, 0, 0);
+
+    Resources.getKeys().forEach((resourceType) => {
+      const minToKeep = Math.min(
+        this.capacity[resourceType] * DONOR_SAFE_LEVEL,
+        DONOR_SAFE_VALUE
+      );
+      const maxSend = this.resources[resourceType] - minToKeep;
+
+      maxSendResources[resourceType] = Math.max(maxSend, 0);
+    });
+
+    return maxSendResources;
   }
 
   getOverflowResources(): Resources {
@@ -72,7 +110,7 @@ class Village {
       }
 
       const futureResources = this.getFutureResources()[resourceType];
-      const maxCapacity = this.capacity?.[resourceType] ?? 0;
+      const maxCapacity = this.capacity[resourceType] ?? 0;
 
       if (futureResources > maxCapacity * OVERFLOW_THRESHOLD) {
         overflowResources[resourceType] =
@@ -88,7 +126,7 @@ class Village {
 
     Resources.getKeys().forEach((resourceType) => {
       const futureResources = this.getFutureResources()[resourceType];
-      const maxCapacity = this.capacity?.[resourceType] ?? 0;
+      const maxCapacity = this.capacity[resourceType] ?? 0;
       const negativeProduction = this.getNetProduction()[resourceType] < 0;
 
       const thresholdDeficit = this.getThresholdDeficit(

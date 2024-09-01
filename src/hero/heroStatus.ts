@@ -1,8 +1,7 @@
 import { Page } from "puppeteer";
 import fs from "fs";
 import path from "path";
-import {
-  HeroIconStatus,
+import HeroIconStatus, {
   HeroIconStatusKeys,
 } from "../constants/heroIconStatus";
 

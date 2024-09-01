@@ -1,5 +1,5 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
-import { TaskNames } from "../constants/taskNames";
+import TaskNames from "../constants/taskNames";
 
 export interface ITaskSchema extends Document {
   _id: mongoose.Schema.Types.ObjectId;

@@ -5,7 +5,7 @@ const {
 import { formatTime } from "../utils/timePrint";
 const { goBuilding } = require("../village/goVillage");
 import { CLICK_DELAY } from "../browser/browserService";
-import { BuildingNames } from "../constants/buildingNames";
+import BuildingNames from "../constants/buildingNames";
 
 const CELEBRATION_TIME_GAP = 4 * 60 * 60;
 

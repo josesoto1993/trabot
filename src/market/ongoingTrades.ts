@@ -1,17 +1,25 @@
-let ongoingTrades = [];
+import Resources from "../models/resources";
+import Trade from "../models/trade";
 
-const addTrade = (trade, duration) => {
+export interface TradeRecord {
+  trade: Trade;
+  finishTime: number;
+}
+
+let ongoingTrades: TradeRecord[] = [];
+
+const addTrade = (trade: Trade, duration: number): void => {
   const finishTime = Date.now() + duration * 1000;
   ongoingTrades.push({ trade, finishTime });
 };
 
-const getTrades = () => {
+const getTrades = (): TradeRecord[] => {
   removeFinishedTrades();
   return ongoingTrades;
 };
 
-const getIncomingResources = (villageName) => {
-  const initialValue = { lumber: 0, clay: 0, iron: 0, crop: 0 };
+const getIncomingResources = (villageName: string): Resources => {
+  const initialValue = new Resources(0, 0, 0, 0);
 
   const trades = getTrades().filter(
     (record) => record.trade.to.name === villageName
@@ -23,22 +31,12 @@ const getIncomingResources = (villageName) => {
 
   return trades
     .map((record) => record.trade.resources)
-    .reduce((acc, resources) => {
-      acc.lumber += resources.lumber;
-      acc.clay += resources.clay;
-      acc.iron += resources.iron;
-      acc.crop += resources.crop;
-      return acc;
-    }, initialValue);
+    .reduce((acc, resources) => Resources.add(acc, resources), initialValue);
 };
 
-const removeFinishedTrades = () => {
+const removeFinishedTrades = (): void => {
   const now = Date.now();
   ongoingTrades = ongoingTrades.filter((trade) => trade.finishTime >= now);
 };
 
-module.exports = {
-  addTrade,
-  getTrades,
-  getIncomingResources,
-};
+export { addTrade, getTrades, getIncomingResources };

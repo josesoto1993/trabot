@@ -1,7 +1,7 @@
 import PriorityBuildingModel, {
   IPriorityBuildingSchema,
 } from "../schemas/PriorityBuildingSchema";
-import { PriorityLevels } from "../constants/priorityLevels";
+import PriorityLevels from "../constants/priorityLevels";
 import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
 
 export interface IPriorityBuilding extends IPriorityBuildingSchema {

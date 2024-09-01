@@ -1,21 +1,20 @@
-const sendResources = require("./sendResources");
-const Resources = require("../models/resources");
-const Trade = require("../models/trade");
+import { Page } from "puppeteer";
+import Resources from "../models/resources";
+import Trade from "../models/trade";
 import { formatTime } from "../utils/timePrint";
-const {
+import {
   getVillages,
   updateVillagesOverviewInfo,
-} = require("../player/playerHandler");
+} from "../player/playerHandler";
+import sendResources from "./sendResources";
+import Village from "../models/village";
+import { TaskResult } from "../index";
 
-const MERCHANTS_CAPACITY = process.env.MERCHANTS_CAPACITY;
-const DONOR_SAFE_LEVEL = 0.5;
-const DONOR_SAFE_VALUE = 40000;
-const ROUNDING_SAFETY_FACTOR = 0.999;
 const DEFICIT_INTERVAL = 3 * 60;
 
 let lastDeficitTime = 0;
 
-const manageDeficit = async (page) => {
+const manageDeficit = async (page: Page): Promise<TaskResult> => {
   const remainingTime = getRemainingTime();
   if (remainingTime > 0) {
     return { nextExecutionTime: remainingTime, skip: true };
@@ -33,17 +32,17 @@ const manageDeficit = async (page) => {
   return { nextExecutionTime: DEFICIT_INTERVAL, skip: false };
 };
 
-const getRemainingTime = () => {
+const getRemainingTime = (): number => {
   const currentTime = Date.now();
   const timePassed = (currentTime - lastDeficitTime) / 1000;
   return DEFICIT_INTERVAL - timePassed;
 };
 
-const updateNextDeficitTime = () => {
+const updateNextDeficitTime = (): void => {
   lastDeficitTime = Date.now();
 };
 
-const checkVillagesDeficit = async (page) => {
+const checkVillagesDeficit = async (page: Page): Promise<void> => {
   try {
     await updateVillagesOverviewInfo(page);
     const villages = getVillages();
@@ -61,7 +60,11 @@ const checkVillagesDeficit = async (page) => {
   }
 };
 
-const checkVillageDeficit = async (page, village, villages) => {
+const checkVillageDeficit = async (
+  page: Page,
+  village: Village,
+  villages: Village[]
+): Promise<void> => {
   const deficitResources = village.getDeficitResources();
 
   if (deficitResources.getTotal() > MERCHANTS_CAPACITY) {
@@ -72,11 +75,11 @@ const checkVillageDeficit = async (page, village, villages) => {
 };
 
 const handleDeficitResources = async (
-  page,
-  villages,
-  village,
-  deficitResources
-) => {
+  page: Page,
+  villages: Village[],
+  village: Village,
+  deficitResources: Resources
+): Promise<void> => {
   console.log(`Village ${village.name} needs resources ${deficitResources}`);
 
   const [donorVillage, resourcesToSend] = findDonorVillageAndRes(
@@ -88,25 +91,27 @@ const handleDeficitResources = async (
     console.log(
       `Village ${village.name} needs to request ${resourcesToSend} from village ${donorVillage.name}`
     );
-    await requestResources(page, donorVillage, village, resourcesToSend);
-    updateVillageResources(donorVillage, village, resourcesToSend);
+    const realResources = await requestResources(
+      page,
+      donorVillage,
+      village,
+      resourcesToSend
+    );
+    updateVillageResources(donorVillage, village, realResources);
   } else {
     console.log(`No one can send resources to ${village.name}`);
   }
 };
 
-const findDonorVillageAndRes = (villages, resourcesToRequest) => {
-  const potentialDonors = [];
+const findDonorVillageAndRes = (
+  villages: Village[],
+  resourcesToRequest: Resources
+): [Village | null, Resources | null] => {
+  const potentialDonors: { village: Village; res: Resources }[] = [];
 
   for (const donorVillage of villages) {
-    const donorResources = Resources.add(
-      donorVillage.resources,
-      donorVillage.ongoingResources
-    );
-
     const possibleDonation = calculatePossibleDonationForDeficit(
-      donorResources,
-      donorVillage.capacity,
+      donorVillage,
       resourcesToRequest
     );
 
@@ -128,23 +133,16 @@ const findDonorVillageAndRes = (villages, resourcesToRequest) => {
 };
 
 const calculatePossibleDonationForDeficit = (
-  donorResources,
-  donorCapacity,
-  resourcesToRequest
-) => {
+  donorVillage: Village,
+  resourcesToRequest: Resources
+): Resources => {
   const possibleDonation = new Resources(0, 0, 0, 0);
+  const maxSendResources = donorVillage.getMaxSendResources();
 
   Resources.getKeys().forEach((resourceType) => {
-    const maxDonation =
-      donorResources[resourceType] -
-      Math.min(
-        donorCapacity[resourceType] * DONOR_SAFE_LEVEL,
-        DONOR_SAFE_VALUE
-      );
-
     possibleDonation[resourceType] = Math.min(
       resourcesToRequest[resourceType],
-      maxDonation
+      maxSendResources[resourceType]
     );
 
     if (possibleDonation[resourceType] < 0) {
@@ -155,31 +153,23 @@ const calculatePossibleDonationForDeficit = (
   return possibleDonation;
 };
 
-const requestResources = async (page, fromVillage, toVillage, resources) => {
-  const resourcesToRequest = limitResourcesToMarket(fromVillage, resources);
-  const trade = new Trade(fromVillage, toVillage, resourcesToRequest);
-  await sendResources(page, trade);
+const requestResources = async (
+  page: Page,
+  fromVillage: Village,
+  toVillage: Village,
+  resources: Resources
+): Promise<Resources> => {
+  const trade = new Trade(fromVillage, toVillage, resources);
+  return await sendResources(page, trade);
 };
 
-const limitResourcesToMarket = (village, deficitResources) => {
-  const maxCargo = village.availableMerchants * MERCHANTS_CAPACITY;
-  const totalDeficit = deficitResources.getTotal();
-
-  if (totalDeficit <= maxCargo) {
-    return deficitResources;
-  }
-
-  const factor = (maxCargo / totalDeficit) * ROUNDING_SAFETY_FACTOR;
-  const realCargoToRequest = Resources.factor(deficitResources, factor);
-  console.log(
-    `Deficit ${totalDeficit} exceeds max cargo ${maxCargo}, scale to request ${realCargoToRequest}`
-  );
-  return realCargoToRequest;
-};
-
-const updateVillageResources = (fromVillage, toVillage, resources) => {
+const updateVillageResources = (
+  fromVillage: Village,
+  toVillage: Village,
+  resources: Resources
+): void => {
   fromVillage.resources = Resources.subtract(fromVillage.resources, resources);
   toVillage.resources = Resources.add(toVillage.resources, resources);
 };
 
-module.exports = manageDeficit;
+export default manageDeficit;

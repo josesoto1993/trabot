@@ -2,7 +2,7 @@ import { Page } from "puppeteer";
 import { goPage } from "../browser/browserService";
 import { getVillagesInfo } from "./listVillagesSimple";
 import { getIncomingResources } from "../market/ongoingTrades";
-import { OverviewTabs } from "../constants/overviewTabs";
+import OverviewTabs from "../constants/overviewTabs";
 import Resources from "../models/resources";
 import Village from "../models/village";
 

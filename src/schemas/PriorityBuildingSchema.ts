@@ -1,5 +1,5 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
-import { PriorityLevels } from "../constants/priorityLevels";
+import PriorityLevels from "../constants/priorityLevels";
 import { IBuildingTypeSchema } from "./buildingTypeSchema";
 
 export interface IPriorityBuildingSchema extends Document {

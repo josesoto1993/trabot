@@ -3,7 +3,7 @@ import { formatTime, formatDateTime } from "../utils/timePrint";
 const { getVillages } = require("../player/playerHandler");
 const { goBuilding } = require("../village/goVillage");
 const { getTrainList } = require("../services/trainService");
-import { BuildingNames } from "../constants/buildingNames";
+import BuildingNames from "../constants/buildingNames";
 
 const UNITS_TO_TRAIN = "999";
 const MAX_TRAIN_TIME = 4 * 60 * 60;

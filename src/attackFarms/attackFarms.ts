@@ -1,6 +1,6 @@
 import { Page } from "puppeteer";
 import { goPage, CLICK_DELAY } from "../browser/browserService";
-import { TRAVIAN_FARM_LIST } from "../constants/links";
+import Links from "../constants/links";
 import { formatTime } from "../utils/timePrint";
 import { TaskResult } from "..";
 
@@ -39,7 +39,7 @@ const updateNextAttackTime = (): void => {
 
 const performAttack = async (page: Page): Promise<boolean> => {
   try {
-    await goPage(TRAVIAN_FARM_LIST);
+    await goPage(Links.TRAVIAN_FARM_LIST);
 
     await waitForButtonsToLoad(page);
     await clickButtons(page);
