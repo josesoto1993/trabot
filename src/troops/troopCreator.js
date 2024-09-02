@@ -68,7 +68,7 @@ const getNextTrainRemaining = (trainList) => {
       }
     }
     return minTime;
-  }, MAX_TRAIN_TIME + MIN_TRAIN_DELAY);
+  }, Infinity);
   return minTroopTime - Date.now() / 1000 - MAX_TRAIN_TIME;
 };
 

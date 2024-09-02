@@ -62,7 +62,7 @@ const checkVillagesOverflow = async (page) => {
 const checkVillageOverflow = async (page, village, villages) => {
   const excessResources = village.getOverflowResources();
 
-  if (excessResources.getTotal() > 0) {
+  if (excessResources.getTotal() > MERCHANTS_CAPACITY) {
     await handleOverflowResources(page, villages, village, excessResources);
   } else {
     console.log(`Village ${village.name} does not need to balance resources.`);
