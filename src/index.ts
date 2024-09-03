@@ -1,24 +1,26 @@
-require("dotenv").config();
-const mongoose = require("mongoose");
+import dotenv from "dotenv";
+dotenv.config();
+import mongoose from "mongoose";
 
+import { Page } from "puppeteer";
 import { formatTime, formatTimeMillis } from "./utils/timePrint";
 import { open, close } from "./browser/browserService";
 import login from "./browser/loginService";
 import attackFarms from "./attackFarms/attackFarms";
-const trainTroops = require("./troops/troopCreator");
-const upgradeTroops = require("./troops/troopUpdater");
+import trainTroops from "./troops/troopCreator";
+import upgradeTroops from "./troops/troopUpdater";
 import goAdventure from "./hero/heroAdventure";
-const build = require("./construct/build");
-const redeem = require("./redeemTask/redeemTask");
-const manageOverflow = require("./market/manageOverflow");
-const manageDeficit = require("./market/manageDeficit");
-const manageCelebrations = require("./celebration/celebration");
-const { updateVillages, getPlayer } = require("./player/playerHandler");
-const populate = require("./populators/populator");
+import build from "./construct/build";
+import redeem from "./redeemTask/redeemTask";
+import manageOverflow from "./market/manageOverflow";
+import manageDeficit from "./market/manageDeficit";
+import manageCelebrations from "./celebration/celebration";
+import { updateVillages, getPlayer } from "./player/playerHandler";
+import populate from "./populators/populator";
 import TaskNames from "./constants/taskNames";
-const { isActive } = require("./services/taskService");
+import { isActive } from "./services/taskService";
 
-const taskStats = {};
+const taskStats: Record<string, { totalDuration: number; count: number }> = {};
 
 export interface TaskResult {
   nextExecutionTime: number;
@@ -41,19 +43,19 @@ mongoose
   });
 
 const main = async () => {
-  let page = await initializeBrowser();
+  const page = await initializeBrowser();
   await login(page);
   await initPlayer(page);
   await mainLoop(page);
   await finalizeBrowser();
 };
 
-const initPlayer = async (page) => {
+const initPlayer = async (page: Page) => {
   await updateVillages(page);
   console.log(`Player loaded: ${getPlayer()}`);
 };
 
-const mainLoop = async (page) => {
+const mainLoop = async (page: Page) => {
   try {
     let loopNumber = 0;
     let nextLoop = 0;
@@ -106,7 +108,10 @@ const finalizeBrowser = async () => {
   }
 };
 
-const runTaskWithTimer = async (taskName: TaskNames, task) => {
+const runTaskWithTimer = async (
+  taskName: TaskNames,
+  task: () => Promise<TaskResult>
+) => {
   const taskStatus = await isActive(taskName);
   if (!taskStatus) {
     console.log(`\n---------------- ${taskName} skip ----------------`);
