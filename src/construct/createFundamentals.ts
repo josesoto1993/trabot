@@ -1,15 +1,23 @@
-const createBuilding = require("./createBuilding");
-const { getBuildingCategory } = require("../services/buildingCategoryService");
-const { getAllByPriority } = require("../services/PriorityBuildingService");
-import { PriorityLevels } from "../constants/priorityLevels";
-import { BuildingCategory } from "../constants/buildingCategories";
+import { Page } from "puppeteer";
+import createBuilding from "./createBuilding";
+import { getBuildingCategory } from "../services/buildingCategoryService";
+import { getAllByPriority } from "../services/PriorityBuildingService";
+import PriorityLevels from "../constants/priorityLevels";
+import BuildingCategory from "../constants/buildingCategories";
+import Village from "../models/village";
+import Building from "../models/building";
+import { IBuildingType } from "../services/buildingTypeService";
 
-const createFundamentals = async (page, village) => {
+const createFundamentals = async (
+  page: Page,
+  village: Village
+): Promise<number | null> => {
   const fundamentals = await getAllByPriority(PriorityLevels.FUNDAMENTAL);
+
   for (const fundamental of fundamentals) {
     const fundamentalBuilding = fundamental.building;
     const buildingExists = village.buildings.some(
-      (building) => building.name === fundamentalBuilding.name
+      (building: Building) => building.name === fundamentalBuilding.name
     );
 
     if (!buildingExists) {
@@ -28,10 +36,10 @@ const createFundamentals = async (page, village) => {
 };
 
 const createFundamentalBuilding = async (
-  page,
-  village,
-  fundamentalBuilding
-) => {
+  page: Page,
+  village: Village,
+  fundamentalBuilding: IBuildingType
+): Promise<number | null> => {
   const availableSlotId = await getAvailableSlotId(
     fundamentalBuilding,
     village
@@ -56,18 +64,19 @@ const createFundamentalBuilding = async (
   );
 };
 
-const getAvailableSlotId = async (fundamentalBuilding, village) => {
+const getAvailableSlotId = async (
+  fundamentalBuilding: IBuildingType,
+  village: Village
+): Promise<number | undefined> => {
   const otherCategory = await getBuildingCategory(BuildingCategory.OTHER);
-  if (fundamentalBuilding.category._id.equals(otherCategory._id)) {
+
+  if (fundamentalBuilding.category.name === otherCategory.name) {
     return fundamentalBuilding.slot;
   }
 
   return village.buildings.find(
-    (building) =>
-      building.name === null ||
-      building.name === "null" ||
-      building.name.trim() === ""
+    (building: Building) => !building.name || building.name.trim() === ""
   )?.slotId;
 };
 
-module.exports = createFundamentals;
+export default createFundamentals;

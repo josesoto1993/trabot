@@ -2,10 +2,10 @@ import PriorityBuildingModel, {
   IPriorityBuildingSchema,
 } from "../schemas/PriorityBuildingSchema";
 import PriorityLevels from "../constants/priorityLevels";
-import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
+import { IBuildingType } from "./buildingTypeService";
 
 export interface IPriorityBuilding extends IPriorityBuildingSchema {
-  building: IBuildingTypeSchema;
+  building: IBuildingType;
 }
 
 export const getAll = async (): Promise<IPriorityBuilding[]> => {
@@ -47,7 +47,7 @@ export const getAllByPriority = async (
 
 export const upsert = async (
   priority: PriorityLevels,
-  building: IBuildingTypeSchema,
+  building: IBuildingType,
   targetLevel: number
 ): Promise<IPriorityBuildingSchema | null> => {
   if (!Object.values(PriorityLevels).includes(priority)) {
@@ -72,7 +72,7 @@ export const upsert = async (
 
 export const remove = async (
   priority: PriorityLevels,
-  building: IBuildingTypeSchema
+  building: IBuildingType
 ): Promise<IPriorityBuildingSchema | null> => {
   if (!Object.values(PriorityLevels).includes(priority)) {
     throw new Error(`Invalid priority level: ${priority}`);

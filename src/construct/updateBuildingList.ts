@@ -1,15 +1,20 @@
-const { upgradeExistingBuilding } = require("./upgradeExistingBuilding");
-import { ConstructionStatus } from "../constants/constructionStatus";
-const { getBuildingType } = require("../services/buildingTypeService");
+import { Page } from "puppeteer";
+import { upgradeExistingBuilding } from "./upgradeExistingBuilding";
+import ConstructionStatus from "../constants/constructionStatus";
+import { getBuildingType } from "../services/buildingTypeService";
+import Village from "../models/village";
+import { IPriorityBuilding } from "../services/PriorityBuildingService";
+import Building from "../models/building";
+import PriorityLevels from "../constants/priorityLevels";
 
 const updateBuildingList = async (
-  page,
-  village,
-  buildingsToUpgrade,
-  priority
-) => {
+  page: Page,
+  village: Village,
+  buildingsToUpgrade: IPriorityBuilding[],
+  priority: PriorityLevels
+): Promise<number | null> => {
   const buildingsToUpgradeInVillage = filterBuildingsToUpgrade(
-    village,
+    village.buildings,
     buildingsToUpgrade
   );
   const building = getFirstBuildingToUpgrade(buildingsToUpgradeInVillage);
@@ -24,32 +29,42 @@ const updateBuildingList = async (
   return null;
 };
 
-const filterBuildingsToUpgrade = (village, buildingsToUpgrade) => {
-  const filteredBuildings = [];
-
-  for (const buildingToUpgrade of buildingsToUpgrade) {
-    const matchingVillageBuildings = village.buildings.filter(
-      (villageBuilding) =>
-        villageBuilding.name === buildingToUpgrade.building.name &&
-        villageBuilding.level < buildingToUpgrade.targetLevel &&
-        villageBuilding.constructionStatus ===
-          ConstructionStatus.READY_TO_UPGRADE
-    );
-
-    filteredBuildings.push(...matchingVillageBuildings);
-  }
-
-  return filteredBuildings;
+const filterBuildingsToUpgrade = (
+  villageBuildings: Building[],
+  buildingsToUpgrade: IPriorityBuilding[]
+): Building[] => {
+  return buildingsToUpgrade.flatMap((buildingToUpgrade) =>
+    villageBuildings.filter((villageBuilding) =>
+      isValidBuilding(villageBuilding, buildingToUpgrade)
+    )
+  );
 };
 
-const getFirstBuildingToUpgrade = (buildingsToUpgradeInVillage) => {
+const isValidBuilding = (
+  villageBuilding: Building,
+  buildingToUpgrade: IPriorityBuilding
+): boolean => {
+  return (
+    villageBuilding.name === buildingToUpgrade.building.name &&
+    villageBuilding.level < buildingToUpgrade.targetLevel &&
+    villageBuilding.constructionStatus === ConstructionStatus.READY_TO_UPGRADE
+  );
+};
+
+const getFirstBuildingToUpgrade = (
+  buildingsToUpgradeInVillage: Building[]
+): Building | null => {
   if (buildingsToUpgradeInVillage.length > 0) {
     return buildingsToUpgradeInVillage[0];
   }
   return null;
 };
 
-const upgradeBuilding = async (page, village, building) => {
+const upgradeBuilding = async (
+  page: Page,
+  village: Village,
+  building: Building
+): Promise<number | null> => {
   console.log(
     `Upgrading building ${building.name} in village ${village.name} from level ${building.level}`
   );
@@ -65,4 +80,4 @@ const upgradeBuilding = async (page, village, building) => {
   return upgradeTime;
 };
 
-module.exports = updateBuildingList;
+export default updateBuildingList;

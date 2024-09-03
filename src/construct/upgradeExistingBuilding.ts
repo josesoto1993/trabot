@@ -1,18 +1,25 @@
-const { URL } = require("url");
+import { ElementHandle, Page } from "puppeteer";
+import { URL } from "url";
 import { goPage, CLICK_DELAY } from "../browser/browserService";
-import { TRAVIAN_BUILD_VIEW } from "../constants/links";
-const {
+import Link from "../constants/links";
+import {
   updatePlayerBuilding,
   updatePlayerField,
   updatePlayerVillageBuildFinishAt,
-} = require("../player/playerHandler");
+} from "../player/playerHandler";
+import { IBuildingType } from "../services/buildingTypeService";
 
-const upgradeExistingBuilding = async (
-  page,
-  villageId,
-  slotId,
-  buildingType
-) => {
+interface UpgradeResult {
+  duration: number | null;
+  level: number | null;
+}
+
+export const upgradeExistingBuilding = async (
+  page: Page,
+  villageId: string,
+  slotId: number,
+  buildingType: IBuildingType
+): Promise<number | null> => {
   await selectBuilding(villageId, slotId);
   const { duration, level } = await upgradeSelectedBuilding(page);
   if (!duration) {
@@ -24,7 +31,11 @@ const upgradeExistingBuilding = async (
   return duration;
 };
 
-const upgradeExistingField = async (page, villageId, slotId) => {
+export const upgradeExistingField = async (
+  page: Page,
+  villageId: string,
+  slotId: number
+): Promise<number | null> => {
   await selectBuilding(villageId, slotId);
   const { duration, level } = await upgradeSelectedBuilding(page);
   if (!duration) {
@@ -36,16 +47,19 @@ const upgradeExistingField = async (page, villageId, slotId) => {
   return duration;
 };
 
-const selectBuilding = async (villageId, slotId) => {
-  const villageUrl = new URL(TRAVIAN_BUILD_VIEW);
+const selectBuilding = async (
+  villageId: string,
+  slotId: number
+): Promise<void> => {
+  const villageUrl = new URL(Link.TRAVIAN_BUILD_VIEW);
   villageUrl.searchParams.append("newdid", villageId);
-  villageUrl.searchParams.append("id", slotId);
+  villageUrl.searchParams.append("id", slotId.toString());
   await goPage(villageUrl);
 
   console.log(`Clicked on city with id ${villageId} building ${slotId}`);
 };
 
-const upgradeSelectedBuilding = async (page) => {
+const upgradeSelectedBuilding = async (page: Page): Promise<UpgradeResult> => {
   const buildButton = await getBuildButton(page);
   if (!buildButton) {
     console.log("No build button found.");
@@ -61,7 +75,9 @@ const upgradeSelectedBuilding = async (page) => {
   return { duration: durationValue, level: oldLevel };
 };
 
-const getBuildButton = async (page) => {
+const getBuildButton = async (
+  page: Page
+): Promise<ElementHandle<Element> | null> => {
   const buildSelector =
     "#build .upgradeBuilding .upgradeButtonsContainer .section1";
   const buildButtonSelector = buildSelector + " .build:not(.disabled)";
@@ -71,7 +87,7 @@ const getBuildButton = async (page) => {
   const buildButton = await page.$(buildButtonSelector);
   if (buildButton) {
     const buttonText = await page.evaluate(
-      (button) => button.innerText,
+      (button: any) => button.innerText,
       buildButton
     );
     if (buttonText.includes("Upgrade to level")) {
@@ -82,12 +98,12 @@ const getBuildButton = async (page) => {
   return null;
 };
 
-const getDurationValue = async (page) => {
+const getDurationValue = async (page: Page): Promise<number> => {
   const buildTimerSelector =
     ".upgradeButtonsContainer .section1 .duration .value";
 
   await page.waitForSelector(buildTimerSelector);
-  const durationValue = await page.$eval(buildTimerSelector, (span) => {
+  const durationValue = await page.$eval(buildTimerSelector, (span: any) => {
     const timeString = span.textContent.trim();
     const [hours, minutes, seconds] = timeString.split(":").map(Number);
     return hours * 3600 + minutes * 60 + seconds;
@@ -96,18 +112,13 @@ const getDurationValue = async (page) => {
   return durationValue;
 };
 
-const getLevelValue = async (page) => {
+const getLevelValue = async (page: Page): Promise<number> => {
   const contentSelector = "#content .titleInHeader .level";
 
   await page.waitForSelector(contentSelector);
 
-  const levelValue = await page.$eval(contentSelector, (span) => {
+  return await page.$eval(contentSelector, (span: any) => {
     const levelText = span.textContent.trim();
-    const levelNumber = parseInt(levelText.replace(/\D/g, ""), 10);
-    return levelNumber;
+    return parseInt(levelText.replace(/\D/g, ""), 10);
   });
-
-  return levelValue;
 };
-
-module.exports = { upgradeExistingBuilding, upgradeExistingField };

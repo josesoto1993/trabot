@@ -1,25 +1,36 @@
-const { URL } = require("url");
+import { URL } from "url";
+import { Page } from "puppeteer";
 import { goPage, CLICK_DELAY } from "../browser/browserService";
-import { TRAVIAN_BUILD_VIEW } from "../constants/links";
-const {
+import Link from "../constants/links";
+import {
   updatePlayerBuilding,
   updatePlayerVillageBuildFinishAt,
-} = require("../player/playerHandler");
-const { getBuildingType } = require("../services/buildingTypeService");
-require("../services/buildingCategoryService");
+} from "../player/playerHandler";
+import { getBuildingType } from "../services/buildingTypeService";
 
-const createBuilding = async (page, villageId, slotId, buildingName) => {
+interface BuildResult {
+  time: number | null;
+  error: string | null;
+}
+
+const createBuilding = async (
+  page: Page,
+  villageId: string,
+  slotId: number,
+  buildingName: string
+): Promise<number | null> => {
   const buildingType = await getBuildingType(buildingName);
   if (!buildingType) {
-    throw new Error(`buildingName ${buildingName} not in BuildingType`);
+    throw new Error(`Building name ${buildingName} not found in BuildingType`);
   }
 
   await selectSlot(villageId, slotId, buildingType.category.value);
 
   const result = await buildSelectedBuilding(page, buildingType.name);
   await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
+
   if (result.error) {
-    console.log("Error on create building:", result.error);
+    console.error("Error in creating building:", result.error);
     return null;
   }
 
@@ -28,18 +39,25 @@ const createBuilding = async (page, villageId, slotId, buildingName) => {
   return result.time;
 };
 
-const selectSlot = async (villageId, slotId, categoryValue) => {
-  const villageUrl = new URL(TRAVIAN_BUILD_VIEW);
+const selectSlot = async (
+  villageId: string,
+  slotId: number,
+  categoryValue: number
+): Promise<void> => {
+  const villageUrl = new URL(Link.TRAVIAN_BUILD_VIEW);
   villageUrl.searchParams.append("newdid", villageId);
-  villageUrl.searchParams.append("id", slotId);
-  villageUrl.searchParams.append("category", categoryValue);
+  villageUrl.searchParams.append("id", slotId.toString());
+  villageUrl.searchParams.append("category", categoryValue.toString());
   await goPage(villageUrl);
 
   console.log(`selectSlot: ${villageId} / ${slotId} / ${categoryValue}`);
 };
 
-const buildSelectedBuilding = async (page, buildingName) => {
-  return await page.evaluate((buildingName) => {
+const buildSelectedBuilding = async (
+  page: Page,
+  buildingName: string
+): Promise<BuildResult> => {
+  return await page.evaluate((buildingName: string) => {
     const buildDiv = document.getElementById("build");
     if (!buildDiv) {
       return { time: null, error: "ERROR!! div#build not found" };
@@ -80,9 +98,10 @@ const buildSelectedBuilding = async (page, buildingName) => {
     const [hours, minutes, seconds] = durationText.split(":").map(Number);
     const durationValue = hours * 3600 + minutes * 60 + seconds;
 
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const contractLink = contractWrapper.querySelector(
       ".contractLink button:is(.build, .new)"
-    );
+    ) as HTMLButtonElement;
 
     if (contractLink) {
       contractLink.click();
@@ -94,4 +113,4 @@ const buildSelectedBuilding = async (page, buildingName) => {
   }, buildingName);
 };
 
-module.exports = createBuilding;
+export default createBuilding;
