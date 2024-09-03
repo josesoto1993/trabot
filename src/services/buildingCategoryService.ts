@@ -2,6 +2,10 @@ import BuildingCategoryModel, {
   IBuildingCategorySchema,
 } from "../schemas/buildingCategorySchema";
 
+export interface IBuildingCategoryUpsertData {
+  name: string;
+  value: number;
+}
 export interface IBuildingCategory extends IBuildingCategorySchema {}
 
 let cachedCategories: Record<string, IBuildingCategory> | null = null;
@@ -27,10 +31,10 @@ export const getBuildingCategory = async (
 };
 
 export const upsertBuildingCategory = async (
-  category: IBuildingCategory
+  data: IBuildingCategoryUpsertData
 ): Promise<IBuildingCategorySchema | null> => {
-  const filter = { name: category.name };
-  const update = { value: category.value };
+  const filter = { name: data.name };
+  const update = { value: data.value };
   const options = { new: true, upsert: true, setDefaultsOnInsert: true };
 
   const result = await BuildingCategoryModel.findOneAndUpdate(

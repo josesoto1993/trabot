@@ -1,5 +1,9 @@
 import TaskModel, { ITaskSchema } from "../schemas/taskSchema";
 
+export interface ITaskUpsertData {
+  name: string;
+  status: boolean;
+}
 export interface ITask extends ITaskSchema {}
 
 export const isActive = async (name: string): Promise<boolean | null> => {
@@ -9,11 +13,10 @@ export const isActive = async (name: string): Promise<boolean | null> => {
 };
 
 export const upsert = async (
-  name: string,
-  status: boolean
+  data: ITaskUpsertData
 ): Promise<ITaskSchema | null> => {
-  const filter = { name };
-  const update = { isActive: status };
+  const filter = { name: data.name };
+  const update = { isActive: data.status };
   const options = { new: true, upsert: true, runValidators: true };
 
   return await TaskModel.findOneAndUpdate(filter, update, options).exec();

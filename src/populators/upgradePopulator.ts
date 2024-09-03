@@ -1,7 +1,7 @@
-const { getUpgradeList } = require("../services/upgradeUnitService");
+import { getUpgradeList } from "../services/upgradeUnitService";
 
-const ensureUpgradeCollectionExists = async () => {
-  console.log("Ensure upgrade table exist or else create");
+const ensureUpgradeCollectionExists = async (): Promise<void> => {
+  console.log("Ensure upgrade table exists or else create");
   try {
     await getUpgradeList();
     console.log("Upgrade collection ensured.");
@@ -10,4 +10,4 @@ const ensureUpgradeCollectionExists = async () => {
   }
 };
 
-module.exports = ensureUpgradeCollectionExists;
+export default ensureUpgradeCollectionExists;

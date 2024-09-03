@@ -1,12 +1,12 @@
-const populateBuildingCategories = require("./buildingCategoryPopulator");
-const populateBuildingTypes = require("./buildingTypePopulator");
-const populatePriorityBuildings = require("./PriorityBuildingPopulator");
-const populateTasks = require("./taskPopulator");
-const ensureTrainCollectionExists = require("./trainPopulator");
-const populateUnits = require("./unitPopulator");
-const ensureUpgradeCollectionExists = require("./upgradePopulator");
+import populateBuildingCategories from "./buildingCategoryPopulator";
+import populateBuildingTypes from "./buildingTypePopulator";
+import populatePriorityBuildings from "./PriorityBuildingPopulator";
+import populateTasks from "./taskPopulator";
+import ensureTrainCollectionExists from "./trainPopulator";
+import populateUnits from "./unitPopulator";
+import ensureUpgradeCollectionExists from "./upgradePopulator";
 
-const populate = async () => {
+const populate = async (): Promise<void> => {
   console.log("Start population");
   await populateTasks();
 
@@ -20,4 +20,4 @@ const populate = async () => {
   console.log("End population");
 };
 
-module.exports = populate;
+export default populate;

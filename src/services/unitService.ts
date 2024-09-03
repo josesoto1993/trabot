@@ -1,6 +1,12 @@
 import UnitModel, { IUnitSchema } from "../schemas/unitSchema";
 import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
+import UnitNames from "../constants/unitsNames";
 
+export interface IUnitUpsertData {
+  name: UnitNames;
+  selector: string;
+  building: IBuildingTypeSchema;
+}
 export interface IUnit extends IUnitSchema {
   building: IBuildingTypeSchema;
 }
@@ -29,12 +35,12 @@ export const getUnit = async (name: string): Promise<IUnit | undefined> => {
 };
 
 export const upsertUnit = async (
-  unitData: IUnitSchema
-): Promise<IUnit | null> => {
-  const filter = { name: unitData.name };
+  data: IUnitUpsertData
+): Promise<IUnitSchema | null> => {
+  const filter = { name: data.name };
   const update = {
-    selector: unitData.selector,
-    building: unitData.building,
+    selector: data.selector,
+    building: data.building._id,
   };
   const options = { new: true, upsert: true };
 
@@ -46,7 +52,7 @@ export const upsertUnit = async (
 
   cleanCache();
 
-  return result as IUnit;
+  return result;
 };
 
 const cleanCache = (): void => {

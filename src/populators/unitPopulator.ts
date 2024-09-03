@@ -1,9 +1,9 @@
-const { upsertUnit } = require("../services/unitService");
-const { getBuildingType } = require("../services/buildingTypeService");
-import { BuildingNames } from "../constants/buildingNames";
-import { UnitNames } from "../constants/unitsNames";
+import { IUnitUpsertData, upsertUnit } from "../services/unitService";
+import { getBuildingType } from "../services/buildingTypeService";
+import BuildingNames from "../constants/buildingNames";
+import UnitNames from "../constants/unitsNames";
 
-const populateUnits = async () => {
+const populateUnits = async (): Promise<void> => {
   console.log("start populating units");
 
   const units = await getBaseUnits();
@@ -11,14 +11,14 @@ const populateUnits = async () => {
     try {
       await upsertUnit(unit);
     } catch (error) {
-      console.error(`Error upserting unit "${unit}":`, error);
+      console.error(`Error upserting unit "${unit.name}":`, error);
     }
   }
 
   console.log("finish populating units");
 };
 
-const getBaseUnits = async () => {
+const getBaseUnits = async (): Promise<IUnitUpsertData[]> => {
   const barracks = await getBuildingType(BuildingNames.BARRACKS);
   const stable = await getBuildingType(BuildingNames.STABLE);
   const workshop = await getBuildingType(BuildingNames.WORKSHOP);
@@ -83,4 +83,4 @@ const getBaseUnits = async () => {
   ];
 };
 
-module.exports = populateUnits;
+export default populateUnits;

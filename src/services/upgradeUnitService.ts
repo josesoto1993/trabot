@@ -2,7 +2,12 @@ import { getUnit, IUnit } from "./unitService";
 import UpgradeUnitModel, {
   IUpgradeUnitSchema,
 } from "../schemas/upgradeUnitSchema";
+import UnitNames from "../constants/unitsNames";
 
+export interface IUpgradeUnitUpsertData {
+  villageName: string;
+  unitName: UnitNames;
+}
 export interface IUpgradeUnit {
   villageName: string;
   unit: IUnit;
@@ -33,22 +38,26 @@ export const clearVillage = async (villageName: string): Promise<void> => {
 };
 
 export const removeUpgrade = async (
-  villageName: string,
-  unitName: string
+  upgrade: IUpgradeUnitUpsertData
 ): Promise<void> => {
-  const filter = { villageName, unitName };
+  const filter = {
+    villageName: upgrade.villageName,
+    unitName: upgrade.unitName,
+  };
   await UpgradeUnitModel.deleteOne(filter).exec();
 };
 
 export const insertUpgrade = async (
-  villageName: string,
-  unitName: string
+  upgrade: IUpgradeUnitUpsertData
 ): Promise<IUpgradeUnitSchema> => {
-  const unit = await getUnit(unitName);
+  const unit = await getUnit(upgrade.unitName);
   if (!unit) {
-    throw new Error(`Unit "${unitName}" not found`);
+    throw new Error(`Unit "${upgrade.unitName}" not found`);
   }
 
-  const newUpgrade = new UpgradeUnitModel({ villageName, unitName });
+  const newUpgrade = new UpgradeUnitModel({
+    villageName: upgrade.villageName,
+    unitName: upgrade.unitName,
+  });
   return await newUpgrade.save();
 };

@@ -1,9 +1,10 @@
-import { BuildingCategory } from "../constants/buildingCategories";
-const {
+import BuildingCategory from "../constants/buildingCategories";
+import {
+  IBuildingCategoryUpsertData,
   upsertBuildingCategory,
-} = require("../services/buildingCategoryService");
+} from "../services/buildingCategoryService";
 
-const populateBuildingCategories = async () => {
+const populateBuildingCategories = async (): Promise<void> => {
   console.log("start populate building categories");
 
   const categories = getBaseBuildingCategories();
@@ -18,7 +19,7 @@ const populateBuildingCategories = async () => {
   console.log("finish populate building categories");
 };
 
-const getBaseBuildingCategories = () => {
+const getBaseBuildingCategories = (): IBuildingCategoryUpsertData[] => {
   return [
     { name: BuildingCategory.INFRASTRUCTURE, value: 1 },
     { name: BuildingCategory.MILITARY, value: 2 },
@@ -28,4 +29,4 @@ const getBaseBuildingCategories = () => {
   ];
 };
 
-module.exports = populateBuildingCategories;
+export default populateBuildingCategories;

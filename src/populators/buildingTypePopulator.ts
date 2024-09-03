@@ -1,9 +1,12 @@
-const { upsertBuildingType } = require("../services/buildingTypeService");
-const { getBuildingCategory } = require("../services/buildingCategoryService");
-import { BuildingCategory } from "../constants/buildingCategories";
-import { BuildingNames } from "../constants/buildingNames";
+import {
+  IBuildingTypeUpsertData,
+  upsertBuildingType,
+} from "../services/buildingTypeService";
+import { getBuildingCategory } from "../services/buildingCategoryService";
+import BuildingCategory from "../constants/buildingCategories";
+import BuildingNames from "../constants/buildingNames";
 
-const populateBuildingTypes = async () => {
+const populateBuildingTypes = async (): Promise<void> => {
   console.log("start populate building types");
 
   const buildingTypes = await getBaseBuildingTypes();
@@ -28,7 +31,7 @@ const populateBuildingTypes = async () => {
   console.log("finish populate building types");
 };
 
-const getBaseBuildingTypes = async () => {
+const getBaseBuildingTypes = async (): Promise<IBuildingTypeUpsertData[]> => {
   const buildingCategoryOther = await getBuildingCategory(
     BuildingCategory.OTHER
   );
@@ -42,7 +45,7 @@ const getBaseBuildingTypes = async () => {
     BuildingCategory.INFRASTRUCTURE
   );
 
-  const buildingTypes = [
+  return [
     {
       structureId: 22,
       name: BuildingNames.ACADEMY,
@@ -186,8 +189,6 @@ const getBaseBuildingTypes = async () => {
       category: buildingCategoryMilitary,
     },
   ];
-
-  return buildingTypes;
 };
 
-module.exports = populateBuildingTypes;
+export default populateBuildingTypes;

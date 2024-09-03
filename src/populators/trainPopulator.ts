@@ -1,7 +1,7 @@
-const { getTrainList } = require("../services/trainService");
+import { getTrainList } from "../services/trainService";
 
-const ensureTrainCollectionExists = async () => {
-  console.log("Ensure train table exist or else create");
+const ensureTrainCollectionExists = async (): Promise<void> => {
+  console.log("Ensure train table exists or else create");
   try {
     await getTrainList();
     console.log("Train collection ensured.");
@@ -10,4 +10,4 @@ const ensureTrainCollectionExists = async () => {
   }
 };
 
-module.exports = ensureTrainCollectionExists;
+export default ensureTrainCollectionExists;

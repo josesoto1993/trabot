@@ -4,6 +4,11 @@ import PriorityBuildingModel, {
 import PriorityLevels from "../constants/priorityLevels";
 import { IBuildingType } from "./buildingTypeService";
 
+export interface IPriorityBuildingUpsertData {
+  priority: PriorityLevels;
+  building: IBuildingType;
+  targetLevel: number;
+}
 export interface IPriorityBuilding extends IPriorityBuildingSchema {
   building: IBuildingType;
 }
@@ -46,20 +51,21 @@ export const getAllByPriority = async (
 };
 
 export const upsert = async (
-  priority: PriorityLevels,
-  building: IBuildingType,
-  targetLevel: number
+  data: IPriorityBuildingUpsertData
 ): Promise<IPriorityBuildingSchema | null> => {
-  if (!Object.values(PriorityLevels).includes(priority)) {
-    throw new Error(`Invalid priority level: ${priority}`);
+  if (!Object.values(PriorityLevels).includes(data.priority)) {
+    throw new Error(`Invalid priority level: ${data.priority}`);
   }
 
-  const filter = { priority, building };
+  const filter = {
+    priority: data.priority,
+    building: data.building._id,
+  };
   const update = {
-    priority: priority,
-    building: building,
-    buildingAuxName: building.name,
-    targetLevel: targetLevel,
+    priority: data.priority,
+    building: data.building._id,
+    buildingAuxName: data.building.name,
+    targetLevel: data.targetLevel,
   };
   const options = { new: true, upsert: true };
 

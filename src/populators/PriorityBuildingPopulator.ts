@@ -1,31 +1,24 @@
-import { PriorityLevels } from "../constants/priorityLevels";
-const { upsert } = require("../services/PriorityBuildingService");
-const { getBuildingType } = require("../services/buildingTypeService");
-import { BuildingNames } from "../constants/buildingNames";
+import PriorityLevels from "../constants/priorityLevels";
+import {
+  IPriorityBuildingUpsertData,
+  upsert,
+} from "../services/PriorityBuildingService";
+import { getBuildingType } from "../services/buildingTypeService";
+import BuildingNames from "../constants/buildingNames";
 
-const populatePriorityBuildings = async () => {
+const populatePriorityBuildings = async (): Promise<void> => {
   try {
-    console.log("start populate priority building");
+    console.log("start populate priority buildings");
 
-    const fundamentalBuildings = await getFundamentalBuildings();
-    const highPriorityBuildings = await getHighPriorityBuildings();
-    const midPriorityBuildings = await getMidPriorityBuildings();
-    const lowPriorityBuildings = await getLowPriorityBuildings();
+    const priorityBuildings = [
+      ...(await getFundamentalBuildings()),
+      ...(await getHighPriorityBuildings()),
+      ...(await getMidPriorityBuildings()),
+      ...(await getLowPriorityBuildings()),
+    ];
 
-    for (const { building, targetLevel } of fundamentalBuildings) {
-      await upsert(PriorityLevels.FUNDAMENTAL, building, targetLevel);
-    }
-
-    for (const { building, targetLevel } of highPriorityBuildings) {
-      await upsert(PriorityLevels.HIGH, building, targetLevel);
-    }
-
-    for (const { building, targetLevel } of midPriorityBuildings) {
-      await upsert(PriorityLevels.MID, building, targetLevel);
-    }
-
-    for (const { building, targetLevel } of lowPriorityBuildings) {
-      await upsert(PriorityLevels.LOW, building, targetLevel);
+    for (const priorityBuilding of priorityBuildings) {
+      await upsert(priorityBuilding);
     }
 
     console.log("finish populate priority buildings");
@@ -34,122 +27,102 @@ const populatePriorityBuildings = async () => {
   }
 };
 
-const getFundamentalBuildings = async () => {
-  return [
-    await getBuildingType(BuildingNames.MAIN_BUILDING),
-    await getBuildingType(BuildingNames.RALLY_POINT),
-    await getBuildingType(BuildingNames.PALISADE),
-    await getBuildingType(BuildingNames.WAREHOUSE),
-    await getBuildingType(BuildingNames.GRANARY),
-    await getBuildingType(BuildingNames.MARKETPLACE),
-    await getBuildingType(BuildingNames.RESIDENCE),
-    await getBuildingType(BuildingNames.GRAIN_MILL),
-    await getBuildingType(BuildingNames.BRICKYARD),
-    await getBuildingType(BuildingNames.SAWMILL),
-    await getBuildingType(BuildingNames.IRON_FOUNDRY),
-    await getBuildingType(BuildingNames.ACADEMY),
-    await getBuildingType(BuildingNames.TOWN_HALL),
-    await getBuildingType(BuildingNames.BAKERY),
-  ].map((building) => ({ building, targetLevel: 1 }));
-};
-
-const getHighPriorityBuildings = async () => {
-  return [
-    {
-      building: await getBuildingType(BuildingNames.RESIDENCE),
-      targetLevel: 10,
-    },
-    {
-      building: await getBuildingType(BuildingNames.MAIN_BUILDING),
-      targetLevel: 20,
-    },
-    {
-      building: await getBuildingType(BuildingNames.GRAIN_MILL),
-      targetLevel: 5,
-    },
-    {
-      building: await getBuildingType(BuildingNames.BRICKYARD),
-      targetLevel: 5,
-    },
-    { building: await getBuildingType(BuildingNames.SAWMILL), targetLevel: 5 },
-    {
-      building: await getBuildingType(BuildingNames.IRON_FOUNDRY),
-      targetLevel: 5,
-    },
-    { building: await getBuildingType(BuildingNames.BAKERY), targetLevel: 5 },
-    {
-      building: await getBuildingType(BuildingNames.WAREHOUSE),
-      targetLevel: 9,
-    },
-    { building: await getBuildingType(BuildingNames.GRANARY), targetLevel: 8 },
-    {
-      building: await getBuildingType(BuildingNames.MARKETPLACE),
-      targetLevel: 3,
-    },
+const getFundamentalBuildings = async (): Promise<
+  IPriorityBuildingUpsertData[]
+> => {
+  const buildingNames = [
+    BuildingNames.MAIN_BUILDING,
+    BuildingNames.RALLY_POINT,
+    BuildingNames.PALISADE,
+    BuildingNames.WAREHOUSE,
+    BuildingNames.GRANARY,
+    BuildingNames.MARKETPLACE,
+    BuildingNames.RESIDENCE,
+    BuildingNames.GRAIN_MILL,
+    BuildingNames.BRICKYARD,
+    BuildingNames.SAWMILL,
+    BuildingNames.IRON_FOUNDRY,
+    BuildingNames.ACADEMY,
+    BuildingNames.TOWN_HALL,
+    BuildingNames.BAKERY,
   ];
+
+  return Promise.all(
+    buildingNames.map(async (name) => ({
+      priority: PriorityLevels.FUNDAMENTAL,
+      building: await getBuildingType(name),
+      targetLevel: 1,
+    }))
+  );
 };
 
-const getMidPriorityBuildings = async () => {
-  return [
-    {
-      building: await getBuildingType(BuildingNames.BARRACKS),
-      targetLevel: 3,
-    },
-    {
-      building: await getBuildingType(BuildingNames.TOWN_HALL),
-      targetLevel: 10,
-    },
-    {
-      building: await getBuildingType(BuildingNames.MARKETPLACE),
-      targetLevel: 10,
-    },
-    {
-      building: await getBuildingType(BuildingNames.ACADEMY),
-      targetLevel: 10,
-    },
+const getHighPriorityBuildings = async (): Promise<
+  IPriorityBuildingUpsertData[]
+> => {
+  const buildingNames = [
+    { name: BuildingNames.RESIDENCE, level: 10 },
+    { name: BuildingNames.MAIN_BUILDING, level: 20 },
+    { name: BuildingNames.GRAIN_MILL, level: 5 },
+    { name: BuildingNames.BRICKYARD, level: 5 },
+    { name: BuildingNames.SAWMILL, level: 5 },
+    { name: BuildingNames.IRON_FOUNDRY, level: 5 },
+    { name: BuildingNames.BAKERY, level: 5 },
+    { name: BuildingNames.WAREHOUSE, level: 9 },
+    { name: BuildingNames.GRANARY, level: 8 },
+    { name: BuildingNames.MARKETPLACE, level: 3 },
   ];
+
+  return Promise.all(
+    buildingNames.map(async ({ name, level }) => ({
+      priority: PriorityLevels.HIGH,
+      building: await getBuildingType(name),
+      targetLevel: level,
+    }))
+  );
 };
 
-const getLowPriorityBuildings = async () => {
-  return [
-    {
-      building: await getBuildingType(BuildingNames.WAREHOUSE),
-      targetLevel: 20,
-    },
-    {
-      building: await getBuildingType(BuildingNames.GRANARY),
-      targetLevel: 20,
-    },
-    {
-      building: await getBuildingType(BuildingNames.MARKETPLACE),
-      targetLevel: 20,
-    },
-    {
-      building: await getBuildingType(BuildingNames.STONEMASONS_LODGE),
-      targetLevel: 20,
-    },
-    { building: await getBuildingType(BuildingNames.PALACE), targetLevel: 20 },
-    {
-      building: await getBuildingType(BuildingNames.RALLY_POINT),
-      targetLevel: 10,
-    },
-    {
-      building: await getBuildingType(BuildingNames.PALISADE),
-      targetLevel: 10,
-    },
-    {
-      building: await getBuildingType(BuildingNames.TRADE_OFFICE),
-      targetLevel: 10,
-    },
-    {
-      building: await getBuildingType(BuildingNames.ACADEMY),
-      targetLevel: 20,
-    },
-    {
-      building: await getBuildingType(BuildingNames.EMBASSY),
-      targetLevel: 20,
-    },
+const getMidPriorityBuildings = async (): Promise<
+  IPriorityBuildingUpsertData[]
+> => {
+  const buildingNames = [
+    { name: BuildingNames.BARRACKS, level: 3 },
+    { name: BuildingNames.TOWN_HALL, level: 10 },
+    { name: BuildingNames.MARKETPLACE, level: 10 },
+    { name: BuildingNames.ACADEMY, level: 10 },
   ];
+
+  return Promise.all(
+    buildingNames.map(async ({ name, level }) => ({
+      priority: PriorityLevels.MID,
+      building: await getBuildingType(name),
+      targetLevel: level,
+    }))
+  );
 };
 
-module.exports = populatePriorityBuildings;
+const getLowPriorityBuildings = async (): Promise<
+  IPriorityBuildingUpsertData[]
+> => {
+  const buildingNames = [
+    { name: BuildingNames.WAREHOUSE, level: 20 },
+    { name: BuildingNames.GRANARY, level: 20 },
+    { name: BuildingNames.MARKETPLACE, level: 20 },
+    { name: BuildingNames.STONEMASONS_LODGE, level: 20 },
+    { name: BuildingNames.PALACE, level: 20 },
+    { name: BuildingNames.RALLY_POINT, level: 10 },
+    { name: BuildingNames.PALISADE, level: 10 },
+    { name: BuildingNames.TRADE_OFFICE, level: 10 },
+    { name: BuildingNames.ACADEMY, level: 20 },
+    { name: BuildingNames.EMBASSY, level: 20 },
+  ];
+
+  return Promise.all(
+    buildingNames.map(async ({ name, level }) => ({
+      priority: PriorityLevels.LOW,
+      building: await getBuildingType(name),
+      targetLevel: level,
+    }))
+  );
+};
+
+export default populatePriorityBuildings;
