@@ -1,7 +1,7 @@
 import { URL } from "url";
 import { Page } from "puppeteer";
 import { goPage, CLICK_DELAY } from "../browser/browserService";
-import Link from "../constants/links";
+import Links from "../constants/links";
 import {
   updatePlayerBuilding,
   updatePlayerVillageBuildFinishAt,
@@ -44,7 +44,7 @@ const selectSlot = async (
   slotId: number,
   categoryValue: number
 ): Promise<void> => {
-  const villageUrl = new URL(Link.TRAVIAN_BUILD_VIEW);
+  const villageUrl = new URL(Links.TRAVIAN_BUILD_VIEW);
   villageUrl.searchParams.append("newdid", villageId);
   villageUrl.searchParams.append("id", slotId.toString());
   villageUrl.searchParams.append("category", categoryValue.toString());

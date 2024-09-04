@@ -5,6 +5,7 @@ const TRAVIAN_RESOURCES_VIEW: string = `${TRAVIAN_BASE}/dorf1.php`;
 const TRAVIAN_BUILDING_VIEW: string = `${TRAVIAN_BASE}/dorf2.php`;
 const TRAVIAN_BUILD_VIEW: string = `${TRAVIAN_BASE}/build.php`;
 const TRAVIAN_TASK_VIEW: string = `${TRAVIAN_BASE}/tasks`;
+const TRAVIAN_MAP: string = `${TRAVIAN_BASE}/karte.php`;
 
 const Links = {
   TRAVIAN_BASE,
@@ -14,6 +15,7 @@ const Links = {
   TRAVIAN_BUILDING_VIEW,
   TRAVIAN_BUILD_VIEW,
   TRAVIAN_TASK_VIEW,
+  TRAVIAN_MAP,
 };
 
 export default Links;
