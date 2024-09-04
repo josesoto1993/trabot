@@ -10,7 +10,7 @@ import sendResources from "./sendResources";
 import Village from "../models/village";
 import { TaskResult } from "../index";
 
-const DEFICIT_INTERVAL = 3 * 60;
+const DEFICIT_INTERVAL = 13 * 60;
 
 let lastDeficitTime = 0;
 

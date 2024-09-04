@@ -10,7 +10,7 @@ import {
 import Village from "../models/village";
 import { TaskResult } from "../index";
 
-const OVERFLOW_INTERVAL = 4 * 60;
+const OVERFLOW_INTERVAL = 14 * 60;
 
 let lastOverflowTime = 0;
 
