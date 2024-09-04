@@ -23,8 +23,11 @@ const sendResources = async (page: Page, trade: Trade): Promise<Resources> => {
 
     await goMarket(trade.from);
     const actualMerchantsCapacity = await getActualMerchantsCapacity(page);
-    if (actualMerchantsCapacity !== trade.from.merchantsCapacity) {
-      trade.from.merchantsCapacity = await getActualMerchantsCapacity(page);
+    if (
+      actualMerchantsCapacity &&
+      actualMerchantsCapacity !== trade.from.merchantsCapacity
+    ) {
+      trade.from.merchantsCapacity = actualMerchantsCapacity;
       console.log(
         `Upgrade villa ${trade.from.name} merchant capacity to new value ${trade.from.merchantsCapacity}`
       );
@@ -56,7 +59,14 @@ const getActualMerchantsCapacity = async (
   page: Page
 ): Promise<number | null> => {
   const capacitySelector =
-    "#marketplaceSendResources .deliveriesOverview .merchantsInformation .capacity .value";
+    "div#marketplaceSendResources div.deliveriesOverview div.merchantsInformation div.capacity span.value";
+
+  try {
+    await page.waitForSelector(capacitySelector, { timeout: 3000 });
+  } catch (error) {
+    console.log("Failed to load merchants capacity selector.");
+    return null;
+  }
 
   const capacityText = await page.evaluate((selector) => {
     const element = document.querySelector(selector);
@@ -64,7 +74,8 @@ const getActualMerchantsCapacity = async (
   }, capacitySelector);
 
   if (!capacityText) {
-    console.log("Unable to find capacity value.");
+    console.log("Unable to find capacityText.");
+    await new Promise((resolve) => setTimeout(resolve, 30 * 1000));
     return null;
   }
 
@@ -72,6 +83,7 @@ const getActualMerchantsCapacity = async (
 
   if (isNaN(actualCapacity)) {
     console.log("Failed to parse capacity value to a number.");
+    await new Promise((resolve) => setTimeout(resolve, 30 * 1000));
     return null;
   }
 
