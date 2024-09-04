@@ -1,11 +1,12 @@
 {
   "name": "trabot",
-  "version": "1.1.6",
-  "description": "",
-  "main": "src/index.js",
+  "version": "1.2.0",
+  "description": "this is a bot to automate play travian",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "node src/index.js",
-    "pretty": "prettier --write \"./**/*.{js,jsx,ts,html,json}\"",
+    "build": "tsc",
+    "start": "npm run build && node dist/index.js",
+    "pretty": "prettier --write \"./**/*.{js,jsx,ts,tsx,html,json}\"",
     "precommit": "lint-staged",
     "postinstall": "npx husky install"
   },
@@ -40,13 +41,23 @@
   "homepage": "https://github.com/josesoto1993/trabot#readme",
   "dependencies": {
     "dotenv": "^16.4.5",
+    "lodash": "^4.17.21",
     "mongodb": "^6.8.0",
     "mongoose": "^8.5.3",
     "puppeteer": "^22.14.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.7",
+    "@types/mongodb": "^4.0.7",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^22.5.1",
+    "@types/puppeteer": "^7.0.4",
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
+    "eslint": "^9.9.1",
     "husky": "^9.1.4",
-    "lint-staged": "^15.2.7",
-    "prettier": "^3.3.3"
+    "lint-staged": "^15.2.9",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
   }
 }
