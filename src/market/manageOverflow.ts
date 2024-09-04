@@ -10,7 +10,7 @@ import {
 import Village from "../models/village";
 import { TaskResult } from "../index";
 
-const OVERFLOW_INTERVAL = 4 * 60;
+const OVERFLOW_INTERVAL = 14 * 60;
 
 let lastOverflowTime = 0;
 
@@ -66,7 +66,7 @@ const checkVillageOverflow = async (
 ): Promise<void> => {
   const excessResources = village.getOverflowResources();
 
-  if (excessResources.getTotal() > village.merchantsCapacity) {
+  if (excessResources.getTotal() > 0) {
     await handleOverflowResources(page, villages, village, excessResources);
   } else {
     console.log(`Village ${village.name} does not need to balance resources.`);

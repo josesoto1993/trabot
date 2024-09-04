@@ -22,6 +22,16 @@ const sendResources = async (page: Page, trade: Trade): Promise<Resources> => {
     }
 
     await goMarket(trade.from);
+    const actualMerchantsCapacity = await getActualMerchantsCapacity(page);
+    if (
+      actualMerchantsCapacity &&
+      actualMerchantsCapacity !== trade.from.merchantsCapacity
+    ) {
+      trade.from.merchantsCapacity = actualMerchantsCapacity;
+      console.log(
+        `Upgrade villa ${trade.from.name} merchant capacity to new value ${trade.from.merchantsCapacity}`
+      );
+    }
     await setDestination(page, trade.to);
     await setResources(page, trade.resources);
     await verify(page);
@@ -43,6 +53,41 @@ const goMarket = async (village: Village): Promise<void> => {
     [MarketTabs.QUERY_PARAM_KEY]: MarketTabs.SEND_RESOURCES,
   };
   await goBuilding(village, BuildingNames.MARKETPLACE, marketTabSearchParam);
+};
+
+const getActualMerchantsCapacity = async (
+  page: Page
+): Promise<number | null> => {
+  const capacitySelector =
+    "div#marketplaceSendResources div.deliveriesOverview div.merchantsInformation div.capacity span.value";
+
+  try {
+    await page.waitForSelector(capacitySelector, { timeout: 3000 });
+  } catch (error) {
+    console.log("Failed to load merchants capacity selector.");
+    return null;
+  }
+
+  const capacityText = await page.evaluate((selector) => {
+    const element = document.querySelector(selector);
+    return element ? element.textContent : null;
+  }, capacitySelector);
+
+  if (!capacityText) {
+    console.log("Unable to find capacityText.");
+    await new Promise((resolve) => setTimeout(resolve, 30 * 1000));
+    return null;
+  }
+
+  const actualCapacity = parseInt(capacityText.replace(/\D/g, ""), 10);
+
+  if (isNaN(actualCapacity)) {
+    console.log("Failed to parse capacity value to a number.");
+    await new Promise((resolve) => setTimeout(resolve, 30 * 1000));
+    return null;
+  }
+
+  return actualCapacity;
 };
 
 const setDestination = async (page: Page, to: Village): Promise<void> => {
@@ -129,16 +174,49 @@ const limitResourcesToMarket = (
   resources: Resources
 ): Resources => {
   const maxCargo = village.getMaxCargo();
-  const totalExcess = resources.getTotal();
+  const merchantsCapacity = village.merchantsCapacity;
+  const totalRes = resources.getTotal();
 
-  if (totalExcess <= maxCargo) {
-    return resources;
+  if (totalRes > maxCargo) {
+    return limitResourcesToMax(resources, maxCargo);
+  } else {
+    return roundResourcesToMerchant(resources, merchantsCapacity);
   }
+};
 
-  const factor = (maxCargo / totalExcess) * ROUNDING_SAFETY_FACTOR;
+const limitResourcesToMax = (
+  resources: Resources,
+  maxCargo: number
+): Resources => {
+  const totalRes = resources.getTotal();
+  const factor = (maxCargo / totalRes) * ROUNDING_SAFETY_FACTOR;
   const realCargo = Resources.factor(resources, factor);
   console.log(
-    `Cargo ${totalExcess} exceeds max cargo ${maxCargo}, scaling to send ${realCargo}.`
+    `Cargo ${totalRes} exceeds max cargo ${maxCargo}, scaling to send ${realCargo}.`
+  );
+  return realCargo;
+};
+
+const roundResourcesToMerchant = (
+  resources: Resources,
+  merchantsCapacity: number
+): Resources => {
+  const totalRes = resources.getTotal();
+  const adjustedTotalRes =
+    Math.floor(totalRes / merchantsCapacity) * merchantsCapacity;
+
+  if (adjustedTotalRes === 0) {
+    console.log(
+      `Cargo ${totalRes} is too small to fill even one merchant. Stop trade.`
+    );
+    return new Resources(0, 0, 0, 0);
+  }
+
+  const adjustmentFactor =
+    (adjustedTotalRes / totalRes) * ROUNDING_SAFETY_FACTOR;
+  const realCargo = Resources.factor(resources, adjustmentFactor);
+  console.log(
+    `Cargo ${totalRes} is under max cargo, adjusting to send ${realCargo} (multiples of ${merchantsCapacity})`
   );
   return realCargo;
 };

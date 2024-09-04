@@ -10,7 +10,7 @@ import sendResources from "./sendResources";
 import Village from "../models/village";
 import { TaskResult } from "../index";
 
-const DEFICIT_INTERVAL = 3 * 60;
+const DEFICIT_INTERVAL = 13 * 60;
 
 let lastDeficitTime = 0;
 
@@ -67,7 +67,7 @@ const checkVillageDeficit = async (
 ): Promise<void> => {
   const deficitResources = village.getDeficitResources();
 
-  if (deficitResources.getTotal() > village.merchantsCapacity) {
+  if (deficitResources.getTotal() > 0) {
     await handleDeficitResources(page, villages, village, deficitResources);
   } else {
     console.log(`Village ${village.name} does not need resources`);
