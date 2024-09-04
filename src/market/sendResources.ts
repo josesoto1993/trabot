@@ -17,6 +17,10 @@ const sendResources = async (page: Page, trade: Trade): Promise<Resources> => {
   );
   try {
     trade.resources = limitResourcesToMarket(trade.from, trade.resources);
+    if (trade.resources.getTotal() <= 0) {
+      return new Resources(0, 0, 0, 0);
+    }
+
     await goMarket(trade.from);
     await setDestination(page, trade.to);
     await setResources(page, trade.resources);
