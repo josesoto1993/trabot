@@ -67,7 +67,7 @@ const checkVillageDeficit = async (
 ): Promise<void> => {
   const deficitResources = village.getDeficitResources();
 
-  if (deficitResources.getTotal() > MERCHANTS_CAPACITY) {
+  if (deficitResources.getTotal() > village.merchantsCapacity) {
     await handleDeficitResources(page, villages, village, deficitResources);
   } else {
     console.log(`Village ${village.name} does not need resources`);

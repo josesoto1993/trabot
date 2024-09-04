@@ -112,7 +112,7 @@ const addNewBuildingType = async (
   const buildingTypeData = {
     structureId,
     name,
-    category: buildingCategory._id,
+    category: buildingCategory,
     slot: null,
   };
 

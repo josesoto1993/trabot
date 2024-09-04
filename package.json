@@ -1,10 +1,11 @@
 {
   "name": "trabot",
   "version": "1.1.6",
-  "description": "",
+  "description": "this is a bot to automate play travian",
   "main": "src/index.ts",
   "scripts": {
-    "start": "node src/index.ts",
+    "build": "tsc",
+    "start": "npm run build && node dist/index.js",
     "pretty": "prettier --write \"./**/*.{js,jsx,ts,tsx,html,json}\"",
     "precommit": "lint-staged",
     "postinstall": "npx husky install"

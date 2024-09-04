@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
+    "module": "commonjs",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -10,8 +11,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "noEmit": true
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "noEmit": false,
+    "removeComments": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }

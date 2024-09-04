@@ -1,9 +1,10 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
+import UnitNames from "../constants/unitsNames";
 
 export interface IUnitSchema extends Document {
   _id: mongoose.Schema.Types.ObjectId;
-  name: string;
+  name: UnitNames;
   selector: string;
   building: mongoose.Schema.Types.ObjectId | IBuildingTypeSchema;
 }
@@ -17,6 +18,7 @@ const UnitSchema: Schema<IUnitSchema> = new Schema({
     type: String,
     required: true,
     unique: true,
+    enum: Object.values(UnitNames),
   },
   selector: {
     type: String,

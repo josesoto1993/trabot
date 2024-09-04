@@ -1,5 +1,5 @@
-import { ConstructionStatus } from "../constants/constructionStatus";
-import { FieldType } from "../constants/fieldType";
+import ConstructionStatus from "../constants/constructionStatus";
+import FieldType from "../constants/fieldType";
 
 class ResourceField {
   slotId: number;

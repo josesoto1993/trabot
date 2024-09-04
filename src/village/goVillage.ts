@@ -1,13 +1,9 @@
 import { goPage } from "../browser/browserService";
-import {
-  TRAVIAN_RESOURCES_VIEW,
-  TRAVIAN_BUILDING_VIEW,
-  TRAVIAN_BUILD_VIEW,
-} from "../constants/links";
+import Links from "../constants/links";
 import Village from "../models/village";
 
 export const goVillageResView = async (village: Village): Promise<void> => {
-  const villageUrl = new URL(TRAVIAN_RESOURCES_VIEW);
+  const villageUrl = new URL(Links.TRAVIAN_RESOURCES_VIEW);
   villageUrl.searchParams.append("newdid", village.id);
 
   await goPage(villageUrl);
@@ -17,7 +13,7 @@ export const goVillageResView = async (village: Village): Promise<void> => {
 export const goVillageBuildingView = async (
   village: Village
 ): Promise<void> => {
-  const villageUrl = new URL(TRAVIAN_BUILDING_VIEW);
+  const villageUrl = new URL(Links.TRAVIAN_BUILDING_VIEW);
   villageUrl.searchParams.append("newdid", village.id);
 
   await goPage(villageUrl);
@@ -42,7 +38,7 @@ export const goBuilding = async (
     );
   }
 
-  const buildingUrl = new URL(TRAVIAN_BUILD_VIEW);
+  const buildingUrl = new URL(Links.TRAVIAN_BUILD_VIEW);
   buildingUrl.searchParams.append("newdid", village.id);
   buildingUrl.searchParams.append("id", villageBuilding.slotId.toString());
   buildingUrl.searchParams.append(

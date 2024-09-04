@@ -79,7 +79,10 @@ const performUpgrade = async (
     console.log(
       `Can't upgrade ${village?.name}-${upgrade.unit.name} as it does not have a Smithy`
     );
-    await removeUpgrade(upgrade.villageName, upgrade.unit.name);
+    await removeUpgrade({
+      villageName: upgrade.villageName,
+      unitName: upgrade.unit.name,
+    });
   }
 
   return await upgradeUnit(page, upgrade.unit, village);
@@ -109,7 +112,7 @@ const upgradeUnit = async (
       console.log(
         `No need to upgrade [${village.name} / ${unit.name}], as it is level 20`
       );
-      await removeUpgrade(village.name, unit.name);
+      await removeUpgrade({ villageName: village.name, unitName: unit.name });
       return false;
     }
 
