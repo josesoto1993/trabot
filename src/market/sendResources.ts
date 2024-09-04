@@ -129,16 +129,49 @@ const limitResourcesToMarket = (
   resources: Resources
 ): Resources => {
   const maxCargo = village.getMaxCargo();
-  const totalExcess = resources.getTotal();
+  const merchantsCapacity = village.merchantsCapacity;
+  const totalRes = resources.getTotal();
 
-  if (totalExcess <= maxCargo) {
-    return resources;
+  if (totalRes > maxCargo) {
+    return limitResourcesToMax(resources, maxCargo);
+  } else {
+    return roundResourcesToMerchant(resources, merchantsCapacity);
   }
+};
 
-  const factor = (maxCargo / totalExcess) * ROUNDING_SAFETY_FACTOR;
+const limitResourcesToMax = (
+  resources: Resources,
+  maxCargo: number
+): Resources => {
+  const totalRes = resources.getTotal();
+  const factor = (maxCargo / totalRes) * ROUNDING_SAFETY_FACTOR;
   const realCargo = Resources.factor(resources, factor);
   console.log(
-    `Cargo ${totalExcess} exceeds max cargo ${maxCargo}, scaling to send ${realCargo}.`
+    `Cargo ${totalRes} exceeds max cargo ${maxCargo}, scaling to send ${realCargo}.`
+  );
+  return realCargo;
+};
+
+const roundResourcesToMerchant = (
+  resources: Resources,
+  merchantsCapacity: number
+): Resources => {
+  const totalRes = resources.getTotal();
+  const adjustedTotalRes =
+    Math.floor(totalRes / merchantsCapacity) * merchantsCapacity;
+
+  if (adjustedTotalRes === 0) {
+    console.log(
+      `Cargo ${totalRes} is too small to fill even one merchant. Stop trade.`
+    );
+    return new Resources(0, 0, 0, 0);
+  }
+
+  const adjustmentFactor =
+    (adjustedTotalRes / totalRes) * ROUNDING_SAFETY_FACTOR;
+  const realCargo = Resources.factor(resources, adjustmentFactor);
+  console.log(
+    `Cargo ${totalRes} is under max cargo, adjusting to send ${realCargo} (multiples of ${merchantsCapacity})`
   );
   return realCargo;
 };
