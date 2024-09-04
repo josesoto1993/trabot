@@ -22,6 +22,13 @@ const sendResources = async (page: Page, trade: Trade): Promise<Resources> => {
     }
 
     await goMarket(trade.from);
+    const actualMerchantsCapacity = await getActualMerchantsCapacity(page);
+    if (actualMerchantsCapacity !== trade.from.merchantsCapacity) {
+      trade.from.merchantsCapacity = await getActualMerchantsCapacity(page);
+      console.log(
+        `Upgrade villa ${trade.from.name} merchant capacity to new value ${trade.from.merchantsCapacity}`
+      );
+    }
     await setDestination(page, trade.to);
     await setResources(page, trade.resources);
     await verify(page);
@@ -43,6 +50,32 @@ const goMarket = async (village: Village): Promise<void> => {
     [MarketTabs.QUERY_PARAM_KEY]: MarketTabs.SEND_RESOURCES,
   };
   await goBuilding(village, BuildingNames.MARKETPLACE, marketTabSearchParam);
+};
+
+const getActualMerchantsCapacity = async (
+  page: Page
+): Promise<number | null> => {
+  const capacitySelector =
+    "#marketplaceSendResources .deliveriesOverview .merchantsInformation .capacity .value";
+
+  const capacityText = await page.evaluate((selector) => {
+    const element = document.querySelector(selector);
+    return element ? element.textContent : null;
+  }, capacitySelector);
+
+  if (!capacityText) {
+    console.log("Unable to find capacity value.");
+    return null;
+  }
+
+  const actualCapacity = parseInt(capacityText.replace(/\D/g, ""), 10);
+
+  if (isNaN(actualCapacity)) {
+    console.log("Failed to parse capacity value to a number.");
+    return null;
+  }
+
+  return actualCapacity;
 };
 
 const setDestination = async (page: Page, to: Village): Promise<void> => {
