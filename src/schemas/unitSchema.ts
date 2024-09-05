@@ -32,7 +32,7 @@ const UnitSchema: Schema<IUnitSchema> = new Schema({
   selector: {
     type: String,
     required: true,
-    unique: true,
+    unique: false,
   },
   building: {
     type: mongoose.Schema.Types.ObjectId,
