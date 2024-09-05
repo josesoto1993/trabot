@@ -61,6 +61,7 @@ const getHighPriorityBuildings = async (): Promise<
 > => {
   const buildingNames = [
     { name: BuildingNames.RESIDENCE, level: 10 },
+    { name: BuildingNames.HEROS_MANSION, level: 10 },
     { name: BuildingNames.MAIN_BUILDING, level: 20 },
     { name: BuildingNames.GRAIN_MILL, level: 5 },
     { name: BuildingNames.BRICKYARD, level: 5 },
