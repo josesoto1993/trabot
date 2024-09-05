@@ -38,7 +38,7 @@ export const getUnits = async (): Promise<Record<string, IUnit>> => {
   return await loadUnits();
 };
 
-export const getUnit = async (name: string): Promise<IUnit | undefined> => {
+export const getUnit = async (name: UnitNames): Promise<IUnit | undefined> => {
   const units = await getUnits();
   return units[name];
 };

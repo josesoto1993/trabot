@@ -22,7 +22,7 @@ enum UnitNames {
   ELEPHANT = "Elephant",
 }
 
-export const getUnit = (unitName: string): UnitNames | null => {
+export const getUnitName = (unitName: string): UnitNames | null => {
   const matchedUnit = Object.values(UnitNames).find(
     (unit) => unit.toLowerCase() === unitName.toLowerCase()
   );
