@@ -1,7 +1,7 @@
 import PriorityLevels from "../constants/priorityLevels";
 import {
   IPriorityBuildingUpsertData,
-  upsert,
+  upsertPriorityBuilding,
 } from "../services/PriorityBuildingService";
 import { getBuildingType } from "../services/buildingTypeService";
 import BuildingNames from "../constants/buildingNames";
@@ -18,7 +18,7 @@ const populatePriorityBuildings = async (): Promise<void> => {
     ];
 
     for (const priorityBuilding of priorityBuildings) {
-      await upsert(priorityBuilding);
+      await upsertPriorityBuilding(priorityBuilding);
     }
 
     console.log("finish populate priority buildings");

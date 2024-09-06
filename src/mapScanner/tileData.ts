@@ -48,17 +48,18 @@ const selectTile = async (
   coordinateX: number,
   coordinateY: number
 ): Promise<void> => {
-  const slotUrl = new URL(Links.TRAVIAN_BUILD_VIEW);
+  const slotUrl = new URL(Links.TRAVIAN_MAP);
   slotUrl.searchParams.append("x", coordinateX.toString());
   slotUrl.searchParams.append("y", coordinateY.toString());
   await goPage(slotUrl);
 
-  console.log(`selectSlot: ${coordinateX} / ${coordinateY}`);
+  console.log(`selectSlot in map: ${coordinateX} / ${coordinateY}`);
 };
 
 const getTileName = async (page: Page): Promise<string> => {
   const titleSelector = "div#tileDetails h1.titleInHeader";
 
+  await page.waitForSelector(titleSelector);
   const tileTitleData = await page.evaluate((selector) => {
     const element = document.querySelector(selector);
     if (!element) {
@@ -94,32 +95,74 @@ const getVillaData = async (
   page: Page,
   tileType: TileTypes
 ): Promise<string> => {
-  if (tileType !== TileTypes.EMPTY && tileType !== TileTypes.OCCUPIED_VILLA) {
-    return "";
+  const isOccupiedVilla = tileType === TileTypes.OCCUPIED_VILLA;
+  const isEmptyVilla = tileType === TileTypes.EMPTY;
+
+  if (isOccupiedVilla || isEmptyVilla) {
+    return await getVillaDataForVilla(page, isOccupiedVilla);
   }
 
-  const resourceSelector = "#map_details table#distribution tbody tr td";
+  return "";
+};
 
+const getVillaDataForVilla = async (
+  page: Page,
+  isOccupiedVilla: boolean
+): Promise<string> => {
+  const resourceSelector = "#map_details table#distribution tbody tr td";
   try {
     await page.waitForSelector(resourceSelector, { timeout: 3000 });
 
-    const resourceValues = await page.evaluate(() => {
-      const wood =
-        document.querySelector("i.r1")?.nextSibling?.textContent?.trim() || "0";
-      const clay =
-        document.querySelector("i.r2")?.nextSibling?.textContent?.trim() || "0";
-      const iron =
-        document.querySelector("i.r3")?.nextSibling?.textContent?.trim() || "0";
-      const crop =
-        document.querySelector("i.r4")?.nextSibling?.textContent?.trim() || "0";
-      return { wood, clay, iron, crop };
-    });
+    const resourceValues = await page.evaluate(
+      (resourceSelector: string, isOccupiedVilla: boolean) => {
+        const getValue = (className: string): string => {
+          const element = document.querySelector(
+            `${resourceSelector} i.${className}`
+          );
+          if (isOccupiedVilla) {
+            return element?.nextSibling?.textContent?.trim() || "0";
+          }
+          return (
+            element
+              ?.closest("tr")
+              ?.querySelector("td.val")
+              ?.textContent?.trim() || "0"
+          );
+        };
 
-    return `${resourceValues.wood}${resourceValues.clay}${resourceValues.iron}${resourceValues.crop}`;
+        const wood = getValue("r1");
+        const clay = getValue("r2");
+        const iron = getValue("r3");
+        const crop = getValue("r4");
+
+        return { wood, clay, iron, crop };
+      },
+      resourceSelector,
+      isOccupiedVilla
+    );
+
+    return formatResourceData(resourceValues);
   } catch (error) {
-    console.log("Failed to find resource distribution.");
+    console.log(
+      `Failed to find resource distribution in ${isOccupiedVilla ? "occupied" : "empty"} villa.`
+    );
     return "";
   }
+};
+
+const formatResourceData = (resourceValues: {
+  wood: string;
+  clay: string;
+  iron: string;
+  crop: string;
+}): string => {
+  if (resourceValues.crop === "15") {
+    return "15c";
+  }
+  if (resourceValues.crop === "9") {
+    return "9c";
+  }
+  return `${resourceValues.wood}${resourceValues.clay}${resourceValues.iron}${resourceValues.crop}`;
 };
 
 const getAnimals = async (

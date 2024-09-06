@@ -65,6 +65,9 @@ const mainLoop = async (page: Page) => {
       console.log(`\n\n\n---------------- loop ${loopNumber} ----------------`);
 
       nextLoop = Math.min(
+        await runTaskWithTimer(TaskNames.MAP_SCANNER, () =>
+          scannerRunner(page)
+        ),
         await runTaskWithTimer(TaskNames.DEFICIT, () => manageDeficit(page)),
         await runTaskWithTimer(TaskNames.OVERFLOW, () => manageOverflow(page)),
         await runTaskWithTimer(TaskNames.ATTACK_FARMS, () => attackFarms(page)),
@@ -77,8 +80,7 @@ const mainLoop = async (page: Page) => {
         await runTaskWithTimer(TaskNames.REDEEM, () => redeem(page)),
         await runTaskWithTimer(TaskNames.CELEBRATIONS, () =>
           manageCelebrations(page)
-        ),
-        await runTaskWithTimer(TaskNames.MAP_SCANNER, () => scannerRunner(page))
+        )
       );
 
       console.log(

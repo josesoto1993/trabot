@@ -3,7 +3,7 @@ import { getVillages } from "../player/playerHandler";
 import scanTiles from "./mapScanner";
 import { TaskResult } from "..";
 
-const SCAN_INTERVAL = 5 * 60 * 1000;
+const SCAN_INTERVAL = 5 * 60;
 const TILES_TO_SCAN = 20;
 
 const scannerRunner = async (page: Page): Promise<TaskResult> => {
