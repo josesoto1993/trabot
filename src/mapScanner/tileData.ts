@@ -52,8 +52,6 @@ const selectTile = async (
   slotUrl.searchParams.append("x", coordinateX.toString());
   slotUrl.searchParams.append("y", coordinateY.toString());
   await goPage(slotUrl);
-
-  console.log(`selectSlot in map: ${coordinateX} / ${coordinateY}`);
 };
 
 const getTileName = async (page: Page): Promise<string> => {

@@ -49,6 +49,7 @@ const main = async () => {
   await initPlayer(page);
   await mainLoop(page);
   await finalizeBrowser();
+  process.exit();
 };
 
 const initPlayer = async (page: Page) => {
@@ -95,6 +96,7 @@ const mainLoop = async (page: Page) => {
           manageCelebrations(page, interval)
         )
       );
+      console.log(`next loop at ${formatDateTime(nextExecutionTime)}`);
       const nextLoop = Math.max(nextExecutionTime - Date.now(), 0);
 
       console.log(
@@ -129,7 +131,7 @@ const finalizeBrowser = async () => {
 const runTaskWithTimer = async (
   taskName: TaskNames,
   task: (interval: number) => Promise<TaskResult>
-) => {
+): Promise<number> => {
   const taskStatus = await isTaskActive(taskName);
   if (!taskStatus) {
     console.log(`\n---------------- ${taskName} skip ----------------`);
@@ -160,7 +162,7 @@ const runTaskWithTimer = async (
       taskStats[taskName].totalDuration / (taskStats[taskName].count || 1);
 
     console.log(
-      `${taskName} ended, took ${formatTimeMillis(duration)}, next in ${formatDateTime(nextExecutionTime)}`
+      `${taskName} ended, took ${formatTimeMillis(duration)}, next at ${formatDateTime(nextExecutionTime)}`
     );
     console.log(
       `Average duration of ${taskName}: ${formatTimeMillis(averageDuration)} for total runs ${taskStats[taskName].count}`

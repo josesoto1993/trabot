@@ -42,6 +42,13 @@ const upgradeTroops = async (page: Page): Promise<TaskResult> => {
 };
 
 const shouldSkip = (upgradeList: IUpgradeUnit[]): TaskResult => {
+  if (upgradeList.length === 0) {
+    return {
+      nextExecutionTime: MIN_UPGRADE_DELAY * 10 + Date.now(),
+      skip: true,
+    };
+  }
+
   const nextExecutionTime = getNextExecutionTime(upgradeList);
   return nextExecutionTime > Date.now()
     ? { nextExecutionTime, skip: true }

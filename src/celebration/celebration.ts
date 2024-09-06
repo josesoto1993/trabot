@@ -130,7 +130,7 @@ const selectCelebration = async (page: Page): Promise<number | null> => {
   } else {
     const remainingTime = await getRemainingCelebrationTime(page);
     console.log(
-      `No celebration can be selected. Keep remainingTime ${formatTime(remainingTime)}`
+      `No celebration can be selected. Keep remainingTime ${formatTimeMillis(remainingTime)}`
     );
     return remainingTime + Date.now();
   }

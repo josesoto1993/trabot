@@ -55,7 +55,7 @@ const getVillagesOverviewInfo = async (page: Page): Promise<Village[]> => {
         merchantsTable[village.name]?.availableMerchants ?? 0;
       village.maxMerchants = merchantsTable[village.name]?.maxMerchants ?? 0;
       village.celebrationTime =
-        cultureTable[village.name]?.celebrationTime ?? 0 + Date.now();
+        cultureTable[village.name]?.celebrationTime ?? Infinity;
       village.consumption = consumptionTable[village.name] ?? 0;
     }
 
@@ -141,7 +141,7 @@ const getOverviewCelebrations = async (
         }
       }
 
-      result[villageName].celebrationTime = value ?? 0;
+      result[villageName].celebrationTime = (value ?? Infinity) + Date.now();
     });
     return result;
   }, ROW_SELECTOR);

@@ -18,7 +18,7 @@ const trainTroops = async (
 ): Promise<TaskResult> => {
   const trainList = await getTrainList();
 
-  const skip = shouldSkip(trainList);
+  const skip = shouldSkip(trainList, interval);
   if (skip) {
     return skip;
   }
@@ -44,7 +44,7 @@ const trainTroops = async (
   }
 
   const nextExecutionTime = Math.max(
-    getNextExecutionTime(trainList),
+    getNextExecutionTime(trainList, interval),
     Date.now() + MIN_TRAIN_DELAY
   );
   return {
@@ -53,14 +53,24 @@ const trainTroops = async (
   };
 };
 
-const shouldSkip = (trainList: ITrainUnit[]): TaskResult | null => {
-  const nextExecutionTime = getNextExecutionTime(trainList);
+const shouldSkip = (
+  trainList: ITrainUnit[],
+  interval: number
+): TaskResult | null => {
+  if (trainList.length === 0) {
+    return { nextExecutionTime: MIN_TRAIN_DELAY * 10, skip: true };
+  }
+
+  const nextExecutionTime = getNextExecutionTime(trainList, interval);
   return nextExecutionTime > Date.now()
     ? { nextExecutionTime, skip: true }
     : null;
 };
 
-const getNextExecutionTime = (trainList: ITrainUnit[]): number => {
+const getNextExecutionTime = (
+  trainList: ITrainUnit[],
+  interval: number
+): number => {
   const villages = getVillages();
 
   const minTroopTime = villages.reduce((minTime: number, village: Village) => {
@@ -82,7 +92,7 @@ const getNextExecutionTime = (trainList: ITrainUnit[]): number => {
     return minTime;
   }, Infinity);
 
-  return minTroopTime;
+  return minTroopTime - interval;
 };
 
 const performTrain = async (
@@ -172,7 +182,7 @@ const updateVillageTroopTime = (
   durationInMillis: number
 ): void => {
   const buildingName = unit.building.name;
-  const finishTime = durationInMillis * 1000 + Date.now();
+  const finishTime = durationInMillis + Date.now();
 
   if (buildingName === BuildingNames.BARRACKS) {
     village.barracksTime = finishTime;

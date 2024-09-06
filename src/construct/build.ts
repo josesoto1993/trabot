@@ -57,7 +57,7 @@ const processVillagesBuild = async (
   for (const village of villages) {
     if (village.skipUpgrade && village.skipCreation) {
       console.log(`Skipping ${village.name} build and upgrade`);
-      updatePlayerVillageBuildFinishIn(village.id, interval * 10 + Date.now());
+      updatePlayerVillageBuildFinishIn(village.id, interval);
       continue;
     }
 

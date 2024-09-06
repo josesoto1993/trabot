@@ -21,9 +21,7 @@ const goAdventure = async (
   const heroStatusClass = await getClassOfHeroIcon(page);
   const atHome = heroStatusClass === HeroIconStatus.HOME;
   if (!atHome) {
-    console.log(
-      `Hero is not at home (${heroStatusClass}), until ${formatDateTime(getNextExecutionTime(interval))}`
-    );
+    console.log(`Hero is not at home (${heroStatusClass})`);
     updateNextAdventureTime();
     return { nextExecutionTime: getNextExecutionTime(interval), skip: true };
   }

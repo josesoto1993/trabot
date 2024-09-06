@@ -8,6 +8,7 @@ import {
   updatePlayerVillageBuildFinishIn,
 } from "../player/playerHandler";
 import { IBuildingType } from "../services/buildingTypeService";
+import { formatTimeMillis } from "../utils/timePrint";
 
 interface UpgradeResult {
   durationInMillis: number | null;
@@ -109,7 +110,7 @@ const getDurationValue = async (page: Page): Promise<number> => {
     const [hours, minutes, seconds] = timeString.split(":").map(Number);
     return (hours * 3600 + minutes * 60 + seconds) * 1000;
   });
-  console.log(`Upgrade duration: ${durationValue}`);
+  console.log(`Upgrade duration: ${formatTimeMillis(durationValue)}`);
   return durationValue;
 };
 
