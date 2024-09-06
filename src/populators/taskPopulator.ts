@@ -31,25 +31,25 @@ const populateTasks = async (): Promise<void> => {
 const getDefaultInterval = (taskName: TaskNames): number => {
   switch (taskName) {
     case TaskNames.DEFICIT:
-      return 13 * 1000;
+      return 13 * 60 * 1000;
     case TaskNames.OVERFLOW:
-      return 14 * 1000;
+      return 14 * 60 * 1000;
     case TaskNames.ATTACK_FARMS:
-      return 5 * 1000;
+      return 5 * 60 * 1000;
     case TaskNames.TRAIN_TROOPS:
       return 4 * 60 * 60 * 1000;
     case TaskNames.UPGRADE_TROOPS:
       return 0;
     case TaskNames.GO_ADVENTURE:
-      return 15 * 1000;
+      return 15 * 60 * 1000;
     case TaskNames.BUILD:
-      return 15 * 1000;
+      return 15 * 60 * 1000;
     case TaskNames.REDEEM:
-      return 60 * 1000;
+      return 60 * 60 * 1000;
     case TaskNames.CELEBRATIONS:
       return 4 * 60 * 60 * 1000;
     case TaskNames.MAP_SCANNER:
-      return 15 * 1000;
+      return 15 * 60 * 1000;
     default:
       throw new Error(`Unknown task name: ${taskName}`);
   }
