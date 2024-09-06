@@ -1,4 +1,5 @@
 import TileTypes from "../constants/tileTypes";
+import { ITileTitleData } from "../mapScanner/tileData";
 import TileModel, { ITileSchema } from "../schemas/tileSchema";
 
 export interface ITileUpsertData {
@@ -40,27 +41,62 @@ export const deleteTile = async (
 };
 
 export const upsertTile = async (
-  tile: ITileUpsertData
+  tile: ITileUpsertData | ITileTitleData
 ): Promise<ITileSchema | null> => {
+  const data = parseTileDataToTileUpsert(tile);
+
   const filter = {
-    coordinateX: tile.coordinateX,
-    coordinateY: tile.coordinateY,
+    coordinateX: data.coordinateX,
+    coordinateY: data.coordinateY,
   };
   const update = {
-    tileName: tile.tileName,
-    tileType: tile.tileType,
-    villaData: tile.villaData || null,
-    att: tile.att || 0,
-    attC: tile.attC || 0,
-    def: tile.def || 0,
-    defC: tile.defC || 0,
-    wood: tile.wood || 0,
-    clay: tile.clay || 0,
-    iron: tile.iron || 0,
-    crop: tile.crop || 0,
-    upkeep: tile.upkeep || 0,
+    tileName: data.tileName,
+    tileType: data.tileType,
+    villaData: data.villaData || null,
+    att: data.att || 0,
+    attC: data.attC || 0,
+    def: data.def || 0,
+    defC: data.defC || 0,
+    wood: data.wood || 0,
+    clay: data.clay || 0,
+    iron: data.iron || 0,
+    crop: data.crop || 0,
+    upkeep: data.upkeep || 0,
   };
   const options = { new: true, upsert: true };
 
   return await TileModel.findOneAndUpdate(filter, update, options);
+};
+
+const parseTileDataToTileUpsert = (
+  tile: ITileTitleData | ITileUpsertData
+): ITileUpsertData => {
+  if (isTileUpsertData(tile)) {
+    return tile;
+  }
+
+  const { tileName, coordinateX, coordinateY, tileType, villaData, troopData } =
+    tile;
+  return {
+    tileName,
+    coordinateX,
+    coordinateY,
+    tileType,
+    villaData,
+    att: troopData.att,
+    attC: troopData.attC,
+    def: troopData.def,
+    defC: troopData.defC,
+    wood: troopData.wood,
+    clay: troopData.clay,
+    iron: troopData.iron,
+    crop: troopData.crop,
+    upkeep: troopData.upkeep,
+  };
+};
+
+const isTileUpsertData = (
+  tile: ITileTitleData | ITileUpsertData
+): tile is ITileUpsertData => {
+  return (tile as ITileUpsertData).att !== undefined;
 };

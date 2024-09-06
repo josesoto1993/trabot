@@ -1,5 +1,5 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
-import TileTypes from "../constants/tileTypes"; // Import your TileTypes enum
+import TileTypes from "../constants/tileTypes";
 
 export interface ITileSchema extends Document {
   _id: mongoose.Schema.Types.ObjectId;

@@ -10,6 +10,8 @@ import calculateUnitsData, {
 
 export interface ITileTitleData {
   tileName: string;
+  coordinateX: number;
+  coordinateY: number;
   tileType: TileTypes;
   villaData: string;
   troopData: ITroopData;
@@ -32,15 +34,14 @@ const getTileData = async (
   const animals = await getAnimals(page, tileType);
   const animalsStat = await calculateUnitsData(animals);
 
-  const tileData: ITileTitleData = {
+  return {
     tileName: tileName,
+    coordinateX: coordinateX,
+    coordinateY: coordinateY,
     tileType: tileType,
     villaData: villaData,
     troopData: animalsStat,
   };
-
-  console.log("get data:", JSON.stringify(tileData, null, 2));
-  return tileData;
 };
 
 const selectTile = async (
@@ -83,12 +84,10 @@ const getTileName = async (page: Page): Promise<string> => {
 };
 
 const getTileType = (tileName: string): TileTypes => {
-  for (const type of Object.values(TileTypes)) {
-    if (tileName.includes(type)) {
-      return type;
-    }
-  }
-  return TileTypes.OCCUPIED_VILLA;
+  const tileType = Object.values(TileTypes).find((type) =>
+    tileName.includes(type)
+  );
+  return tileType || TileTypes.OCCUPIED_VILLA;
 };
 
 const getVillaData = async (
