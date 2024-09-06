@@ -1,9 +1,10 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
+import UnitNames from "../constants/unitsNames";
 
 export interface IUpgradeUnitSchema extends Document {
   _id: mongoose.Schema.Types.ObjectId;
   villageName: string;
-  unitName: string;
+  unitName: UnitNames;
 }
 
 const UpgradeUnitSchema: Schema<IUpgradeUnitSchema> = new Schema({
@@ -18,6 +19,7 @@ const UpgradeUnitSchema: Schema<IUpgradeUnitSchema> = new Schema({
   unitName: {
     type: String,
     required: true,
+    enum: Object.values(UnitNames),
   },
 });
 

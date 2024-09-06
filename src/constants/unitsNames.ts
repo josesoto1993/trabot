@@ -10,6 +10,23 @@ enum UnitNames {
   CHIEFTAIN = "Chieftain",
   SETTLER = "Settler",
   TRAPS = "Traps",
+  RAT = "Rat",
+  SPIDER = "Spider",
+  SNAKE = "Snake",
+  BAT = "Bat",
+  WILD_BOAR = "Wild Boar",
+  WOLF = "Wolf",
+  BEAR = "Bear",
+  CROCODILE = "Crocodile",
+  TIGER = "Tiger",
+  ELEPHANT = "Elephant",
 }
 
+export const getUnitName = (unitName: string): UnitNames | null => {
+  const matchedUnit = Object.values(UnitNames).find(
+    (unit) => unit.toLowerCase() === unitName.toLowerCase()
+  );
+
+  return matchedUnit || null;
+};
 export default UnitNames;

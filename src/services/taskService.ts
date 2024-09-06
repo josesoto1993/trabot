@@ -6,13 +6,13 @@ export interface ITaskUpsertData {
 }
 export interface ITask extends ITaskSchema {}
 
-export const isActive = async (name: string): Promise<boolean | null> => {
+export const isTaskActive = async (name: string): Promise<boolean | null> => {
   const filter = { name };
   const task = await TaskModel.findOne(filter).exec();
   return task ? task.isActive : null;
 };
 
-export const upsert = async (
+export const upsertTask = async (
   data: ITaskUpsertData
 ): Promise<ITaskSchema | null> => {
   const filter = { name: data.name };

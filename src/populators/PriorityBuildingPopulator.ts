@@ -1,7 +1,7 @@
 import PriorityLevels from "../constants/priorityLevels";
 import {
   IPriorityBuildingUpsertData,
-  upsert,
+  upsertPriorityBuilding,
 } from "../services/PriorityBuildingService";
 import { getBuildingType } from "../services/buildingTypeService";
 import BuildingNames from "../constants/buildingNames";
@@ -18,7 +18,7 @@ const populatePriorityBuildings = async (): Promise<void> => {
     ];
 
     for (const priorityBuilding of priorityBuildings) {
-      await upsert(priorityBuilding);
+      await upsertPriorityBuilding(priorityBuilding);
     }
 
     console.log("finish populate priority buildings");
@@ -38,6 +38,7 @@ const getFundamentalBuildings = async (): Promise<
     BuildingNames.GRANARY,
     BuildingNames.MARKETPLACE,
     BuildingNames.RESIDENCE,
+    BuildingNames.TRAPPER,
     BuildingNames.GRAIN_MILL,
     BuildingNames.BRICKYARD,
     BuildingNames.SAWMILL,
@@ -61,6 +62,7 @@ const getHighPriorityBuildings = async (): Promise<
 > => {
   const buildingNames = [
     { name: BuildingNames.RESIDENCE, level: 10 },
+    { name: BuildingNames.HEROS_MANSION, level: 10 },
     { name: BuildingNames.MAIN_BUILDING, level: 20 },
     { name: BuildingNames.GRAIN_MILL, level: 5 },
     { name: BuildingNames.BRICKYARD, level: 5 },
@@ -85,6 +87,7 @@ const getMidPriorityBuildings = async (): Promise<
   IPriorityBuildingUpsertData[]
 > => {
   const buildingNames = [
+    { name: BuildingNames.TRAPPER, level: 10 },
     { name: BuildingNames.BARRACKS, level: 3 },
     { name: BuildingNames.TOWN_HALL, level: 10 },
     { name: BuildingNames.MARKETPLACE, level: 10 },

@@ -5,7 +5,16 @@ import UnitNames from "../constants/unitsNames";
 export interface IUnitUpsertData {
   name: UnitNames;
   selector: string;
-  building: IBuildingTypeSchema;
+  building?: IBuildingTypeSchema;
+  att: number;
+  attC: number;
+  def: number;
+  defC: number;
+  wood: number;
+  clay: number;
+  iron: number;
+  crop: number;
+  upkeep: number;
 }
 export interface IUnit extends IUnitSchema {
   building: IBuildingTypeSchema;
@@ -29,7 +38,7 @@ export const getUnits = async (): Promise<Record<string, IUnit>> => {
   return await loadUnits();
 };
 
-export const getUnit = async (name: string): Promise<IUnit | undefined> => {
+export const getUnit = async (name: UnitNames): Promise<IUnit | undefined> => {
   const units = await getUnits();
   return units[name];
 };
@@ -40,7 +49,16 @@ export const upsertUnit = async (
   const filter = { name: data.name };
   const update = {
     selector: data.selector,
-    building: data.building._id,
+    building: data.building ? data.building._id : null,
+    att: data.att,
+    attC: data.attC,
+    def: data.def,
+    defC: data.defC,
+    wood: data.wood,
+    clay: data.clay,
+    iron: data.iron,
+    crop: data.crop,
+    upkeep: data.upkeep,
   };
   const options = { new: true, upsert: true };
 

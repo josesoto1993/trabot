@@ -1,9 +1,10 @@
+import UnitNames from "../constants/unitsNames";
 import TrainModel, { ITrainSchema } from "../schemas/trainSchema";
 import { getUnit, IUnit } from "./unitService";
 
 export interface ITrainUpsertData {
   villageName: string;
-  unitName: string;
+  unitName: UnitNames;
 }
 export interface ITrainUnit {
   villageName: string;

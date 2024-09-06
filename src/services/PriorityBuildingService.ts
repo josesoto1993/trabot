@@ -50,7 +50,7 @@ export const getAllByPriority = async (
   return priorityBuildings as IPriorityBuilding[];
 };
 
-export const upsert = async (
+export const upsertPriorityBuilding = async (
   data: IPriorityBuildingUpsertData
 ): Promise<IPriorityBuildingSchema | null> => {
   if (!Object.values(PriorityLevels).includes(data.priority)) {
