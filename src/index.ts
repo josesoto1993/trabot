@@ -3,7 +3,7 @@ dotenv.config();
 import mongoose from "mongoose";
 
 import { Page } from "puppeteer";
-import { formatTime, formatTimeMillis } from "./utils/timePrint";
+import { formatDateTime, formatTimeMillis } from "./utils/timePrint";
 import { open, close } from "./browser/browserService";
 import login from "./browser/loginService";
 import attackFarms from "./attackFarms/attackFarms";
@@ -59,12 +59,11 @@ const initPlayer = async (page: Page) => {
 const mainLoop = async (page: Page) => {
   try {
     let loopNumber = 0;
-    let nextLoop = 0;
     while (true) {
       loopNumber += 1;
       console.log(`\n\n\n---------------- loop ${loopNumber} ----------------`);
 
-      nextLoop = Math.min(
+      const nextExecutionTime = Math.min(
         await runTaskWithTimer(TaskNames.MAP_SCANNER, () =>
           scannerRunner(page)
         ),
@@ -82,11 +81,12 @@ const mainLoop = async (page: Page) => {
           manageCelebrations(page)
         )
       );
+      const nextLoop = Math.max(nextExecutionTime - Date.now(), 0);
 
       console.log(
-        `\n---------------- Waiting for ${formatTime(nextLoop)} before next run----------------`
+        `\n---------------- Waiting for ${formatTimeMillis(nextLoop)} before next run ----------------`
       );
-      await new Promise((resolve) => setTimeout(resolve, nextLoop * 1000));
+      await new Promise((resolve) => setTimeout(resolve, nextLoop));
     }
   } catch (error) {
     console.error("Error in main loop:", error);
@@ -137,13 +137,15 @@ const runTaskWithTimer = async (
     if (!skip) {
       taskStats[taskName].totalDuration += duration;
       taskStats[taskName].count += 1;
+    } else {
+      console.log("task internal skip");
     }
 
     const averageDuration =
       taskStats[taskName].totalDuration / (taskStats[taskName].count || 1);
 
     console.log(
-      `${taskName} ended, took ${formatTimeMillis(duration)}, next in ${formatTime(nextExecutionTime)}`
+      `${taskName} ended, took ${formatTimeMillis(duration)}, next in ${formatDateTime(nextExecutionTime)}`
     );
     console.log(
       `Average duration of ${taskName}: ${formatTimeMillis(averageDuration)} for total runs ${taskStats[taskName].count}`

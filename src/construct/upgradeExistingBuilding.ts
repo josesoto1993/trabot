@@ -5,12 +5,12 @@ import Links from "../constants/links";
 import {
   updatePlayerBuilding,
   updatePlayerField,
-  updatePlayerVillageBuildFinishAt,
+  updatePlayerVillageBuildFinishIn,
 } from "../player/playerHandler";
 import { IBuildingType } from "../services/buildingTypeService";
 
 interface UpgradeResult {
-  duration: number | null;
+  durationInMillis: number | null;
   level: number | null;
 }
 
@@ -19,16 +19,16 @@ export const upgradeExistingBuilding = async (
   villageId: string,
   slotId: number,
   buildingType: IBuildingType
-): Promise<number | null> => {
+): Promise<boolean> => {
   await selectBuilding(villageId, slotId);
-  const { duration, level } = await upgradeSelectedBuilding(page);
-  if (!duration) {
-    return null;
+  const { durationInMillis, level } = await upgradeSelectedBuilding(page);
+  if (!durationInMillis) {
+    return false;
   }
 
   updatePlayerBuilding(villageId, slotId, buildingType, level + 1);
-  updatePlayerVillageBuildFinishAt(villageId, duration);
-  return duration;
+  updatePlayerVillageBuildFinishIn(villageId, durationInMillis);
+  return true;
 };
 
 export const upgradeExistingField = async (
@@ -37,13 +37,14 @@ export const upgradeExistingField = async (
   slotId: number
 ): Promise<number | null> => {
   await selectBuilding(villageId, slotId);
-  const { duration, level } = await upgradeSelectedBuilding(page);
+  const { durationInMillis: duration, level } =
+    await upgradeSelectedBuilding(page);
   if (!duration) {
     return null;
   }
 
   updatePlayerField(villageId, slotId, level + 1);
-  updatePlayerVillageBuildFinishAt(villageId, duration);
+  updatePlayerVillageBuildFinishIn(villageId, duration);
   return duration;
 };
 
@@ -63,16 +64,16 @@ const upgradeSelectedBuilding = async (page: Page): Promise<UpgradeResult> => {
   const buildButton = await getBuildButton(page);
   if (!buildButton) {
     console.log("No build button found.");
-    return { duration: null, level: null };
+    return { durationInMillis: null, level: null };
   }
 
-  const durationValue = await getDurationValue(page);
+  const durationInMillis = await getDurationValue(page);
   const oldLevel = await getLevelValue(page);
 
   await buildButton.click();
   await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
   console.log("Clicked on the build button.");
-  return { duration: durationValue, level: oldLevel };
+  return { durationInMillis, level: oldLevel };
 };
 
 const getBuildButton = async (
@@ -106,7 +107,7 @@ const getDurationValue = async (page: Page): Promise<number> => {
   const durationValue = await page.$eval(buildTimerSelector, (span: any) => {
     const timeString = span.textContent.trim();
     const [hours, minutes, seconds] = timeString.split(":").map(Number);
-    return hours * 3600 + minutes * 60 + seconds;
+    return (hours * 3600 + minutes * 60 + seconds) * 1000;
   });
   console.log(`Upgrade duration: ${durationValue}`);
   return durationValue;

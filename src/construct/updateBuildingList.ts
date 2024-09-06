@@ -12,7 +12,7 @@ const updateBuildingList = async (
   village: Village,
   buildingsToUpgrade: IPriorityBuilding[],
   priority: PriorityLevels
-): Promise<number | null> => {
+): Promise<boolean> => {
   const buildingsToUpgradeInVillage = filterBuildingsToUpgrade(
     village.buildings,
     buildingsToUpgrade
@@ -26,7 +26,7 @@ const updateBuildingList = async (
   console.log(
     `No priority ${priority} buildings to upgrade in village ${village.name}`
   );
-  return null;
+  return false;
 };
 
 const filterBuildingsToUpgrade = (
@@ -64,20 +64,18 @@ const upgradeBuilding = async (
   page: Page,
   village: Village,
   building: Building
-): Promise<number | null> => {
+): Promise<boolean> => {
   console.log(
     `Upgrading building ${building.name} in village ${village.name} from level ${building.level}`
   );
 
   const buildingType = await getBuildingType(building.name);
-  const upgradeTime = await upgradeExistingBuilding(
+  return await upgradeExistingBuilding(
     page,
     village.id,
     building.slotId,
     buildingType
   );
-
-  return upgradeTime;
 };
 
 export default updateBuildingList;

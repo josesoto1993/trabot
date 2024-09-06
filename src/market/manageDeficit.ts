@@ -1,7 +1,6 @@
 import { Page } from "puppeteer";
 import Resources from "../models/resources";
 import Trade from "../models/trade";
-import { formatTime } from "../utils/timePrint";
 import {
   getVillages,
   updateVillagesOverviewInfo,
@@ -10,14 +9,14 @@ import sendResources from "./sendResources";
 import Village from "../models/village";
 import { TaskResult } from "../index";
 
-const DEFICIT_INTERVAL = 13 * 60;
+const DEFICIT_INTERVAL = 13 * 60 * 1000;
 
 let lastDeficitTime = 0;
 
 const manageDeficit = async (page: Page): Promise<TaskResult> => {
-  const remainingTime = getRemainingTime();
-  if (remainingTime > 0) {
-    return { nextExecutionTime: remainingTime, skip: true };
+  const nextExecutionTime = getNextExecutionTime();
+  if (nextExecutionTime > Date.now()) {
+    return { nextExecutionTime, skip: true };
   }
   console.log(
     "Enough time has passed since the last deficit check, let's check again"
@@ -26,16 +25,11 @@ const manageDeficit = async (page: Page): Promise<TaskResult> => {
   await checkVillagesDeficit(page);
   updateNextDeficitTime();
 
-  console.log(
-    `Manage Deficit finished. Next in ${formatTime(DEFICIT_INTERVAL)}`
-  );
-  return { nextExecutionTime: DEFICIT_INTERVAL, skip: false };
+  return { nextExecutionTime: getNextExecutionTime(), skip: false };
 };
 
-const getRemainingTime = (): number => {
-  const currentTime = Date.now();
-  const timePassed = (currentTime - lastDeficitTime) / 1000;
-  return DEFICIT_INTERVAL - timePassed;
+const getNextExecutionTime = (): number => {
+  return lastDeficitTime + DEFICIT_INTERVAL;
 };
 
 const updateNextDeficitTime = (): void => {

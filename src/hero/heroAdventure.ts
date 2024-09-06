@@ -2,18 +2,18 @@ import { Page } from "puppeteer";
 import { goPage, CLICK_DELAY } from "../browser/browserService";
 import { getClassOfHeroIcon, getHeroAdventures } from "./heroStatus";
 import Links from "../constants/links";
-import { formatTime } from "../utils/timePrint";
+import { formatTimeMillis } from "../utils/timePrint";
 import HeroIconStatus from "../constants/heroIconStatus";
 import { TaskResult } from "../index";
 
-const ADVENTURE_BUTTON_SELECTOR_TIMEOUT_MILLIS: number = 15000;
-const ADVENTURE_INTERVAL: number = 15 * 60;
+const ADVENTURE_BUTTON_SELECTOR_TIMEOUT: number = 15000;
+const ADVENTURE_INTERVAL: number = 15 * 60 * 1000;
 let lastAdventureTime: number = 0;
 
 const goAdventure = async (page: Page): Promise<TaskResult> => {
-  const remainingTime = getRemainingTime();
-  if (remainingTime > 0) {
-    return { nextExecutionTime: remainingTime, skip: true };
+  const nextExecutionTime = getNextExecutionTime();
+  if (nextExecutionTime > Date.now()) {
+    return { nextExecutionTime, skip: true };
   }
   console.log("Enough time has passed since the last adventure, try go");
 
@@ -21,19 +21,19 @@ const goAdventure = async (page: Page): Promise<TaskResult> => {
   const atHome = heroStatusClass === HeroIconStatus.HOME;
   if (!atHome) {
     console.log(
-      `Hero is not at home (${heroStatusClass}), await ${formatTime(ADVENTURE_INTERVAL)}`
+      `Hero is not at home (${heroStatusClass}), await ${formatTimeMillis(ADVENTURE_INTERVAL)}`
     );
     updateNextAdventureTime();
-    return { nextExecutionTime: ADVENTURE_INTERVAL, skip: true };
+    return { nextExecutionTime: getNextExecutionTime(), skip: true };
   }
 
   const heroAdventures = await getHeroAdventures(page);
   if (heroAdventures <= 0) {
     console.log(
-      `There are no adventures (${heroAdventures}), await ${formatTime(ADVENTURE_INTERVAL)}`
+      `There are no adventures (${heroAdventures}), await ${formatTimeMillis(ADVENTURE_INTERVAL)}`
     );
     updateNextAdventureTime();
-    return { nextExecutionTime: ADVENTURE_INTERVAL, skip: true };
+    return { nextExecutionTime: getNextExecutionTime(), skip: true };
   }
 
   const successfullyAdventure = await performAdventure(page);
@@ -41,13 +41,11 @@ const goAdventure = async (page: Page): Promise<TaskResult> => {
     updateNextAdventureTime();
   }
 
-  return { nextExecutionTime: ADVENTURE_INTERVAL, skip: false };
+  return { nextExecutionTime: getNextExecutionTime(), skip: false };
 };
 
-const getRemainingTime = (): number => {
-  const currentTime = Date.now();
-  const timePassed = (currentTime - lastAdventureTime) / 1000;
-  return ADVENTURE_INTERVAL - timePassed;
+const getNextExecutionTime = (): number => {
+  return lastAdventureTime + ADVENTURE_INTERVAL;
 };
 
 const updateNextAdventureTime = (): void => {
@@ -70,7 +68,7 @@ const clickAdventureButton = async (page: Page): Promise<void> => {
     ".adventureList tbody tr td .textButtonV2:not(.disabled)";
   try {
     await page.waitForSelector(adventureButtonSelector, {
-      timeout: ADVENTURE_BUTTON_SELECTOR_TIMEOUT_MILLIS,
+      timeout: ADVENTURE_BUTTON_SELECTOR_TIMEOUT,
     });
     const button = await page.$(adventureButtonSelector);
     if (button) {

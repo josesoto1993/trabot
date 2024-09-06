@@ -2,38 +2,36 @@ import { Page, ElementHandle } from "puppeteer";
 import { URL } from "url";
 import getVillagesInfo from "../village/listVillagesSimple";
 import { goPage, CLICK_DELAY } from "../browser/browserService";
-import { formatTime } from "../utils/timePrint";
+import { formatTimeMillis } from "../utils/timePrint";
 import Links from "../constants/links";
 import TaskTabs from "../constants/taskTabs";
 import { TaskResult } from "../index";
 
 let lastRedeemTime = 0;
 
-const REDEEM_TASK_INTERVAL = 1 * 60 * 60;
+const REDEEM_TASK_INTERVAL = 1 * 60 * 60 * 1000;
 const REDEEM_TASK_VIEW_SELECTOR = ".taskOverview";
 const REDEEM_BUTTONS_SELECTOR = ".taskOverview .achieved .progress .collect";
 
 const redeem = async (page: Page): Promise<TaskResult> => {
-  const remainingTime = getRemainingTime();
-  if (remainingTime > 0) {
-    return { nextExecutionTime: remainingTime, skip: true };
+  const nextExecutionTime = getNextExecutionTime();
+  if (nextExecutionTime > Date.now()) {
+    return { nextExecutionTime, skip: true };
   }
   console.log("Enough time has passed since the redeem, try redeem new tasks");
 
   await redeemTask(page);
 
   updateNextBuildTime();
-  return { nextExecutionTime: getRemainingTime(), skip: false };
+  return { nextExecutionTime: getNextExecutionTime(), skip: false };
 };
 
-const getRemainingTime = (): number => {
-  const currentTime = Date.now();
-  const timePassed = (currentTime - lastRedeemTime) / 1000;
-  return REDEEM_TASK_INTERVAL - timePassed;
+const getNextExecutionTime = (): number => {
+  return lastRedeemTime + REDEEM_TASK_INTERVAL;
 };
 
 const updateNextBuildTime = (): void => {
-  console.log(`Next redeem in ${formatTime(REDEEM_TASK_INTERVAL)}`);
+  console.log(`Next redeem in ${formatTimeMillis(REDEEM_TASK_INTERVAL)}`);
   lastRedeemTime = Date.now();
 };
 

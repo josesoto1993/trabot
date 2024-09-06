@@ -133,9 +133,9 @@ export const updatePlayerField = (
   );
 };
 
-export const updatePlayerVillageBuildFinishAt = (
+export const updatePlayerVillageBuildFinishIn = (
   villageId: string,
-  durationInSeconds: number
+  durationInMillis: number
 ): void => {
   const village = getVillages().find((village) => village.id === villageId);
 
@@ -145,7 +145,7 @@ export const updatePlayerVillageBuildFinishAt = (
   }
 
   const actualFinishAt = Math.max(Date.now(), village.buildFinishTime || 0);
-  village.buildFinishTime = actualFinishAt + durationInSeconds * 1000;
+  village.buildFinishTime = actualFinishAt + durationInMillis;
   const remainingTime = village.buildFinishTime - Date.now();
 
   console.log(

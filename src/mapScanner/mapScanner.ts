@@ -54,14 +54,14 @@ const scanTile = async (tile: ICoordinate, page: Page): Promise<void> => {
 
 const getNotScannedTiles = async (): Promise<ICoordinate[]> => {
   const alreadyScannedTiles = await getAllTiles();
+  const scannedTileSet = new Set(
+    alreadyScannedTiles.map((tile) => `${tile.coordinateX},${tile.coordinateY}`)
+  );
   const allMapTiles = generateAllMapTiles();
-  return allMapTiles.filter((tile) => {
-    return !alreadyScannedTiles.some(
-      (scannedTile) =>
-        scannedTile.coordinateX === tile.coordinateX &&
-        scannedTile.coordinateY === tile.coordinateY
-    );
-  });
+
+  return allMapTiles.filter(
+    (tile) => !scannedTileSet.delete(`${tile.coordinateX},${tile.coordinateY}`)
+  );
 };
 
 const generateAllMapTiles = (): ICoordinate[] => {

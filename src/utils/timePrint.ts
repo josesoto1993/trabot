@@ -31,14 +31,12 @@ export const formatTimeMillis = (
   return formatTime(milliseconds / 1000);
 };
 
-export const formatDateTime = (
-  rawSeconds: number | null | undefined
-): string => {
-  if (!rawSeconds) {
+export const formatDateTime = (raw: number | null | undefined): string => {
+  if (!raw) {
     return "nullTime";
   }
 
-  const date: Date = new Date(rawSeconds * 1000);
+  const date: Date = new Date(raw);
 
   const year: number = date.getFullYear();
   const month: string = String(date.getMonth() + 1).padStart(2, "0");

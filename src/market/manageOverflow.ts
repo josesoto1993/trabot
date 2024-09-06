@@ -1,6 +1,5 @@
 import { Page } from "puppeteer";
 import sendResources from "./sendResources";
-import { formatTime } from "../utils/timePrint";
 import Resources from "../models/resources";
 import Trade from "../models/trade";
 import {
@@ -10,14 +9,14 @@ import {
 import Village from "../models/village";
 import { TaskResult } from "../index";
 
-const OVERFLOW_INTERVAL = 14 * 60;
+const OVERFLOW_INTERVAL = 14 * 60 * 1000;
 
 let lastOverflowTime = 0;
 
 const manageOverflow = async (page: Page): Promise<TaskResult> => {
-  const remainingTime = getRemainingTime();
-  if (remainingTime > 0) {
-    return { nextExecutionTime: remainingTime, skip: true };
+  const nextExecutionTime = getNextExecutionTime();
+  if (nextExecutionTime > Date.now()) {
+    return { nextExecutionTime, skip: true };
   }
   console.log(
     "Enough time has passed since the last overflow check, let's check again."
@@ -26,16 +25,11 @@ const manageOverflow = async (page: Page): Promise<TaskResult> => {
   await checkVillagesOverflow(page);
   updateNextOverflowTime();
 
-  console.log(
-    `Manage Overflow finished. Next in ${formatTime(OVERFLOW_INTERVAL)}`
-  );
-  return { nextExecutionTime: OVERFLOW_INTERVAL, skip: false };
+  return { nextExecutionTime: getNextExecutionTime(), skip: false };
 };
 
-const getRemainingTime = (): number => {
-  const currentTime = Date.now();
-  const timePassed = (currentTime - lastOverflowTime) / 1000;
-  return OVERFLOW_INTERVAL - timePassed;
+const getNextExecutionTime = (): number => {
+  return lastOverflowTime + OVERFLOW_INTERVAL;
 };
 
 const updateNextOverflowTime = (): void => {

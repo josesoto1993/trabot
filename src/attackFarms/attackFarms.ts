@@ -1,18 +1,17 @@
 import { Page } from "puppeteer";
 import { goPage, CLICK_DELAY } from "../browser/browserService";
 import Links from "../constants/links";
-import { formatTime } from "../utils/timePrint";
+import { formatTimeMillis } from "../utils/timePrint";
 import { TaskResult } from "../index";
 
 let lastAttackTime: number = 0;
-let randomAttackInterval: number = 0;
 let attackCount: number = 1;
-const MIN_ATTACK_INTERVAL: number = 5 * 60;
+const MIN_ATTACK_INTERVAL: number = 5 * 60 * 1000;
 
 const attackFarms = async (page: Page): Promise<TaskResult> => {
-  const remainingTime = getRemainingTime();
-  if (remainingTime > 0) {
-    return { nextExecutionTime: remainingTime, skip: true };
+  const nextExecutionTime = getNextExecutionTime();
+  if (nextExecutionTime > Date.now()) {
+    return { nextExecutionTime: nextExecutionTime, skip: true };
   }
   console.log("Enough time has passed since the last attack, go for attack!");
 
@@ -22,17 +21,15 @@ const attackFarms = async (page: Page): Promise<TaskResult> => {
     updateNextAttackTime();
   }
 
-  return { nextExecutionTime: getRemainingTime(), skip: false };
+  console.log(`Next attack in ${formatTimeMillis(MIN_ATTACK_INTERVAL)}`);
+  return { nextExecutionTime: getNextExecutionTime(), skip: false };
 };
 
-const getRemainingTime = (): number => {
-  const currentTime = Date.now();
-  const timePassed = (currentTime - lastAttackTime) / 1000;
-  return MIN_ATTACK_INTERVAL + randomAttackInterval - timePassed;
+const getNextExecutionTime = (): number => {
+  return MIN_ATTACK_INTERVAL + lastAttackTime;
 };
 
 const updateNextAttackTime = (): void => {
-  console.log(`Next attack in ${formatTime(MIN_ATTACK_INTERVAL)}`);
   lastAttackTime = Date.now();
   attackCount = attackCount + 1;
 };
