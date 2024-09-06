@@ -29,7 +29,7 @@ const scanTiles = async (
 
     if (tilesToProcess.length === 0) {
       console.log("All tiles have been scanned. No more tiles to process.");
-      const stopMapScanner = { name: TaskNames.MAP_SCANNER, status: false };
+      const stopMapScanner = { taskName: TaskNames.MAP_SCANNER, status: false };
       await upsertTask(stopMapScanner);
       return;
     }

@@ -1,5 +1,6 @@
 import TaskNames from "../constants/taskNames";
 import { isTaskActive, upsertTask } from "../services/taskService";
+import { formatTimeMillis } from "../utils/timePrint";
 
 const populateTasks = async (): Promise<void> => {
   console.log("start populate tasks");
@@ -8,12 +9,16 @@ const populateTasks = async (): Promise<void> => {
     try {
       const taskStatus = await isTaskActive(taskName);
       if (taskStatus === null) {
+        const status = true;
+        const interval = getDefaultInterval(taskName);
         await upsertTask({
-          name: taskName,
-          status: true,
-          interval: getDefaultInterval(taskName),
+          taskName,
+          status,
+          interval,
         });
-        console.log(`Inserted task "${taskName}" with default active status.`);
+        console.log(
+          `Inserted task "${taskName}" with default active status and interval: ${formatTimeMillis(interval)}`
+        );
       }
     } catch (error) {
       console.error(`Error processing task "${taskName}":`, error);

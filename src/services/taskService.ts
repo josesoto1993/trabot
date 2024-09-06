@@ -2,7 +2,7 @@ import TaskNames from "../constants/taskNames";
 import TaskModel, { ITaskSchema } from "../schemas/taskSchema";
 
 export interface ITaskUpsertData {
-  name: string;
+  taskName: TaskNames;
   status?: boolean;
   interval?: number;
 }
@@ -28,7 +28,7 @@ export const getTaskInterval = async (
 export const upsertTask = async (
   data: ITaskUpsertData
 ): Promise<ITaskSchema | null> => {
-  const filter = { name: data.name };
+  const filter = { name: data.taskName };
   const update: any = {};
   if (data.status !== undefined) {
     update.isActive = data.status;
