@@ -18,7 +18,7 @@ import manageCelebrations from "./celebration/celebration";
 import { updateVillages, getPlayer } from "./player/playerHandler";
 import populate from "./populators/populator";
 import TaskNames from "./constants/taskNames";
-import { isTaskActive } from "./services/taskService";
+import { getTaskInterval, isTaskActive } from "./services/taskService";
 import scannerRunner from "./mapScanner/scannerRunner";
 
 const taskStats: Record<string, { totalDuration: number; count: number }> = {};
@@ -64,21 +64,35 @@ const mainLoop = async (page: Page) => {
       console.log(`\n\n\n---------------- loop ${loopNumber} ----------------`);
 
       const nextExecutionTime = Math.min(
-        await runTaskWithTimer(TaskNames.MAP_SCANNER, () =>
-          scannerRunner(page)
+        await runTaskWithTimer(TaskNames.MAP_SCANNER, (interval: number) =>
+          scannerRunner(page, interval)
         ),
-        await runTaskWithTimer(TaskNames.DEFICIT, () => manageDeficit(page)),
-        await runTaskWithTimer(TaskNames.OVERFLOW, () => manageOverflow(page)),
-        await runTaskWithTimer(TaskNames.ATTACK_FARMS, () => attackFarms(page)),
-        await runTaskWithTimer(TaskNames.TRAIN_TROOPS, () => trainTroops(page)),
-        await runTaskWithTimer(TaskNames.UPGRADE_TROOPS, () =>
+        await runTaskWithTimer(TaskNames.DEFICIT, (interval: number) =>
+          manageDeficit(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.OVERFLOW, (interval: number) =>
+          manageOverflow(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.ATTACK_FARMS, (interval: number) =>
+          attackFarms(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.TRAIN_TROOPS, (interval: number) =>
+          trainTroops(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.UPGRADE_TROOPS, (_: number) =>
           upgradeTroops(page)
         ),
-        await runTaskWithTimer(TaskNames.GO_ADVENTURE, () => goAdventure(page)),
-        await runTaskWithTimer(TaskNames.BUILD, () => build(page)),
-        await runTaskWithTimer(TaskNames.REDEEM, () => redeem(page)),
-        await runTaskWithTimer(TaskNames.CELEBRATIONS, () =>
-          manageCelebrations(page)
+        await runTaskWithTimer(TaskNames.GO_ADVENTURE, (interval: number) =>
+          goAdventure(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.BUILD, (interval: number) =>
+          build(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.REDEEM, (interval: number) =>
+          redeem(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.CELEBRATIONS, (interval: number) =>
+          manageCelebrations(page, interval)
         )
       );
       const nextLoop = Math.max(nextExecutionTime - Date.now(), 0);
@@ -114,7 +128,7 @@ const finalizeBrowser = async () => {
 
 const runTaskWithTimer = async (
   taskName: TaskNames,
-  task: () => Promise<TaskResult>
+  task: (interval: number) => Promise<TaskResult>
 ) => {
   const taskStatus = await isTaskActive(taskName);
   if (!taskStatus) {
@@ -129,7 +143,8 @@ const runTaskWithTimer = async (
   try {
     console.log(`\n---------------- ${taskName} start ----------------`);
     const startTime = Date.now();
-    const { nextExecutionTime, skip } = await task();
+    const interval = await getTaskInterval(taskName);
+    const { nextExecutionTime, skip } = await task(interval);
 
     const endTime = Date.now();
     const duration = endTime - startTime;

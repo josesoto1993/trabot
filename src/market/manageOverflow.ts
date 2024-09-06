@@ -9,12 +9,13 @@ import {
 import Village from "../models/village";
 import { TaskResult } from "../index";
 
-const OVERFLOW_INTERVAL = 14 * 60 * 1000;
-
 let lastOverflowTime = 0;
 
-const manageOverflow = async (page: Page): Promise<TaskResult> => {
-  const nextExecutionTime = getNextExecutionTime();
+const manageOverflow = async (
+  page: Page,
+  interval: number
+): Promise<TaskResult> => {
+  const nextExecutionTime = getNextExecutionTime(interval);
   if (nextExecutionTime > Date.now()) {
     return { nextExecutionTime, skip: true };
   }
@@ -25,11 +26,11 @@ const manageOverflow = async (page: Page): Promise<TaskResult> => {
   await checkVillagesOverflow(page);
   updateNextOverflowTime();
 
-  return { nextExecutionTime: getNextExecutionTime(), skip: false };
+  return { nextExecutionTime: getNextExecutionTime(interval), skip: false };
 };
 
-const getNextExecutionTime = (): number => {
-  return lastOverflowTime + OVERFLOW_INTERVAL;
+const getNextExecutionTime = (interval: number): number => {
+  return lastOverflowTime + interval;
 };
 
 const updateNextOverflowTime = (): void => {

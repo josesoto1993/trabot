@@ -4,30 +4,32 @@ import scanTiles from "./mapScanner";
 import { TaskResult } from "..";
 import { goVillageResView } from "../village/goVillage";
 
-const SCAN_INTERVAL = 15 * 60 * 1000;
 const TILES_TO_SCAN = 100;
 let lastScanTime = 0;
 
-const scannerRunner = async (page: Page): Promise<TaskResult> => {
-  const skip = shouldSkip();
+const scannerRunner = async (
+  page: Page,
+  interval: number
+): Promise<TaskResult> => {
+  const skip = shouldSkip(interval);
   if (skip) {
     return skip;
   }
 
   await performScan(page);
   updateLastScanTime();
-  return { nextExecutionTime: getNextExecutionTime(), skip: false };
+  return { nextExecutionTime: getNextExecutionTime(interval), skip: false };
 };
 
-const shouldSkip = (): TaskResult | null => {
-  const nextExecutionTime = getNextExecutionTime();
+const shouldSkip = (interval: number): TaskResult | null => {
+  const nextExecutionTime = getNextExecutionTime(interval);
   return nextExecutionTime > Date.now()
     ? { nextExecutionTime, skip: true }
     : null;
 };
 
-const getNextExecutionTime = (): number => {
-  return lastScanTime + SCAN_INTERVAL;
+const getNextExecutionTime = (interval: number): number => {
+  return lastScanTime + interval;
 };
 
 const updateLastScanTime = (): void => {

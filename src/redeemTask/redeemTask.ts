@@ -9,12 +9,11 @@ import { TaskResult } from "../index";
 
 let lastRedeemTime = 0;
 
-const REDEEM_TASK_INTERVAL = 1 * 60 * 60 * 1000;
 const REDEEM_TASK_VIEW_SELECTOR = ".taskOverview";
 const REDEEM_BUTTONS_SELECTOR = ".taskOverview .achieved .progress .collect";
 
-const redeem = async (page: Page): Promise<TaskResult> => {
-  const nextExecutionTime = getNextExecutionTime();
+const redeem = async (page: Page, interval: number): Promise<TaskResult> => {
+  const nextExecutionTime = getNextExecutionTime(interval);
   if (nextExecutionTime > Date.now()) {
     return { nextExecutionTime, skip: true };
   }
@@ -22,16 +21,16 @@ const redeem = async (page: Page): Promise<TaskResult> => {
 
   await redeemTask(page);
 
-  updateNextBuildTime();
-  return { nextExecutionTime: getNextExecutionTime(), skip: false };
+  updateNextBuildTime(interval);
+  return { nextExecutionTime: getNextExecutionTime(interval), skip: false };
 };
 
-const getNextExecutionTime = (): number => {
-  return lastRedeemTime + REDEEM_TASK_INTERVAL;
+const getNextExecutionTime = (interval: number): number => {
+  return lastRedeemTime + interval;
 };
 
-const updateNextBuildTime = (): void => {
-  console.log(`Next redeem in ${formatTimeMillis(REDEEM_TASK_INTERVAL)}`);
+const updateNextBuildTime = (interval: number): void => {
+  console.log(`Next redeem in ${formatTimeMillis(interval)}`);
   lastRedeemTime = Date.now();
 };
 

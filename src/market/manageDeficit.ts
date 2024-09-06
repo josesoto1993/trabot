@@ -9,12 +9,13 @@ import sendResources from "./sendResources";
 import Village from "../models/village";
 import { TaskResult } from "../index";
 
-const DEFICIT_INTERVAL = 13 * 60 * 1000;
-
 let lastDeficitTime = 0;
 
-const manageDeficit = async (page: Page): Promise<TaskResult> => {
-  const nextExecutionTime = getNextExecutionTime();
+const manageDeficit = async (
+  page: Page,
+  interval: number
+): Promise<TaskResult> => {
+  const nextExecutionTime = getNextExecutionTime(interval);
   if (nextExecutionTime > Date.now()) {
     return { nextExecutionTime, skip: true };
   }
@@ -25,11 +26,11 @@ const manageDeficit = async (page: Page): Promise<TaskResult> => {
   await checkVillagesDeficit(page);
   updateNextDeficitTime();
 
-  return { nextExecutionTime: getNextExecutionTime(), skip: false };
+  return { nextExecutionTime: getNextExecutionTime(interval), skip: false };
 };
 
-const getNextExecutionTime = (): number => {
-  return lastDeficitTime + DEFICIT_INTERVAL;
+const getNextExecutionTime = (interval: number): number => {
+  return lastDeficitTime + interval;
 };
 
 const updateNextDeficitTime = (): void => {

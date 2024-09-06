@@ -8,7 +8,11 @@ const populateTasks = async (): Promise<void> => {
     try {
       const taskStatus = await isTaskActive(taskName);
       if (taskStatus === null) {
-        await upsertTask({ name: taskName, status: true });
+        await upsertTask({
+          name: taskName,
+          status: true,
+          interval: getDefaultInterval(taskName),
+        });
         console.log(`Inserted task "${taskName}" with default active status.`);
       }
     } catch (error) {
@@ -17,6 +21,33 @@ const populateTasks = async (): Promise<void> => {
   }
 
   console.log("finish populate tasks");
+};
+
+const getDefaultInterval = (taskName: TaskNames): number => {
+  switch (taskName) {
+    case TaskNames.DEFICIT:
+      return 13 * 1000;
+    case TaskNames.OVERFLOW:
+      return 14 * 1000;
+    case TaskNames.ATTACK_FARMS:
+      return 5 * 1000;
+    case TaskNames.TRAIN_TROOPS:
+      return 4 * 60 * 60 * 1000;
+    case TaskNames.UPGRADE_TROOPS:
+      return 0;
+    case TaskNames.GO_ADVENTURE:
+      return 15 * 1000;
+    case TaskNames.BUILD:
+      return 15 * 1000;
+    case TaskNames.REDEEM:
+      return 60 * 1000;
+    case TaskNames.CELEBRATIONS:
+      return 4 * 60 * 60 * 1000;
+    case TaskNames.MAP_SCANNER:
+      return 15 * 1000;
+    default:
+      throw new Error(`Unknown task name: ${taskName}`);
+  }
 };
 
 export default populateTasks;

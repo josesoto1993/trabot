@@ -1,15 +1,17 @@
 import { Page } from "puppeteer";
 import { goPage, CLICK_DELAY } from "../browser/browserService";
 import Links from "../constants/links";
-import { formatTimeMillis } from "../utils/timePrint";
+import { formatDateTime } from "../utils/timePrint";
 import { TaskResult } from "../index";
 
 let lastAttackTime: number = 0;
 let attackCount: number = 1;
-const MIN_ATTACK_INTERVAL: number = 5 * 60 * 1000;
 
-const attackFarms = async (page: Page): Promise<TaskResult> => {
-  const nextExecutionTime = getNextExecutionTime();
+const attackFarms = async (
+  page: Page,
+  interval: number
+): Promise<TaskResult> => {
+  const nextExecutionTime = getNextExecutionTime(interval);
   if (nextExecutionTime > Date.now()) {
     return { nextExecutionTime: nextExecutionTime, skip: true };
   }
@@ -21,12 +23,14 @@ const attackFarms = async (page: Page): Promise<TaskResult> => {
     updateNextAttackTime();
   }
 
-  console.log(`Next attack in ${formatTimeMillis(MIN_ATTACK_INTERVAL)}`);
-  return { nextExecutionTime: getNextExecutionTime(), skip: false };
+  console.log(
+    `Next attack at ${formatDateTime(getNextExecutionTime(interval))}`
+  );
+  return { nextExecutionTime: getNextExecutionTime(interval), skip: false };
 };
 
-const getNextExecutionTime = (): number => {
-  return MIN_ATTACK_INTERVAL + lastAttackTime;
+const getNextExecutionTime = (interval: number): number => {
+  return interval + lastAttackTime;
 };
 
 const updateNextAttackTime = (): void => {

@@ -10,7 +10,6 @@ import {
 import { TaskResult } from "../index";
 import Village from "../models/village";
 
-const CELEBRATION_TIME_GAP = 4 * 60 * 60 * 1000;
 const AWAIT_MORE_RESOURCES_TIME = 15 * 60 * 1000;
 
 interface CelebrationButton {
@@ -19,17 +18,20 @@ interface CelebrationButton {
   exist: boolean;
 }
 
-const manageCelebrations = async (page: Page): Promise<TaskResult> => {
-  const skip = shouldSkip();
+const manageCelebrations = async (
+  page: Page,
+  interval: number
+): Promise<TaskResult> => {
+  const skip = shouldSkip(interval);
   if (skip) {
     return skip;
   }
 
   console.log("Time to start celebrations process...");
 
-  await processVillagesCelebration(page);
+  await processVillagesCelebration(page, interval);
 
-  const nextExecutionTime = getNextExecutionTime();
+  const nextExecutionTime = getNextExecutionTime(interval);
 
   return {
     nextExecutionTime,
@@ -37,46 +39,50 @@ const manageCelebrations = async (page: Page): Promise<TaskResult> => {
   };
 };
 
-const shouldSkip = (): TaskResult | null => {
-  const nextExecutionTime = getNextExecutionTime();
+const shouldSkip = (interval: number): TaskResult | null => {
+  const nextExecutionTime = getNextExecutionTime(interval);
 
   return nextExecutionTime > Date.now()
     ? { nextExecutionTime, skip: true }
     : null;
 };
 
-const getNextExecutionTime = (): number => {
+const getNextExecutionTime = (interval: number): number => {
   const minCelebrationFinishAt = Math.min(
     ...getVillages().map((village) => village.celebrationTime || Infinity)
   );
 
-  return minCelebrationFinishAt - CELEBRATION_TIME_GAP;
+  return minCelebrationFinishAt - interval;
 };
 
-const processVillagesCelebration = async (page: Page) => {
+const processVillagesCelebration = async (page: Page, interval: number) => {
   await updateVillagesOverviewInfo(page);
   const villages = getVillages();
   for (const village of villages) {
     if (
       village.celebrationTime !== null &&
-      village.celebrationTime > Date.now() + CELEBRATION_TIME_GAP
+      village.celebrationTime > Date.now() + interval
     ) {
       console.log(
-        `Village ${village.name} does not need celebration, remaining time ${formatTimeMillis(village.celebrationTime - Date.now())} > desired ${formatTime(CELEBRATION_TIME_GAP)} `
+        `Village ${village.name} does not need celebration, remaining time ${formatTimeMillis(village.celebrationTime - Date.now())} > desired ${formatTime(interval)} `
       );
       continue;
     }
-    await processVillageCelebration(page, village);
+    await processVillageCelebration(page, village, interval);
   }
 };
 
-const processVillageCelebration = async (page: Page, village: Village) => {
+const processVillageCelebration = async (
+  page: Page,
+  village: Village,
+  interval: number
+) => {
   const villageTownHall = village.buildings.find(
     (building) => building.name === BuildingNames.TOWN_HALL
   );
 
   if (!villageTownHall) {
-    village.celebrationTime = Date.now() + CELEBRATION_TIME_GAP * 2;
+    village.celebrationTime = Date.now() + interval * 2;
     console.log(
       `Village ${village.name} does not need celebration as it does not have a town hall, set time to ${village.celebrationTime}`
     );
@@ -85,8 +91,7 @@ const processVillageCelebration = async (page: Page, village: Village) => {
 
   const celebrationTime = await celebrate(page, village);
   if (!celebrationTime) {
-    village.celebrationTime =
-      Date.now() + CELEBRATION_TIME_GAP + AWAIT_MORE_RESOURCES_TIME;
+    village.celebrationTime = Date.now() + interval + AWAIT_MORE_RESOURCES_TIME;
     console.log(
       `Set await resources celebration time ${village.celebrationTime} on ${village.name}`
     );

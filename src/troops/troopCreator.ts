@@ -10,10 +10,12 @@ import { TaskResult } from "../index";
 import { IUnit } from "../services/unitService";
 
 const UNITS_TO_TRAIN = "999";
-const MAX_TRAIN_TIME = 4 * 60 * 60 * 1000;
 const MIN_TRAIN_DELAY = 5 * 60 * 1000;
 
-const trainTroops = async (page: Page): Promise<TaskResult> => {
+const trainTroops = async (
+  page: Page,
+  interval: number
+): Promise<TaskResult> => {
   const trainList = await getTrainList();
 
   const skip = shouldSkip(trainList);
@@ -30,7 +32,12 @@ const trainTroops = async (page: Page): Promise<TaskResult> => {
       continue;
     }
 
-    const trainPerformed = await performTrain(page, train.unit, village);
+    const trainPerformed = await performTrain(
+      page,
+      train.unit,
+      village,
+      interval
+    );
     if (trainPerformed) {
       anyTrainPerformed = true;
     }
@@ -81,15 +88,16 @@ const getNextExecutionTime = (trainList: ITrainUnit[]): number => {
 const performTrain = async (
   page: Page,
   unit: IUnit,
-  village: Village
+  village: Village,
+  interval: number
 ): Promise<boolean> => {
   try {
     await goBuilding(village, unit.building.name);
     const remainingTime = await getRemainingTime(page);
 
-    if (remainingTime < MAX_TRAIN_TIME) {
+    if (remainingTime < interval) {
       console.log(
-        `Need to train [${village.name} / ${unit.name}], remaining time=${formatTimeMillis(remainingTime)} is lower than MAX_TRAIN_TIME=${formatTimeMillis(MAX_TRAIN_TIME)}`
+        `Need to train [${village.name} / ${unit.name}], remaining time=${formatTimeMillis(remainingTime)} is lower than MAX_TRAIN_TIME=${formatTimeMillis(interval)}`
       );
       await writeInputValueToMax(page, unit.selector);
       await submit(page);
@@ -97,7 +105,7 @@ const performTrain = async (
       updateVillageTroopTime(village, unit, finalRemainingTime);
     } else {
       console.log(
-        `No need to train [${village.name} / ${unit.name}], remaining time=${formatTimeMillis(remainingTime)} is higher than MAX_TRAIN_TIME=${formatTimeMillis(MAX_TRAIN_TIME)}`
+        `No need to train [${village.name} / ${unit.name}], remaining time=${formatTimeMillis(remainingTime)} is higher than MAX_TRAIN_TIME=${formatTimeMillis(interval)}`
       );
       updateVillageTroopTime(village, unit, remainingTime);
     }
