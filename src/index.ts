@@ -18,7 +18,8 @@ import manageCelebrations from "./celebration/celebration";
 import { updateVillages, getPlayer } from "./player/playerHandler";
 import populate from "./populators/populator";
 import TaskNames from "./constants/taskNames";
-import { isActive } from "./services/taskService";
+import { isTaskActive } from "./services/taskService";
+import scannerRunner from "./mapScanner/scannerRunner";
 
 const taskStats: Record<string, { totalDuration: number; count: number }> = {};
 
@@ -76,7 +77,8 @@ const mainLoop = async (page: Page) => {
         await runTaskWithTimer(TaskNames.REDEEM, () => redeem(page)),
         await runTaskWithTimer(TaskNames.CELEBRATIONS, () =>
           manageCelebrations(page)
-        )
+        ),
+        await runTaskWithTimer(TaskNames.MAP_SCANNER, () => scannerRunner(page))
       );
 
       console.log(
@@ -112,7 +114,7 @@ const runTaskWithTimer = async (
   taskName: TaskNames,
   task: () => Promise<TaskResult>
 ) => {
-  const taskStatus = await isActive(taskName);
+  const taskStatus = await isTaskActive(taskName);
   if (!taskStatus) {
     console.log(`\n---------------- ${taskName} skip ----------------`);
     return Infinity;

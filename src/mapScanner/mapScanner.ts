@@ -2,6 +2,8 @@ import { Page } from "puppeteer";
 import { getAllTiles, upsertTile } from "../services/tileService";
 import { ITileSchema } from "../schemas/tileSchema";
 import getTileData from "./tileData";
+import { upsertTask } from "../services/taskService";
+import TaskNames from "../constants/taskNames";
 
 const MIN_COORD = -200;
 const MAX_COORD = 200;
@@ -27,6 +29,8 @@ const scanTiles = async (
 
     if (tilesToProcess.length === 0) {
       console.log("All tiles have been scanned. No more tiles to process.");
+      const stopMapScanner = { name: TaskNames.MAP_SCANNER, status: false };
+      await upsertTask(stopMapScanner);
       return;
     }
 

@@ -8,6 +8,7 @@ enum TaskNames {
   BUILD = "Build",
   REDEEM = "Redeem",
   CELEBRATIONS = "Celebrations",
+  MAP_SCANNER = "Map scanner",
 }
 
 export default TaskNames;
