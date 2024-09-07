@@ -9,6 +9,7 @@ enum TaskNames {
   REDEEM = "Redeem",
   CELEBRATIONS = "Celebrations",
   MAP_SCANNER = "Map scanner",
+  HERO_RESOURCE_BALANCER = "Hero resource balancer",
 }
 
 export default TaskNames;

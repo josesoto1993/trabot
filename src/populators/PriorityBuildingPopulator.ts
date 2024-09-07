@@ -112,6 +112,7 @@ const getLowPriorityBuildings = async (): Promise<
     { name: BuildingNames.PALACE, level: 20 },
     { name: BuildingNames.RALLY_POINT, level: 10 },
     { name: BuildingNames.PALISADE, level: 10 },
+    { name: BuildingNames.STABLE, level: 10 },
     { name: BuildingNames.TRADE_OFFICE, level: 10 },
     { name: BuildingNames.ACADEMY, level: 20 },
     { name: BuildingNames.EMBASSY, level: 20 },
