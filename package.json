@@ -1,6 +1,6 @@
 {
   "name": "trabot",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "this is a bot to automate play travian",
   "main": "src/index.ts",
   "scripts": {
