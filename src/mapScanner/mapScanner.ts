@@ -29,7 +29,7 @@ const scanTiles = async (
 
     if (tilesToProcess.length === 0) {
       console.log("All tiles have been scanned. No more tiles to process.");
-      const stopMapScanner = { name: TaskNames.MAP_SCANNER, status: false };
+      const stopMapScanner = { taskName: TaskNames.MAP_SCANNER, status: false };
       await upsertTask(stopMapScanner);
       return;
     }
@@ -54,14 +54,14 @@ const scanTile = async (tile: ICoordinate, page: Page): Promise<void> => {
 
 const getNotScannedTiles = async (): Promise<ICoordinate[]> => {
   const alreadyScannedTiles = await getAllTiles();
+  const scannedTileSet = new Set(
+    alreadyScannedTiles.map((tile) => `${tile.coordinateX},${tile.coordinateY}`)
+  );
   const allMapTiles = generateAllMapTiles();
-  return allMapTiles.filter((tile) => {
-    return !alreadyScannedTiles.some(
-      (scannedTile) =>
-        scannedTile.coordinateX === tile.coordinateX &&
-        scannedTile.coordinateY === tile.coordinateY
-    );
-  });
+
+  return allMapTiles.filter(
+    (tile) => !scannedTileSet.delete(`${tile.coordinateX},${tile.coordinateY}`)
+  );
 };
 
 const generateAllMapTiles = (): ICoordinate[] => {

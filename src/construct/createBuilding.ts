@@ -4,12 +4,12 @@ import { goPage, CLICK_DELAY } from "../browser/browserService";
 import Links from "../constants/links";
 import {
   updatePlayerBuilding,
-  updatePlayerVillageBuildFinishAt,
+  updatePlayerVillageBuildFinishIn,
 } from "../player/playerHandler";
 import { getBuildingType } from "../services/buildingTypeService";
 
 interface BuildResult {
-  time: number | null;
+  durationInMillis: number | null;
   error: string | null;
 }
 
@@ -18,7 +18,7 @@ const createBuilding = async (
   villageId: string,
   slotId: number,
   buildingName: string
-): Promise<number | null> => {
+): Promise<boolean> => {
   const buildingType = await getBuildingType(buildingName);
   if (!buildingType) {
     throw new Error(`Building name ${buildingName} not found in BuildingType`);
@@ -31,12 +31,12 @@ const createBuilding = async (
 
   if (result.error) {
     console.error("Error in creating building:", result.error);
-    return null;
+    return false;
   }
 
   updatePlayerBuilding(villageId, slotId, buildingType, 1);
-  updatePlayerVillageBuildFinishAt(villageId, result.time);
-  return result.time;
+  updatePlayerVillageBuildFinishIn(villageId, result.durationInMillis);
+  return true;
 };
 
 const selectSlot = async (
@@ -60,7 +60,7 @@ const buildSelectedBuilding = async (
   return await page.evaluate((buildingName: string) => {
     const buildDiv = document.getElementById("build");
     if (!buildDiv) {
-      return { time: null, error: "ERROR!! div#build not found" };
+      return { durationInMillis: null, error: "ERROR!! div#build not found" };
     }
 
     const validBuildingWrappers = Array.from(buildDiv.children).filter(
@@ -77,26 +77,32 @@ const buildSelectedBuilding = async (
 
     if (!selectedBuilding) {
       return {
-        time: null,
+        durationInMillis: null,
         error: `ERROR!! Building name ${buildingName} does not exist`,
       };
     }
 
     const contractWrapper = selectedBuilding.querySelector(".contractWrapper");
     if (!contractWrapper) {
-      return { time: null, error: "ERROR!! Contract wrapper not found" };
+      return {
+        durationInMillis: null,
+        error: "ERROR!! Contract wrapper not found",
+      };
     }
 
     const durationElement = contractWrapper.querySelector(
       ".lineWrapper .duration span"
     );
     if (!durationElement) {
-      return { time: null, error: "ERROR!! Duration element not found" };
+      return {
+        durationInMillis: null,
+        error: "ERROR!! Duration element not found",
+      };
     }
 
     const durationText = durationElement.textContent.trim();
     const [hours, minutes, seconds] = durationText.split(":").map(Number);
-    const durationValue = hours * 3600 + minutes * 60 + seconds;
+    const durationValue = (hours * 3600 + minutes * 60 + seconds) * 1000;
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const contractLink = contractWrapper.querySelector(
@@ -106,10 +112,13 @@ const buildSelectedBuilding = async (
     if (contractLink) {
       contractLink.click();
     } else {
-      return { time: null, error: "ERROR!! Contract link button not found" };
+      return {
+        durationInMillis: null,
+        error: "ERROR!! Contract link button not found",
+      };
     }
 
-    return { time: durationValue, error: null };
+    return { durationInMillis: durationValue, error: null };
   }, buildingName);
 };
 

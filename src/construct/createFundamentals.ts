@@ -11,7 +11,7 @@ import { IBuildingType } from "../services/buildingTypeService";
 const createFundamentals = async (
   page: Page,
   village: Village
-): Promise<number | null> => {
+): Promise<boolean> => {
   const fundamentals = await getAllByPriority(PriorityLevels.FUNDAMENTAL);
 
   for (const fundamental of fundamentals) {
@@ -32,14 +32,14 @@ const createFundamentals = async (
     }
   }
 
-  return null;
+  return false;
 };
 
 const createFundamentalBuilding = async (
   page: Page,
   village: Village,
   fundamentalBuilding: IBuildingType
-): Promise<number | null> => {
+): Promise<boolean> => {
   const availableSlotId = await getAvailableSlotId(
     fundamentalBuilding,
     village
@@ -49,7 +49,7 @@ const createFundamentalBuilding = async (
     console.error(
       `No available slot found in village ${village.id} for fundamental Building ${fundamentalBuilding.name}.`
     );
-    return null;
+    return false;
   }
 
   console.log(

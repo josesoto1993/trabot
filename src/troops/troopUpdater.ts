@@ -1,6 +1,6 @@
 import { ElementHandle, Page } from "puppeteer";
 import { CLICK_DELAY } from "../browser/browserService";
-import { formatTime, formatDateTime } from "../utils/timePrint";
+import { formatDateTime, formatTimeMillis } from "../utils/timePrint";
 import { getVillages } from "../player/playerHandler";
 import { goBuilding } from "../village/goVillage";
 import {
@@ -13,7 +13,7 @@ import { TaskResult } from "../index";
 import { IUnit } from "../services/unitService";
 import Village from "../models/village";
 
-const MIN_UPGRADE_DELAY = 5 * 60;
+const MIN_UPGRADE_DELAY = 5 * 60 * 1000;
 
 const upgradeTroops = async (page: Page): Promise<TaskResult> => {
   const upgradeList = await getUpgradeList();
@@ -32,24 +32,30 @@ const upgradeTroops = async (page: Page): Promise<TaskResult> => {
   }
 
   const nextExecutionTime = Math.max(
-    getNextUpgradeRemaining(upgradeList),
-    MIN_UPGRADE_DELAY
+    getNextExecutionTime(upgradeList),
+    Date.now() + MIN_UPGRADE_DELAY
   );
-
   return {
-    nextExecutionTime: nextExecutionTime,
+    nextExecutionTime,
     skip: !anyUpgradePerformed,
   };
 };
 
 const shouldSkip = (upgradeList: IUpgradeUnit[]): TaskResult => {
-  const remainingTime = getNextUpgradeRemaining(upgradeList);
-  return remainingTime > 0
-    ? { nextExecutionTime: remainingTime, skip: true }
+  if (upgradeList.length === 0) {
+    return {
+      nextExecutionTime: MIN_UPGRADE_DELAY * 10 + Date.now(),
+      skip: true,
+    };
+  }
+
+  const nextExecutionTime = getNextExecutionTime(upgradeList);
+  return nextExecutionTime > Date.now()
+    ? { nextExecutionTime, skip: true }
     : null;
 };
 
-const getNextUpgradeRemaining = (upgradeList: IUpgradeUnit[]): number => {
+const getNextExecutionTime = (upgradeList: IUpgradeUnit[]): number => {
   const villages = getVillages();
 
   const minTroopUpgradeTime = villages.reduce((minTime, village) => {
@@ -60,7 +66,7 @@ const getNextUpgradeRemaining = (upgradeList: IUpgradeUnit[]): number => {
     return minTime;
   }, Infinity);
 
-  return minTroopUpgradeTime - Date.now() / 1000;
+  return minTroopUpgradeTime;
 };
 
 const performUpgrade = async (
@@ -97,9 +103,9 @@ const upgradeUnit = async (
     await goBuilding(village, BuildingNames.SMITHY);
     const remainingTime = await getRemainingTime(page);
 
-    if (remainingTime !== 0) {
+    if (remainingTime > 0) {
       console.log(
-        `No need to upgrade [${village.name} / ${unit.name}], remaining time=${formatTime(
+        `No need to upgrade [${village.name} / ${unit.name}], remaining time=${formatTimeMillis(
           remainingTime
         )}`
       );
@@ -134,17 +140,19 @@ const upgradeUnit = async (
 };
 
 const getRemainingTime = async (page: Page): Promise<number> => {
-  const upgradesTimeoutMillis = 5 * 1000;
+  const upgradesTimeout = 5 * 1000;
   const timerSelector = "td.dur span.timer";
   try {
     await page.waitForSelector(timerSelector, {
-      timeout: upgradesTimeoutMillis,
+      timeout: upgradesTimeout,
     });
     const remainingTimes = await page.$$eval(timerSelector, (spans: any[]) =>
       spans.map((span) => parseInt(span.getAttribute("value"), 10))
     );
-    const maxRemainingTime = Math.max(...remainingTimes);
-    console.log(`Maximum remaining time: ${formatTime(maxRemainingTime)}`);
+    const maxRemainingTime = Math.max(...remainingTimes) * 1000;
+    console.log(
+      `Maximum remaining time: ${formatTimeMillis(maxRemainingTime)}`
+    );
     return maxRemainingTime;
   } catch (error) {
     if (error.name === "TimeoutError") {
@@ -237,16 +245,14 @@ const getSection = async (
 const updateVillageTroopTime = (
   village: Village,
   unit: IUnit,
-  finalRemainingTime: number
+  durationInMillis: number
 ): void => {
-  const finishTime = finalRemainingTime + Date.now() / 1000;
+  const finishTime = durationInMillis + Date.now();
 
   village.upgradeTroopTime = finishTime;
 
   console.log(
-    `Village ${village.name} / ${unit.name} -> duration ${formatTime(
-      finalRemainingTime
-    )} will finish ${formatDateTime(finishTime)}`
+    `Village ${village.name} / ${unit.name} -> will finish ${formatDateTime(finishTime)}`
   );
 };
 

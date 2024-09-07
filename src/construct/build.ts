@@ -4,20 +4,18 @@ import {
   updateVillageResources,
   updateVillageBuildings,
   getVillages,
-  updatePlayerVillageBuildFinishAt,
+  updatePlayerVillageBuildFinishIn,
 } from "../player/playerHandler";
 import upgradeResources from "./upgradeResources";
 import createFundamentals from "./createFundamentals";
 import updateBuildingList from "./updateBuildingList";
-import { formatTime, formatTimeMillis } from "../utils/timePrint";
+import { formatTimeMillis } from "../utils/timePrint";
 import { getAllByPriority } from "../services/PriorityBuildingService";
 import PriorityLevels from "../constants/priorityLevels";
 import { TaskResult } from "../index";
 import Village from "../models/village";
 
-const DEFAULT_INTERVAL = 15 * 60;
-
-const build = async (page: Page): Promise<TaskResult> => {
+const build = async (page: Page, interval: number): Promise<TaskResult> => {
   const skip = shouldSkip();
   if (skip) {
     return skip;
@@ -25,43 +23,41 @@ const build = async (page: Page): Promise<TaskResult> => {
 
   console.log("Time to build, starting the build process...");
 
-  await processVillagesBuild(page);
-
-  console.log(
-    `Build process finished, next in ${formatTime(getNextBuildFinishAt())}`
-  );
+  await processVillagesBuild(page, interval);
 
   return {
-    nextExecutionTime: getNextBuildFinishAt(),
+    nextExecutionTime: getNextExecutionTime(),
     skip: false,
   };
 };
 
 const shouldSkip = (): TaskResult | null => {
-  const remainingTime = getNextBuildFinishAt();
-  return remainingTime > 0
-    ? { nextExecutionTime: remainingTime, skip: true }
+  const nextExecutionTime = getNextExecutionTime();
+  return nextExecutionTime > Date.now()
+    ? { nextExecutionTime, skip: true }
     : null;
 };
 
-const getNextBuildFinishAt = (): number => {
-  const currentTime = Date.now();
+const getNextExecutionTime = (): number => {
   const villages = getVillages();
 
   const minBuildFinishAt = Math.min(
     ...villages.map((village) => village.buildFinishTime)
   );
 
-  return (minBuildFinishAt - currentTime) / 1000;
+  return minBuildFinishAt;
 };
 
-const processVillagesBuild = async (page: Page): Promise<void> => {
+const processVillagesBuild = async (
+  page: Page,
+  interval: number
+): Promise<void> => {
   await updateVillagesOverviewInfo(page);
   const villages = getVillages();
   for (const village of villages) {
     if (village.skipUpgrade && village.skipCreation) {
       console.log(`Skipping ${village.name} build and upgrade`);
-      updatePlayerVillageBuildFinishAt(village.id, DEFAULT_INTERVAL * 10);
+      updatePlayerVillageBuildFinishIn(village.id, interval);
       continue;
     }
 
@@ -74,13 +70,14 @@ const processVillagesBuild = async (page: Page): Promise<void> => {
 
     await updateVillageResources(page, village.id);
     await updateVillageBuildings(page, village.id);
-    await processVillageBuild(page, village);
+    await processVillageBuild(page, village, interval);
   }
 };
 
 const processVillageBuild = async (
   page: Page,
-  village: Village
+  village: Village,
+  interval: number
 ): Promise<void> => {
   if (!village.capital && !village.skipCreation) {
     const fundamentalsCreated = await createFundamentals(page, village);
@@ -91,7 +88,7 @@ const processVillageBuild = async (
 
   if (village.skipUpgrade) {
     console.log(`Skipping upgrade in ${village.name}`);
-    updatePlayerVillageBuildFinishAt(village.id, DEFAULT_INTERVAL);
+    updatePlayerVillageBuildFinishIn(village.id, interval);
     return;
   }
 
@@ -134,7 +131,7 @@ const processVillageBuild = async (
   }
 
   console.log(`Nothing to update in ${village.name}`);
-  updatePlayerVillageBuildFinishAt(village.id, DEFAULT_INTERVAL);
+  updatePlayerVillageBuildFinishIn(village.id, interval);
 };
 
 export default build;

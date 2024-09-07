@@ -3,8 +3,9 @@ import TaskNames from "../constants/taskNames";
 
 export interface ITaskSchema extends Document {
   _id: mongoose.Schema.Types.ObjectId;
-  name: keyof typeof TaskNames;
+  name: TaskNames;
   isActive: boolean;
+  interval: number;
 }
 
 const TaskSchema: Schema<ITaskSchema> = new Schema({
@@ -20,6 +21,10 @@ const TaskSchema: Schema<ITaskSchema> = new Schema({
   isActive: {
     type: Boolean,
     default: true,
+  },
+  interval: {
+    type: Number,
+    required: false,
   },
 });
 

@@ -55,7 +55,7 @@ const getVillagesOverviewInfo = async (page: Page): Promise<Village[]> => {
         merchantsTable[village.name]?.availableMerchants ?? 0;
       village.maxMerchants = merchantsTable[village.name]?.maxMerchants ?? 0;
       village.celebrationTime =
-        cultureTable[village.name]?.celebrationTime ?? 0;
+        cultureTable[village.name]?.celebrationTime ?? Infinity;
       village.consumption = consumptionTable[village.name] ?? 0;
     }
 
@@ -134,13 +134,14 @@ const getOverviewCelebrations = async (
         if (celebrationElement.classList.contains("timer")) {
           const durationText = celebrationElement.textContent?.trim() ?? "";
           const [hours, minutes, seconds] = durationText.split(":").map(Number);
-          value = (hours || 0) * 3600 + (minutes || 0) * 60 + (seconds || 0);
+          value =
+            ((hours || 0) * 3600 + (minutes || 0) * 60 + (seconds || 0)) * 1000;
         } else if (celebrationElement.classList.contains("dot")) {
           value = 0;
         }
       }
 
-      result[villageName].celebrationTime = value ?? 0;
+      result[villageName].celebrationTime = (value ?? Infinity) + Date.now();
     });
     return result;
   }, ROW_SELECTOR);

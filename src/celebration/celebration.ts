@@ -1,5 +1,5 @@
 import { ElementHandle, Page } from "puppeteer";
-import { formatTime } from "../utils/timePrint";
+import { formatTime, formatTimeMillis } from "../utils/timePrint";
 import { goBuilding } from "../village/goVillage";
 import { CLICK_DELAY } from "../browser/browserService";
 import BuildingNames from "../constants/buildingNames";
@@ -10,8 +10,7 @@ import {
 import { TaskResult } from "../index";
 import Village from "../models/village";
 
-const CELEBRATION_TIME_GAP = 4 * 60 * 60;
-const AWAIT_MORE_RESOURCES_TIME = 15 * 60;
+const AWAIT_MORE_RESOURCES_TIME = 15 * 60 * 1000;
 
 interface CelebrationButton {
   button: ElementHandle<HTMLButtonElement>;
@@ -19,21 +18,20 @@ interface CelebrationButton {
   exist: boolean;
 }
 
-const manageCelebrations = async (page: Page): Promise<TaskResult> => {
-  const skip = shouldSkip();
+const manageCelebrations = async (
+  page: Page,
+  interval: number
+): Promise<TaskResult> => {
+  const skip = shouldSkip(interval);
   if (skip) {
     return skip;
   }
 
   console.log("Time to start celebrations process...");
 
-  await processVillagesCelebration(page);
+  await processVillagesCelebration(page, interval);
 
-  const nextExecutionTime = getNextCelebrationFinishAt() - CELEBRATION_TIME_GAP;
-
-  console.log(
-    `Celebration process finished, next in ${formatTime(nextExecutionTime)}`
-  );
+  const nextExecutionTime = getNextExecutionTime(interval);
 
   return {
     nextExecutionTime,
@@ -41,51 +39,50 @@ const manageCelebrations = async (page: Page): Promise<TaskResult> => {
   };
 };
 
-const shouldSkip = (): TaskResult | null => {
-  const remainingTimes = getVillages()
-    .map((village) => village.celebrationTime)
-    .filter((time): time is number => time !== null);
+const shouldSkip = (interval: number): TaskResult | null => {
+  const nextExecutionTime = getNextExecutionTime(interval);
 
-  const remainingTime =
-    Math.min(...remainingTimes, Infinity) - CELEBRATION_TIME_GAP;
-
-  return remainingTime > 0
-    ? { nextExecutionTime: remainingTime, skip: true }
+  return nextExecutionTime > Date.now()
+    ? { nextExecutionTime, skip: true }
     : null;
 };
 
-const getNextCelebrationFinishAt = (): number => {
+const getNextExecutionTime = (interval: number): number => {
   const minCelebrationFinishAt = Math.min(
     ...getVillages().map((village) => village.celebrationTime || Infinity)
   );
 
-  return minCelebrationFinishAt;
+  return minCelebrationFinishAt - interval;
 };
 
-const processVillagesCelebration = async (page: Page) => {
+const processVillagesCelebration = async (page: Page, interval: number) => {
   await updateVillagesOverviewInfo(page);
   const villages = getVillages();
   for (const village of villages) {
     if (
       village.celebrationTime !== null &&
-      village.celebrationTime > CELEBRATION_TIME_GAP
+      village.celebrationTime > Date.now() + interval
     ) {
       console.log(
-        `Village ${village.name} does not need celebration, remaining time ${formatTime(village.celebrationTime)} > desired ${formatTime(CELEBRATION_TIME_GAP)} `
+        `Village ${village.name} does not need celebration, remaining time ${formatTimeMillis(village.celebrationTime - Date.now())} > desired ${formatTime(interval)} `
       );
       continue;
     }
-    await processVillageCelebration(page, village);
+    await processVillageCelebration(page, village, interval);
   }
 };
 
-const processVillageCelebration = async (page: Page, village: Village) => {
+const processVillageCelebration = async (
+  page: Page,
+  village: Village,
+  interval: number
+) => {
   const villageTownHall = village.buildings.find(
     (building) => building.name === BuildingNames.TOWN_HALL
   );
 
   if (!villageTownHall) {
-    village.celebrationTime = CELEBRATION_TIME_GAP * 2;
+    village.celebrationTime = Date.now() + interval * 2;
     console.log(
       `Village ${village.name} does not need celebration as it does not have a town hall, set time to ${village.celebrationTime}`
     );
@@ -94,7 +91,7 @@ const processVillageCelebration = async (page: Page, village: Village) => {
 
   const celebrationTime = await celebrate(page, village);
   if (!celebrationTime) {
-    village.celebrationTime = CELEBRATION_TIME_GAP + AWAIT_MORE_RESOURCES_TIME;
+    village.celebrationTime = Date.now() + interval + AWAIT_MORE_RESOURCES_TIME;
     console.log(
       `Set await resources celebration time ${village.celebrationTime} on ${village.name}`
     );
@@ -120,7 +117,7 @@ const selectCelebration = async (page: Page): Promise<number | null> => {
     await greatCelebration.button.click();
     console.log("Great celebration selected.");
     await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
-    return greatCelebration.celebrationTime;
+    return greatCelebration.celebrationTime + Date.now();
   } else if (
     smallCelebration.exist &&
     smallCelebration.button &&
@@ -129,13 +126,13 @@ const selectCelebration = async (page: Page): Promise<number | null> => {
     await smallCelebration.button.click();
     console.log("Small celebration selected.");
     await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
-    return smallCelebration.celebrationTime;
+    return smallCelebration.celebrationTime + Date.now();
   } else {
     const remainingTime = await getRemainingCelebrationTime(page);
     console.log(
-      `No celebration can be selected. Keep remainingTime ${formatTime(remainingTime)}`
+      `No celebration can be selected. Keep remainingTime ${formatTimeMillis(remainingTime)}`
     );
-    return remainingTime;
+    return remainingTime + Date.now();
   }
 };
 
@@ -222,7 +219,7 @@ const getCelebrationTime = async (
     durationElement
   );
   const [hours, minutes, seconds] = durationText.split(":").map(Number);
-  return hours * 3600 + minutes * 60 + seconds;
+  return (hours * 3600 + minutes * 60 + seconds) * 1000;
 };
 
 const getRemainingCelebrationTime = async (
@@ -239,7 +236,7 @@ const getRemainingCelebrationTime = async (
     durationElement
   );
 
-  return isNaN(duration) ? null : duration;
+  return isNaN(duration) ? null : duration * 1000;
 };
 
 export default manageCelebrations;

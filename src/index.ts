@@ -3,7 +3,7 @@ dotenv.config();
 import mongoose from "mongoose";
 
 import { Page } from "puppeteer";
-import { formatTime, formatTimeMillis } from "./utils/timePrint";
+import { formatDateTime, formatTimeMillis } from "./utils/timePrint";
 import { open, close } from "./browser/browserService";
 import login from "./browser/loginService";
 import attackFarms from "./attackFarms/attackFarms";
@@ -18,7 +18,7 @@ import manageCelebrations from "./celebration/celebration";
 import { updateVillages, getPlayer } from "./player/playerHandler";
 import populate from "./populators/populator";
 import TaskNames from "./constants/taskNames";
-import { isTaskActive } from "./services/taskService";
+import { getTaskInterval, isTaskActive } from "./services/taskService";
 import scannerRunner from "./mapScanner/scannerRunner";
 
 const taskStats: Record<string, { totalDuration: number; count: number }> = {};
@@ -49,6 +49,7 @@ const main = async () => {
   await initPlayer(page);
   await mainLoop(page);
   await finalizeBrowser();
+  process.exit();
 };
 
 const initPlayer = async (page: Page) => {
@@ -59,34 +60,49 @@ const initPlayer = async (page: Page) => {
 const mainLoop = async (page: Page) => {
   try {
     let loopNumber = 0;
-    let nextLoop = 0;
     while (true) {
       loopNumber += 1;
       console.log(`\n\n\n---------------- loop ${loopNumber} ----------------`);
 
-      nextLoop = Math.min(
-        await runTaskWithTimer(TaskNames.MAP_SCANNER, () =>
-          scannerRunner(page)
+      const nextExecutionTime = Math.min(
+        await runTaskWithTimer(TaskNames.MAP_SCANNER, (interval: number) =>
+          scannerRunner(page, interval)
         ),
-        await runTaskWithTimer(TaskNames.DEFICIT, () => manageDeficit(page)),
-        await runTaskWithTimer(TaskNames.OVERFLOW, () => manageOverflow(page)),
-        await runTaskWithTimer(TaskNames.ATTACK_FARMS, () => attackFarms(page)),
-        await runTaskWithTimer(TaskNames.TRAIN_TROOPS, () => trainTroops(page)),
-        await runTaskWithTimer(TaskNames.UPGRADE_TROOPS, () =>
+        await runTaskWithTimer(TaskNames.DEFICIT, (interval: number) =>
+          manageDeficit(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.OVERFLOW, (interval: number) =>
+          manageOverflow(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.ATTACK_FARMS, (interval: number) =>
+          attackFarms(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.TRAIN_TROOPS, (interval: number) =>
+          trainTroops(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.UPGRADE_TROOPS, (_: number) =>
           upgradeTroops(page)
         ),
-        await runTaskWithTimer(TaskNames.GO_ADVENTURE, () => goAdventure(page)),
-        await runTaskWithTimer(TaskNames.BUILD, () => build(page)),
-        await runTaskWithTimer(TaskNames.REDEEM, () => redeem(page)),
-        await runTaskWithTimer(TaskNames.CELEBRATIONS, () =>
-          manageCelebrations(page)
+        await runTaskWithTimer(TaskNames.GO_ADVENTURE, (interval: number) =>
+          goAdventure(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.BUILD, (interval: number) =>
+          build(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.REDEEM, (interval: number) =>
+          redeem(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.CELEBRATIONS, (interval: number) =>
+          manageCelebrations(page, interval)
         )
       );
+      console.log(`next loop at ${formatDateTime(nextExecutionTime)}`);
+      const nextLoop = Math.max(nextExecutionTime - Date.now(), 0);
 
       console.log(
-        `\n---------------- Waiting for ${formatTime(nextLoop)} before next run----------------`
+        `\n---------------- Waiting for ${formatTimeMillis(nextLoop)} before next run ----------------`
       );
-      await new Promise((resolve) => setTimeout(resolve, nextLoop * 1000));
+      await new Promise((resolve) => setTimeout(resolve, nextLoop));
     }
   } catch (error) {
     console.error("Error in main loop:", error);
@@ -114,8 +130,8 @@ const finalizeBrowser = async () => {
 
 const runTaskWithTimer = async (
   taskName: TaskNames,
-  task: () => Promise<TaskResult>
-) => {
+  task: (interval: number) => Promise<TaskResult>
+): Promise<number> => {
   const taskStatus = await isTaskActive(taskName);
   if (!taskStatus) {
     console.log(`\n---------------- ${taskName} skip ----------------`);
@@ -129,7 +145,8 @@ const runTaskWithTimer = async (
   try {
     console.log(`\n---------------- ${taskName} start ----------------`);
     const startTime = Date.now();
-    const { nextExecutionTime, skip } = await task();
+    const interval = await getTaskInterval(taskName);
+    const { nextExecutionTime, skip } = await task(interval);
 
     const endTime = Date.now();
     const duration = endTime - startTime;
@@ -137,13 +154,15 @@ const runTaskWithTimer = async (
     if (!skip) {
       taskStats[taskName].totalDuration += duration;
       taskStats[taskName].count += 1;
+    } else {
+      console.log("task internal skip");
     }
 
     const averageDuration =
       taskStats[taskName].totalDuration / (taskStats[taskName].count || 1);
 
     console.log(
-      `${taskName} ended, took ${formatTimeMillis(duration)}, next in ${formatTime(nextExecutionTime)}`
+      `${taskName} ended, took ${formatTimeMillis(duration)}, next at ${formatDateTime(nextExecutionTime)}`
     );
     console.log(
       `Average duration of ${taskName}: ${formatTimeMillis(averageDuration)} for total runs ${taskStats[taskName].count}`
