@@ -18,15 +18,16 @@ export interface ITileUpsertData {
   crop?: number;
   upkeep?: number;
 }
+export interface ITile extends ITileSchema {}
 
-export const getAllTiles = async (): Promise<ITileSchema[]> => {
+export const getAllTiles = async (): Promise<ITile[]> => {
   return await TileModel.find();
 };
 
 export const getTile = async (
   coordinateX: number,
   coordinateY: number
-): Promise<ITileSchema | null> => {
+): Promise<ITile | null> => {
   const filter = { coordinateX, coordinateY };
   return await TileModel.findOne(filter);
 };
