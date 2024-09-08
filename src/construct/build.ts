@@ -127,6 +127,7 @@ const processVillageBuild = async (
     console.log(
       `Ignore low priority on ${village.name} as still have fields level ${minResourceFieldLevel}`
     );
+    updatePlayerVillageBuildFinishIn(village.id, interval);
     return;
   }
 
