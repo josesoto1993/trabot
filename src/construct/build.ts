@@ -121,7 +121,7 @@ const processVillageBuild = async (
 
   const minResourceFieldLevel = village.resourceFields.reduce(
     (minLevel, field) => (field.level < minLevel ? field.level : minLevel),
-    20
+    RESOURCE_MAX_LEVEL
   );
   if (minResourceFieldLevel < RESOURCE_MAX_LEVEL) {
     console.log(
@@ -129,6 +129,7 @@ const processVillageBuild = async (
     );
     return;
   }
+
   const lowPriorityBuilding = await getAllByPriority(PriorityLevels.LOW);
   const lowUpgraded = await updateBuildingList(
     page,
