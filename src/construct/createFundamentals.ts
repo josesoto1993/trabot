@@ -1,7 +1,7 @@
 import { Page } from "puppeteer";
 import createBuilding from "./createBuilding";
 import { getBuildingCategory } from "../services/buildingCategoryService";
-import { getAllByPriority } from "../services/PriorityBuildingService";
+import { getPriorityBuildingByPriority } from "../services/PriorityBuildingService";
 import PriorityLevels from "../constants/priorityLevels";
 import BuildingCategory from "../constants/buildingCategories";
 import Village from "../models/village";
@@ -12,7 +12,9 @@ const createFundamentals = async (
   page: Page,
   village: Village
 ): Promise<boolean> => {
-  const fundamentals = await getAllByPriority(PriorityLevels.FUNDAMENTAL);
+  const fundamentals = await getPriorityBuildingByPriority(
+    PriorityLevels.FUNDAMENTAL
+  );
 
   for (const fundamental of fundamentals) {
     const fundamentalBuilding = fundamental.building;
