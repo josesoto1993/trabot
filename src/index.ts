@@ -6,7 +6,7 @@ import { Page } from "puppeteer";
 import { formatDateTime, formatTimeMillis } from "./utils/timePrint";
 import { open, close } from "./browser/browserService";
 import login from "./browser/loginService";
-import attackFarms from "./attackFarms/attackFarms";
+import attackFarms from "./attack/attackFarms";
 import trainTroops from "./troops/troopCreator";
 import upgradeTroops from "./troops/troopUpdater";
 import goAdventure from "./hero/heroAdventure";
