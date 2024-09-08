@@ -7,7 +7,7 @@ import ResourceField from "../models/resourceField";
 
 const CAPITAL_FIELDS_ENABLE = process.env.CAPITAL_FIELDS_ENABLE === "true";
 
-const RESOURCE_MAX_LEVEL = 10;
+export const RESOURCE_MAX_LEVEL = 10;
 
 const upgradeResources = async (
   page: Page,

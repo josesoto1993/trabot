@@ -42,6 +42,7 @@ const getFundamentalBuildings = async (): Promise<
     BuildingNames.BRICKYARD,
     BuildingNames.SAWMILL,
     BuildingNames.IRON_FOUNDRY,
+    BuildingNames.BARRACKS,
     BuildingNames.ACADEMY,
     BuildingNames.TOWN_HALL,
     BuildingNames.BAKERY,
@@ -87,9 +88,10 @@ const getMidPriorityBuildings = async (): Promise<
 > => {
   const buildingNames = [
     { name: BuildingNames.BARRACKS, level: 3 },
-    { name: BuildingNames.TOWN_HALL, level: 10 },
     { name: BuildingNames.MARKETPLACE, level: 10 },
     { name: BuildingNames.ACADEMY, level: 10 },
+    { name: BuildingNames.WAREHOUSE, level: 13 },
+    { name: BuildingNames.GRANARY, level: 11 },
   ];
 
   return Promise.all(
@@ -105,6 +107,7 @@ const getLowPriorityBuildings = async (): Promise<
   IPriorityBuildingUpsertData[]
 > => {
   const buildingNames = [
+    { name: BuildingNames.TOWN_HALL, level: 10 },
     { name: BuildingNames.WAREHOUSE, level: 20 },
     { name: BuildingNames.GRANARY, level: 20 },
     { name: BuildingNames.MARKETPLACE, level: 20 },

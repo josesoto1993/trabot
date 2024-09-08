@@ -6,7 +6,7 @@ import {
   getVillages,
   updatePlayerVillageBuildFinishIn,
 } from "../player/playerHandler";
-import upgradeResources from "./upgradeResources";
+import upgradeResources, { RESOURCE_MAX_LEVEL } from "./upgradeResources";
 import createFundamentals from "./createFundamentals";
 import updateBuildingList from "./updateBuildingList";
 import { formatTimeMillis } from "../utils/timePrint";
@@ -116,6 +116,18 @@ const processVillageBuild = async (
     PriorityLevels.MID
   );
   if (midUpgraded) {
+    return;
+  }
+
+  const minResourceFieldLevel = village.resourceFields.reduce(
+    (minLevel, field) => (field.level < minLevel ? field.level : minLevel),
+    RESOURCE_MAX_LEVEL
+  );
+  if (minResourceFieldLevel < RESOURCE_MAX_LEVEL) {
+    console.log(
+      `Ignore low priority on ${village.name} as still have fields level ${minResourceFieldLevel}`
+    );
+    updatePlayerVillageBuildFinishIn(village.id, interval);
     return;
   }
 
