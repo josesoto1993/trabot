@@ -20,6 +20,7 @@ import populate from "./populators/populator";
 import TaskNames from "./constants/taskNames";
 import { getTaskInterval, isTaskActive } from "./services/taskService";
 import scannerRunner from "./mapScanner/scannerRunner";
+import balanceHeroResources from "./hero/heroResourceBalancer";
 
 const taskStats: Record<string, { totalDuration: number; count: number }> = {};
 
@@ -65,6 +66,10 @@ const mainLoop = async (page: Page) => {
       console.log(`\n\n\n---------------- loop ${loopNumber} ----------------`);
 
       const nextExecutionTime = Math.min(
+        await runTaskWithTimer(
+          TaskNames.HERO_RESOURCE_BALANCER,
+          (interval: number) => balanceHeroResources(page, interval)
+        ),
         await runTaskWithTimer(TaskNames.MAP_SCANNER, (interval: number) =>
           scannerRunner(page, interval)
         ),

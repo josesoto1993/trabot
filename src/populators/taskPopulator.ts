@@ -50,6 +50,8 @@ const getDefaultInterval = (taskName: TaskNames): number => {
       return 4 * 60 * 60 * 1000;
     case TaskNames.MAP_SCANNER:
       return 15 * 60 * 1000;
+    case TaskNames.HERO_RESOURCE_BALANCER:
+      return 60 * 60 * 1000;
     default:
       throw new Error(`Unknown task name: ${taskName}`);
   }

@@ -5,7 +5,6 @@ import { formatDateTime } from "../utils/timePrint";
 import { TaskResult } from "../index";
 
 let lastAttackTime: number = 0;
-let attackCount: number = 1;
 
 const attackFarms = async (
   page: Page,
@@ -35,7 +34,6 @@ const getNextExecutionTime = (interval: number): number => {
 
 const updateNextAttackTime = (): void => {
   lastAttackTime = Date.now();
-  attackCount = attackCount + 1;
 };
 
 const performAttack = async (page: Page): Promise<boolean> => {
@@ -44,10 +42,6 @@ const performAttack = async (page: Page): Promise<boolean> => {
 
     await waitForButtonsToLoad(page);
     await clickButtons(page);
-
-    console.log(
-      `Attack completed successfully. Total attacks done ${attackCount}`
-    );
 
     return true;
   } catch (error) {
