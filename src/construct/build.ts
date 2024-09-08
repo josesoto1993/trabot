@@ -6,7 +6,7 @@ import {
   getVillages,
   updatePlayerVillageBuildFinishIn,
 } from "../player/playerHandler";
-import upgradeResources from "./upgradeResources";
+import upgradeResources, { RESOURCE_MAX_LEVEL } from "./upgradeResources";
 import createFundamentals from "./createFundamentals";
 import updateBuildingList from "./updateBuildingList";
 import { formatTimeMillis } from "../utils/timePrint";
@@ -119,15 +119,21 @@ const processVillageBuild = async (
     return;
   }
 
-  const lowPriorityBuilding = await getAllByPriority(PriorityLevels.LOW);
-  const lowUpgraded = await updateBuildingList(
-    page,
-    village,
-    lowPriorityBuilding,
-    PriorityLevels.LOW
+  const minResourceFieldLevel = village.resourceFields.reduce(
+    (minLevel, field) => (field.level < minLevel ? field.level : minLevel),
+    20
   );
-  if (lowUpgraded) {
-    return;
+  if (minResourceFieldLevel >= RESOURCE_MAX_LEVEL) {
+    const lowPriorityBuilding = await getAllByPriority(PriorityLevels.LOW);
+    const lowUpgraded = await updateBuildingList(
+      page,
+      village,
+      lowPriorityBuilding,
+      PriorityLevels.LOW
+    );
+    if (lowUpgraded) {
+      return;
+    }
   }
 
   console.log(`Nothing to update in ${village.name}`);
