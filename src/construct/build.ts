@@ -123,17 +123,21 @@ const processVillageBuild = async (
     (minLevel, field) => (field.level < minLevel ? field.level : minLevel),
     20
   );
-  if (minResourceFieldLevel >= RESOURCE_MAX_LEVEL) {
-    const lowPriorityBuilding = await getAllByPriority(PriorityLevels.LOW);
-    const lowUpgraded = await updateBuildingList(
-      page,
-      village,
-      lowPriorityBuilding,
-      PriorityLevels.LOW
+  if (minResourceFieldLevel < RESOURCE_MAX_LEVEL) {
+    console.log(
+      `Ignore low priority on ${village.name} as still have fields level ${minResourceFieldLevel}`
     );
-    if (lowUpgraded) {
-      return;
-    }
+    return;
+  }
+  const lowPriorityBuilding = await getAllByPriority(PriorityLevels.LOW);
+  const lowUpgraded = await updateBuildingList(
+    page,
+    village,
+    lowPriorityBuilding,
+    PriorityLevels.LOW
+  );
+  if (lowUpgraded) {
+    return;
   }
 
   console.log(`Nothing to update in ${village.name}`);
