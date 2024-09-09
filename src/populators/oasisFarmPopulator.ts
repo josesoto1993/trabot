@@ -34,6 +34,7 @@ const getOasisFarmData = (): IOasisFarmUpsertData[] => {
   ];
 
   return coords.map((coord) => ({
+    villageName: "HDS 01",
     coordinateX: coord.x,
     coordinateY: coord.y,
     unitName: UnitNames.SWORDSMAN,

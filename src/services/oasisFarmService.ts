@@ -5,6 +5,7 @@ import { getTile, ITile } from "./tileService";
 import { getUnit, IUnit } from "./unitService";
 
 export interface IOasisFarmUpsertData {
+  villageName: string;
   coordinateX: number;
   coordinateY: number;
   unitName: UnitNames;
@@ -89,6 +90,7 @@ export const upsertOasisFarm = async (
     tile: tile._id,
   };
   const update: any = {
+    villageName: oasisFarmData.villageName,
     unit: unit._id,
     unitQtty: oasisFarmData.unitQtty,
   };

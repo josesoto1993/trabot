@@ -4,6 +4,7 @@ import { IUnit } from "../services/unitService";
 
 export interface IOasisFarmSchema extends Document {
   _id: mongoose.Schema.Types.ObjectId;
+  villageName: string;
   tile: mongoose.Schema.Types.ObjectId | ITile;
   unit: mongoose.Schema.Types.ObjectId | IUnit;
   unitQtty: number;
@@ -13,6 +14,10 @@ export interface IOasisFarmSchema extends Document {
 const OasisFarmSchema: Schema<IOasisFarmSchema> = new Schema({
   _id: {
     type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
+  villageName: {
+    type: String,
     required: true,
   },
   tile: {
