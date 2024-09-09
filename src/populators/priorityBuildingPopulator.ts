@@ -2,7 +2,7 @@ import PriorityLevels from "../constants/priorityLevels";
 import {
   IPriorityBuildingUpsertData,
   upsertPriorityBuilding,
-} from "../services/PriorityBuildingService";
+} from "../services/priorityBuildingService";
 import { getBuildingType } from "../services/buildingTypeService";
 import BuildingNames from "../constants/buildingNames";
 
@@ -42,7 +42,6 @@ const getFundamentalBuildings = async (): Promise<
     BuildingNames.BRICKYARD,
     BuildingNames.SAWMILL,
     BuildingNames.IRON_FOUNDRY,
-    BuildingNames.BARRACKS,
     BuildingNames.ACADEMY,
     BuildingNames.TOWN_HALL,
     BuildingNames.BAKERY,

@@ -10,7 +10,7 @@ import upgradeResources, { RESOURCE_MAX_LEVEL } from "./upgradeResources";
 import createFundamentals from "./createFundamentals";
 import updateBuildingList from "./updateBuildingList";
 import { formatTimeMillis } from "../utils/timePrint";
-import { getPriorityBuildingByPriority } from "../services/PriorityBuildingService";
+import { getPriorityBuildingByPriority } from "../services/priorityBuildingService";
 import PriorityLevels from "../constants/priorityLevels";
 import { TaskResult } from "../index";
 import Village from "../models/village";
