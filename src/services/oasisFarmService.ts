@@ -1,3 +1,4 @@
+import TileTypes from "../constants/tileTypes";
 import UnitNames from "../constants/unitsNames";
 import OasisFarmModel, { IOasisFarmSchema } from "../schemas/oasisFarmSchema";
 import { getTile, ITile } from "./tileService";
@@ -65,6 +66,15 @@ export const upsertOasisFarm = async (
   if (!tile) {
     console.log(
       `ERROR! Can't find oasis to add at: (${oasisFarmData.coordinateX}|${oasisFarmData.coordinateY})`
+    );
+    return null;
+  }
+  if (
+    tile.tileType !== TileTypes.UNOCUPPIED_OASIS &&
+    tile.tileType !== TileTypes.OCCUPIED_OASIS
+  ) {
+    console.log(
+      `ERROR! tile at (${oasisFarmData.coordinateX}|${oasisFarmData.coordinateY}) is not an oasis`
     );
     return null;
   }

@@ -1,5 +1,6 @@
 import populateBuildingCategories from "./buildingCategoryPopulator";
 import populateBuildingTypes from "./buildingTypePopulator";
+import populateOasisFarms from "./oasisFarmPopulator";
 import populatePriorityBuildings from "./PriorityBuildingPopulator";
 import populateTasks from "./taskPopulator";
 import ensureTileCollectionExists from "./tilePopulator";
@@ -19,6 +20,7 @@ const populate = async (): Promise<void> => {
   await ensureTrainCollectionExists();
   await ensureUpgradeCollectionExists();
   await ensureTileCollectionExists();
+  await populateOasisFarms();
   console.log("End population");
 };
 
