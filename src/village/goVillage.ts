@@ -1,4 +1,5 @@
 import { goPage } from "../browser/browserService";
+import BuildingNames from "../constants/buildingNames";
 import Links from "../constants/links";
 import Village from "../models/village";
 
@@ -22,7 +23,7 @@ export const goVillageBuildingView = async (
 
 export const goBuilding = async (
   village: Village,
-  buildingName: string,
+  buildingName: BuildingNames,
   searchParams: Record<
     string,
     string | number | boolean | null | undefined

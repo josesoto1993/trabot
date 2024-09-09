@@ -1,6 +1,7 @@
 import UnitModel, { IUnitSchema } from "../schemas/unitSchema";
 import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
 import UnitNames from "../constants/unitsNames";
+import { IBuildingType } from "./buildingTypeService";
 
 export interface IUnitUpsertData {
   name: UnitNames;
@@ -17,7 +18,7 @@ export interface IUnitUpsertData {
   upkeep: number;
 }
 export interface IUnit extends IUnitSchema {
-  building: IBuildingTypeSchema;
+  building: IBuildingType;
 }
 
 let cachedUnits: Record<string, IUnit> | null = null;
