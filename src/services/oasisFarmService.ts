@@ -3,9 +3,10 @@ import ICoordinates from "../commonInterfaces/coordinates";
 import TileTypes from "../constants/tileTypes";
 import UnitNames from "../constants/unitsNames";
 import OasisFarmModel, { IOasisFarmSchema } from "../schemas/oasisFarmSchema";
-import { getTile, ITile } from "./tileService";
+import { getTile, ITile, parseTileSchemaToTile } from "./tileService";
 import { getUnit, IUnit } from "./unitService";
 import ISquadron from "../commonInterfaces/squadron";
+import { ITileSchema } from "../schemas/tileSchema";
 
 export interface IOasisFarmUpsertData {
   villageName: string;
@@ -124,7 +125,7 @@ export const parseOasisFarmSchemaToOasisFarm = async (
   return {
     _id: oasisFarm._id,
     villageName: oasisFarm.villageName,
-    tile: oasisFarm.tile as ITile,
+    tile: parseTileSchemaToTile(oasisFarm.tile as ITileSchema),
     squadron: {
       unit: oasisFarm.unit as IUnit,
       quantity: oasisFarm.unitQtty,

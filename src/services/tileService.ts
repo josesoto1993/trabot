@@ -116,7 +116,7 @@ const isTileUpsertData = (
   return (tile as ITileUpsertData).att !== undefined;
 };
 
-const parseTileSchemaToTile = (tileSchema: ITileSchema): ITile => {
+export const parseTileSchemaToTile = (tileSchema: ITileSchema): ITile => {
   return {
     _id: tileSchema._id,
     coordinates: {

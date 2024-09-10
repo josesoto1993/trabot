@@ -1,11 +1,12 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 import { ITile } from "../services/tileService";
 import { IUnit } from "../services/unitService";
+import { ITileSchema } from "./tileSchema";
 
 export interface IOasisFarmSchema extends Document {
   _id: mongoose.Schema.Types.ObjectId;
   villageName: string;
-  tile: mongoose.Schema.Types.ObjectId | ITile;
+  tile: mongoose.Schema.Types.ObjectId | ITileSchema | ITile;
   unit: mongoose.Schema.Types.ObjectId | IUnit;
   unitQtty: number;
   lastAttack?: Date;
