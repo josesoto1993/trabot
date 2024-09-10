@@ -6,6 +6,7 @@ enum TribeNames {
   HUNS = "Huns",
   NATURE = "Nature",
   NATARS = "Natars",
+  SPECIAL = "Special",
 }
 
 export const getTribeName = (tribeName: string): TribeNames | null => {

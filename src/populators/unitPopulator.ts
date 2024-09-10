@@ -24,6 +24,7 @@ const getBaseGaulUnits = async (): Promise<IUnitUpsertData[]> => {
   const stable = await getBuildingType(BuildingNames.STABLE);
   const workshop = await getBuildingType(BuildingNames.WORKSHOP);
   const residence = await getBuildingType(BuildingNames.RESIDENCE);
+  const trapper = await getBuildingType(BuildingNames.TRAPPER);
 
   return [
     {
@@ -178,9 +179,9 @@ const getBaseGaulUnits = async (): Promise<IUnitUpsertData[]> => {
     },
     {
       name: UnitNames.TRAPS,
-      tribe: TribeNames.GAULS,
+      tribe: TribeNames.SPECIAL,
       selector: "t911",
-      building: residence,
+      building: trapper,
       att: 0,
       attC: 0,
       def: 0,
