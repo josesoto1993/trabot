@@ -42,7 +42,7 @@ const getVillagesOverviewInfo = async (page: Page): Promise<Village[]> => {
       capacitySelectors
     );
     const cultureTable = await getOverviewCelebrations(page);
-    const consumptionTable = await getOverviewConsumption(page);
+    const troopsInVillageTable = await getOverviewTroopsInVillage(page);
 
     const villages = await getVillagesInfo(page);
 
@@ -56,7 +56,7 @@ const getVillagesOverviewInfo = async (page: Page): Promise<Village[]> => {
       village.maxMerchants = merchantsTable[village.name]?.maxMerchants ?? 0;
       village.celebrationTime =
         cultureTable[village.name]?.celebrationTime ?? Infinity;
-      village.consumption = consumptionTable[village.name] ?? 0;
+      village.consumption = troopsInVillageTable[village.name] ?? 0;
     }
 
     return villages;
@@ -149,10 +149,10 @@ const getOverviewCelebrations = async (
   return celebrationsRaw;
 };
 
-const getOverviewConsumption = async (
+const getOverviewTroopsInVillage = async (
   page: Page
 ): Promise<Record<string, number>> => {
-  await goPage(OverviewTabs.TROOPS_INVILLAGE);
+  await goPage(OverviewTabs.TROOPS_IN_VILLAGE);
   await page.waitForSelector(CONSUMPTION_TABLE_SELECTOR);
 
   const consumptionRaw = await page.evaluate((rowSelector: string) => {

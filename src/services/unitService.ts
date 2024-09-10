@@ -3,6 +3,7 @@ import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
 import UnitNames from "../constants/unitsNames";
 import { IBuildingType } from "./buildingTypeService";
 import mongoose from "mongoose";
+import TribeNames from "../constants/tribes";
 
 export interface IUnitUpsertData {
   name: UnitNames;
@@ -43,6 +44,17 @@ export const getUnits = async (): Promise<Record<string, IUnit>> => {
 export const getUnit = async (name: UnitNames): Promise<IUnit | undefined> => {
   const units = await getUnits();
   return units[name];
+};
+
+export const getUnitsByTribe = async (
+  tribe: TribeNames
+): Promise<IUnit[] | undefined> => {
+  const units = await getUnits();
+  const filteredUnits = Object.values(units).filter(
+    (unit) => unit.tribe === tribe
+  );
+
+  return filteredUnits.length > 0 ? filteredUnits : undefined;
 };
 
 export const getUnitById = async (

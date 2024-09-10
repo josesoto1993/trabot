@@ -68,8 +68,8 @@ const processVillagesBuild = async (
       continue;
     }
 
-    await updateVillageResources(page, village.id);
-    await updateVillageBuildings(page, village.id);
+    await updateVillageResources(page, village);
+    await updateVillageBuildings(page, village);
     await processVillageBuild(page, village, interval);
   }
 };

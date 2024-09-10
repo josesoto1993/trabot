@@ -1,4 +1,5 @@
 import ICoordinates from "../commonInterfaces/coordinates";
+import ISquadron from "../commonInterfaces/squadron";
 import Building from "./building";
 import ResourceField from "./resourceField";
 import Resources from "./resources";
@@ -31,6 +32,7 @@ class Village {
   merchantsCapacity: number = MERCHANTS_CAPACITY;
   resourceFields: ResourceField[] = [];
   buildings: Building[] = [];
+  squadrons: ISquadron[] = [];
   buildFinishTime: number | null = null;
   barracksTime: number | null = null;
   stableTime: number | null = null;
@@ -171,6 +173,22 @@ class Village {
       this.production || new Resources(0, 0, 0, 0),
       new Resources(0, 0, 0, this.consumption ?? 0)
     );
+  }
+
+  haveSquadron(squadron: ISquadron): boolean {
+    const existingSquadron = this.squadrons.find(
+      (s) => s.unit.name === squadron.unit.name
+    );
+
+    if (!existingSquadron) {
+      return false;
+    }
+
+    return existingSquadron.quantity >= squadron.quantity;
+  }
+
+  haveSquadrons(squadrons: ISquadron[]): boolean {
+    return squadrons.every((squadron) => this.haveSquadron(squadron));
   }
 }
 
