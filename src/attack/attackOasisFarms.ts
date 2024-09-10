@@ -80,7 +80,7 @@ const performAttackForVillage = async (
     const data: ISendTroops = {
       village,
       coordinates: oasisFarm.tile.coordinates,
-      sendType: SendTroopsTypes.ATTACK,
+      sendType: SendTroopsTypes.RAID,
       squadrons: [oasisFarm.squadron],
     };
 

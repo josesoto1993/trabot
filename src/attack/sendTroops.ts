@@ -23,6 +23,7 @@ const sendTroops = async (page: Page, data: ISendTroops): Promise<void> => {
     await selectTroop(squadron);
   }
   await submit(page);
+  await confirm(page);
   logResults(data);
 };
 
@@ -93,6 +94,15 @@ const submit = async (page: Page): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
   } catch (error) {
     console.error("Error submitting send troops form:", error);
+  }
+};
+
+const confirm = async (page: Page): Promise<void> => {
+  try {
+    await page.click('button[value="Confirm"]');
+    await new Promise((resolve) => setTimeout(resolve, CLICK_DELAY));
+  } catch (error) {
+    console.error("Error submitting confirm", error);
   }
 };
 
