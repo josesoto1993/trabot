@@ -1,30 +1,24 @@
 import { Page } from "puppeteer";
 import { getAllTiles, upsertTile } from "../services/tileService";
-import { ITileSchema } from "../schemas/tileSchema";
 import getTileData from "./tileData";
 import { upsertTask } from "../services/taskService";
 import TaskNames from "../constants/taskNames";
+import ICoordinates from "../commonInterfaces/coordinates";
 
 const MIN_COORD = -200;
 const MAX_COORD = 200;
 const MAP_SIZE = MAX_COORD - MIN_COORD + 1;
 
-interface ICoordinate {
-  coordinateX: number;
-  coordinateY: number;
-}
-
 const scanTiles = async (
   page: Page,
-  centerX: number,
-  centerY: number,
+  center: ICoordinates,
   tilesToScan: number
 ): Promise<void> => {
   try {
     const remainingToScan = await getNotScannedTiles();
 
     const tilesToProcess = remainingToScan
-      .toSorted(tileSorter(centerX, centerY))
+      .toSorted(tileSorter(center))
       .slice(0, tilesToScan);
 
     if (tilesToProcess.length === 0) {
@@ -42,54 +36,55 @@ const scanTiles = async (
   }
 };
 
-const scanTile = async (tile: ICoordinate, page: Page): Promise<void> => {
-  const { coordinateX, coordinateY } = tile;
-
-  console.log(`Scanning tile at (${coordinateX}, ${coordinateY})...`);
-
-  const tileData = await getTileData(page, coordinateX, coordinateY);
+const scanTile = async (
+  coordinates: ICoordinates,
+  page: Page
+): Promise<void> => {
+  console.log(`Scanning tile at (${coordinates.x}, ${coordinates.y})...`);
+  const tileData = await getTileData(page, coordinates);
 
   await upsertTile(tileData);
 };
 
-const getNotScannedTiles = async (): Promise<ICoordinate[]> => {
+const getNotScannedTiles = async (): Promise<ICoordinates[]> => {
   const alreadyScannedTiles = await getAllTiles();
   const scannedTileSet = new Set(
-    alreadyScannedTiles.map((tile) => `${tile.coordinateX},${tile.coordinateY}`)
+    alreadyScannedTiles.map(
+      (tile) => `${tile.coordinates.x},${tile.coordinates.y}`
+    )
   );
   const allMapTiles = generateAllMapTiles();
 
   return allMapTiles.filter(
-    (tile) => !scannedTileSet.delete(`${tile.coordinateX},${tile.coordinateY}`)
+    (tile) => !scannedTileSet.delete(`${tile.x},${tile.y}`)
   );
 };
 
-const generateAllMapTiles = (): ICoordinate[] => {
+const generateAllMapTiles = (): ICoordinates[] => {
   const allTiles = [];
   for (let x = MIN_COORD; x <= MAX_COORD; x++) {
     for (let y = MIN_COORD; y <= MAX_COORD; y++) {
-      allTiles.push({ coordinateX: x, coordinateY: y });
+      allTiles.push({ x, y } as ICoordinates);
     }
   }
   return allTiles;
 };
 
 const tileSorter = (
-  centerX: number,
-  centerY: number
-): ((tile: ITileSchema, otherTile: ITileSchema) => number) => {
+  center: ICoordinates
+): ((tile: ICoordinates, otherTile: ICoordinates) => number) => {
   return (tile, otherTile) => {
     const distanceA = calculateWrappedDistance(
-      centerX,
-      centerY,
-      tile.coordinateX,
-      tile.coordinateY
+      center.x,
+      center.y,
+      tile.x,
+      tile.y
     );
     const distanceB = calculateWrappedDistance(
-      centerX,
-      centerY,
-      otherTile.coordinateX,
-      otherTile.coordinateY
+      center.x,
+      center.y,
+      otherTile.x,
+      otherTile.y
     );
     return distanceA - distanceB;
   };

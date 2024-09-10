@@ -5,23 +5,19 @@ import BuildingNames from "../constants/buildingNames";
 import RallyPointTabs from "../constants/rallyPointTabs";
 import SendTroopsTypes from "../constants/sendTroopsTypes";
 import { CLICK_DELAY, typeInSelector } from "../browser/browserService";
-import { IUnit } from "../services/unitService";
+import ISquadron from "../commonInterfaces/squadron";
+import ICoordinates from "../commonInterfaces/coordinates";
 
-interface ISquadron {
-  unit: IUnit;
-  quantity: number;
-}
 export interface ISendTroops {
   village: Village;
-  coordinateX: number;
-  coordinateY: number;
+  coordinates: ICoordinates;
   sendType: SendTroopsTypes;
   squadrons: ISquadron[];
 }
 
 const sendTroops = async (page: Page, data: ISendTroops): Promise<void> => {
   await goRallyPointSendTroops(data.village);
-  await selectCoords(data.coordinateX, data.coordinateY);
+  await selectCoords(data.coordinates);
   await selectSendType(page, data.sendType);
   for (const squadron of data.squadrons) {
     await selectTroop(squadron);
@@ -41,12 +37,9 @@ const selectTroop = async (squadron: ISquadron): Promise<void> => {
   await typeInSelector(inputSelector, squadron.quantity);
 };
 
-const selectCoords = async (
-  coordinateX: number,
-  coordinateY: number
-): Promise<void> => {
-  await typeInSelector("#xCoordInput", coordinateX);
-  await typeInSelector("#yCoordInput", coordinateY);
+const selectCoords = async (coordinates: ICoordinates): Promise<void> => {
+  await typeInSelector("#xCoordInput", coordinates.x);
+  await typeInSelector("#yCoordInput", coordinates.y);
 };
 
 const selectSendType = async (

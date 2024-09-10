@@ -36,9 +36,9 @@ const getVillageSlotsInfo = async (page: Page): Promise<string> => {
 };
 
 const parseVillageSlots = (slotText: string): VillageSlotInfo => {
-  const cleanedText = slotText.replace(/[^\d\/]/g, "");
-
-  const slotMatch = cleanedText.match(/(\d+)\/(\d+)/);
+  const cleanedText = slotText.replace(/[^\d/]/g, "");
+  const slotPattern = /(\d+)\/(\d+)/;
+  const slotMatch = slotPattern.exec(cleanedText);
   if (slotMatch) {
     return {
       actualVillages: parseInt(slotMatch[1], 10),

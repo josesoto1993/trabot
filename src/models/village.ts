@@ -1,3 +1,4 @@
+import ICoordinates from "../commonInterfaces/coordinates";
 import Building from "./building";
 import ResourceField from "./resourceField";
 import Resources from "./resources";
@@ -17,8 +18,7 @@ const MERCHANTS_CAPACITY = Number(process.env.MERCHANTS_CAPACITY);
 class Village {
   id: string;
   name: string;
-  coordinateX: number;
-  coordinateY: number;
+  coordinates: ICoordinates;
   active: boolean;
   resources: Resources | null = null;
   production: Resources | null = null;
@@ -45,14 +45,12 @@ class Village {
   constructor(
     id: string,
     name: string,
-    coordinateX: number,
-    coordinateY: number,
+    coordinates: ICoordinates,
     active: boolean = false
   ) {
     this.id = id;
     this.name = name;
-    this.coordinateX = coordinateX;
-    this.coordinateY = coordinateY;
+    this.coordinates = coordinates;
     this.active = active;
   }
 

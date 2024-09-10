@@ -96,11 +96,11 @@ const setDestination = async (page: Page, to: Village): Promise<void> => {
 
   await typeInSelector(
     "div.inputWrapper label.coordinateX input",
-    to.coordinateX.toString()
+    to.coordinates.x.toString()
   );
   await typeInSelector(
     "div.inputWrapper label.coordinateY input",
-    to.coordinateY.toString()
+    to.coordinates.y.toString()
   );
 };
 

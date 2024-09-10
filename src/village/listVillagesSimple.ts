@@ -1,14 +1,15 @@
 import { Page } from "puppeteer";
 import Village from "../models/village";
 import { validateActiveVillages, validateVillagesCount } from "./villageSlots";
+import ICoordinates from "../commonInterfaces/coordinates";
 
 const VILLAGES_SIDEBAR = "div.villageList div.dropContainer";
+const CAPITAL_NAME: string = process.env.CAPITAL_NAME || "HDS 01";
 
 interface VillageData {
   id: string;
   name: string | null;
-  coordinateX: number;
-  coordinateY: number;
+  coordinate: ICoordinates;
   active: boolean;
 }
 
@@ -17,9 +18,7 @@ const getVillagesInfo = async (page: Page): Promise<Village[]> => {
     await waitForVillageList(page);
 
     const villages = await getVillagesFromPage(page);
-    if (villages.length > 0) {
-      villages[0].capital = true;
-    }
+    setCapital(villages);
 
     validateActiveVillages(villages);
     await validateVillagesCount(page, villages);
@@ -55,17 +54,12 @@ const getVillagesFromPage = async (page: Page): Promise<Village[]> => {
 
           const id = coordinatesGrid.getAttribute("data-did");
           const name = coordinatesGrid.getAttribute("data-villagename");
-          const coordinateX = parseInt(
-            coordinatesGrid.getAttribute("data-x"),
-            10
-          );
-          const coordinateY = parseInt(
-            coordinatesGrid.getAttribute("data-y"),
-            10
-          );
+          const x = parseInt(coordinatesGrid.getAttribute("data-x"), 10);
+          const y = parseInt(coordinatesGrid.getAttribute("data-y"), 10);
+          const coordinate = { x, y };
           const active = listEntry.classList.contains("active");
 
-          return { id, name, coordinateX, coordinateY, active };
+          return { id, name, coordinate, active };
         });
       }
     );
@@ -75,14 +69,26 @@ const getVillagesFromPage = async (page: Page): Promise<Village[]> => {
         new Village(
           villageData.id,
           villageData.name,
-          villageData.coordinateX,
-          villageData.coordinateY,
+          villageData.coordinate,
           villageData.active
         )
     );
   } catch (error) {
     console.error("Error extracting villages from page:", error);
     throw error;
+  }
+};
+
+const setCapital = (villages: Village[]): void => {
+  if (!CAPITAL_NAME) {
+    throw new Error("CAPITAL_NAME is not defined in environment variables.");
+  }
+
+  const capitalVillage = villages.find(
+    (village) => village.name === CAPITAL_NAME
+  );
+  if (capitalVillage) {
+    capitalVillage.capital = true;
   }
 };
 

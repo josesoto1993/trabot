@@ -1,3 +1,4 @@
+import ICoordinates from "../commonInterfaces/coordinates";
 import TileTypes from "../constants/tileTypes";
 import UnitNames from "../constants/unitsNames";
 import OasisFarmModel, { IOasisFarmSchema } from "../schemas/oasisFarmSchema";
@@ -6,8 +7,7 @@ import { getUnit, IUnit } from "./unitService";
 
 export interface IOasisFarmUpsertData {
   villageName: string;
-  coordinateX: number;
-  coordinateY: number;
+  coordinates: ICoordinates;
   unitName: UnitNames;
   unitQtty: number;
   lastAttack?: Date;
@@ -40,13 +40,12 @@ export const getAllOasisFarms = async (): Promise<IOasisFarm[]> => {
 };
 
 export const deleteOasisFarm = async (
-  coordinateX: number,
-  coordinateY: number
+  coordinates: ICoordinates
 ): Promise<boolean> => {
-  const tile = await getTile(coordinateX, coordinateY);
+  const tile = await getTile(coordinates);
   if (!tile) {
     console.log(
-      `ERROR! cant find oasis to delete at: (${coordinateX}|${coordinateY})`
+      `ERROR! cant find oasis to delete at: (${coordinates.x}|${coordinates.y})`
     );
     return false;
   }
@@ -60,13 +59,10 @@ export const deleteOasisFarm = async (
 export const upsertOasisFarm = async (
   oasisFarmData: IOasisFarmUpsertData
 ): Promise<IOasisFarmSchema | null> => {
-  const tile = await getTile(
-    oasisFarmData.coordinateX,
-    oasisFarmData.coordinateY
-  );
+  const tile = await getTile(oasisFarmData.coordinates);
   if (!tile) {
     console.log(
-      `ERROR! Can't find oasis to add at: (${oasisFarmData.coordinateX}|${oasisFarmData.coordinateY})`
+      `ERROR! Can't find oasis to add at: (${oasisFarmData.coordinates.x}|${oasisFarmData.coordinates.y})`
     );
     return null;
   }
@@ -75,7 +71,7 @@ export const upsertOasisFarm = async (
     tile.tileType !== TileTypes.OCCUPIED_OASIS
   ) {
     console.log(
-      `ERROR! tile at (${oasisFarmData.coordinateX}|${oasisFarmData.coordinateY}) is not an oasis`
+      `ERROR! tile at (${oasisFarmData.coordinates.x}|${oasisFarmData.coordinates.y}) is not an oasis`
     );
     return null;
   }

@@ -20,7 +20,7 @@ const populateOasisFarms = async (): Promise<void> => {
 };
 
 const getOasisFarmData = (): IOasisFarmUpsertData[] => {
-  const coords = [
+  const targetsCoordinates = [
     { x: 29, y: 101 },
     { x: 11, y: 99 },
     { x: 10, y: 100 },
@@ -33,13 +33,11 @@ const getOasisFarmData = (): IOasisFarmUpsertData[] => {
     { x: 19, y: 101 },
   ];
 
-  return coords.map((coord) => ({
+  return targetsCoordinates.map((coordinates) => ({
     villageName: "HDS 01",
-    coordinateX: coord.x,
-    coordinateY: coord.y,
+    coordinates,
     unitName: UnitNames.SWORDSMAN,
     unitQtty: 400,
-    lastAttack: new Date(),
   }));
 };
 
