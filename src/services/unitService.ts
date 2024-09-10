@@ -7,6 +7,7 @@ import TribeNames from "../constants/tribes";
 
 export interface IUnitUpsertData {
   name: UnitNames;
+  tribe: TribeNames;
   selector: string;
   building?: IBuildingTypeSchema;
   att: number;
@@ -72,6 +73,7 @@ export const upsertUnit = async (
 ): Promise<IUnitSchema | null> => {
   const filter = { name: data.name };
   const update = {
+    tribe: data.tribe,
     selector: data.selector,
     building: data.building ? data.building._id : null,
     att: data.att,
