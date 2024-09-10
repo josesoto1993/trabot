@@ -1,5 +1,5 @@
 enum RallyPointTabs {
-  QUERY_PARAM_KEY = "t",
+  QUERY_PARAM_KEY = "tt",
   MANAGEMENT = "0",
   OVERVIEW = "1",
   SEND_TROOPS = "2",

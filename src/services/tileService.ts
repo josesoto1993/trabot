@@ -49,14 +49,6 @@ export const getTile = async (
   return tileSchema ? parseTileSchemaToTile(tileSchema) : null;
 };
 
-export const getTileById = async (
-  id: mongoose.Schema.Types.ObjectId
-): Promise<ITile | null> => {
-  const filter = { _id: id };
-  const tileSchema = await TileModel.findOne(filter);
-  return tileSchema ? parseTileSchemaToTile(tileSchema) : null;
-};
-
 export const deleteTile = async (
   coordinates: ICoordinates
 ): Promise<boolean> => {

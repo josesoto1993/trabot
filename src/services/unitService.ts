@@ -2,7 +2,6 @@ import UnitModel, { IUnitSchema } from "../schemas/unitSchema";
 import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
 import UnitNames from "../constants/unitsNames";
 import { IBuildingType } from "./buildingTypeService";
-import mongoose from "mongoose";
 import TribeNames from "../constants/tribes";
 
 export interface IUnitUpsertData {
@@ -56,16 +55,6 @@ export const getUnitsByTribe = async (
   );
 
   return filteredUnits.length > 0 ? filteredUnits : undefined;
-};
-
-export const getUnitById = async (
-  id: mongoose.Schema.Types.ObjectId
-): Promise<IUnit | undefined> => {
-  const units = await getUnits();
-
-  return Object.values(units).find(
-    (unit) => unit._id.toString() === id.toString()
-  );
 };
 
 export const upsertUnit = async (

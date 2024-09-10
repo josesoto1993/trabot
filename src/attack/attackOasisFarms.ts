@@ -1,6 +1,10 @@
 import { Page } from "puppeteer";
 import { TaskResult } from "../index";
-import { getAllOasisFarms, IOasisFarm } from "../services/oasisFarmService";
+import {
+  getAllOasisFarms,
+  IOasisFarm,
+  updateOasisFarmTime,
+} from "../services/oasisFarmService";
 import sendTroops, { ISendTroops } from "./sendTroops";
 import SendTroopsTypes from "../constants/sendTroopsTypes";
 import { getVillages } from "../player/playerHandler";
@@ -81,6 +85,7 @@ const performAttackForVillage = async (
     };
 
     await sendTroops(page, data);
+    await updateOasisFarmTime(oasisFarm);
     attackSent = true;
   }
 

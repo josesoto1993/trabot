@@ -23,13 +23,20 @@ const sendTroops = async (page: Page, data: ISendTroops): Promise<void> => {
     await selectTroop(squadron);
   }
   await submit(page);
+  logResults(data);
 };
 
-const goRallyPointSendTroops = async (village: Village): Promise<void> => {
-  const marketTabSearchParam = {
+export const goRallyPointSendTroops = async (
+  village: Village
+): Promise<void> => {
+  const rallyPointTabSearchParam = {
     [RallyPointTabs.QUERY_PARAM_KEY]: RallyPointTabs.SEND_TROOPS,
   };
-  await goBuilding(village, BuildingNames.RALLY_POINT, marketTabSearchParam);
+  await goBuilding(
+    village,
+    BuildingNames.RALLY_POINT,
+    rallyPointTabSearchParam
+  );
 };
 
 const selectTroop = async (squadron: ISquadron): Promise<void> => {
@@ -87,6 +94,15 @@ const submit = async (page: Page): Promise<void> => {
   } catch (error) {
     console.error("Error submitting send troops form:", error);
   }
+};
+
+const logResults = (data: ISendTroops): void => {
+  console.log(
+    `Sent troops from village ${data.village.name} to (${data.coordinates.x}, ${data.coordinates.y}):`
+  );
+  data.squadrons.forEach((squadron) => {
+    console.log(`- ${squadron.unit.name}: ${squadron.quantity}`);
+  });
 };
 
 export default sendTroops;

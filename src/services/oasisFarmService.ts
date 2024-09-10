@@ -3,8 +3,8 @@ import ICoordinates from "../commonInterfaces/coordinates";
 import TileTypes from "../constants/tileTypes";
 import UnitNames from "../constants/unitsNames";
 import OasisFarmModel, { IOasisFarmSchema } from "../schemas/oasisFarmSchema";
-import { getTile, getTileById, ITile } from "./tileService";
-import { getUnit, getUnitById, IUnit } from "./unitService";
+import { getTile, ITile } from "./tileService";
+import { getUnit, IUnit } from "./unitService";
 import ISquadron from "../commonInterfaces/squadron";
 
 export interface IOasisFarmUpsertData {
@@ -121,28 +121,12 @@ export const updateOasisFarmTime = async (
 export const parseOasisFarmSchemaToOasisFarm = async (
   oasisFarm: IOasisFarmSchema
 ): Promise<IOasisFarm> => {
-  const tile = mongoose.isValidObjectId(oasisFarm.tile)
-    ? await getTileById(oasisFarm.tile as mongoose.Schema.Types.ObjectId)
-    : (oasisFarm.tile as ITile);
-
-  if (!tile) {
-    throw new Error(`Tile could not be found`);
-  }
-
-  const unit = mongoose.isValidObjectId(oasisFarm.unit)
-    ? await getUnitById(oasisFarm.unit as mongoose.Schema.Types.ObjectId)
-    : (oasisFarm.unit as IUnit);
-
-  if (!unit) {
-    throw new Error(`Unit could not be found`);
-  }
-
   return {
     _id: oasisFarm._id,
     villageName: oasisFarm.villageName,
-    tile,
+    tile: oasisFarm.tile as ITile,
     squadron: {
-      unit,
+      unit: oasisFarm.unit as IUnit,
       quantity: oasisFarm.unitQtty,
     },
     lastAttack: oasisFarm.lastAttack,
