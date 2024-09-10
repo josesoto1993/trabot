@@ -1,9 +1,11 @@
+import mongoose from "mongoose";
 import ICoordinates from "../commonInterfaces/coordinates";
 import TileTypes from "../constants/tileTypes";
 import UnitNames from "../constants/unitsNames";
 import OasisFarmModel, { IOasisFarmSchema } from "../schemas/oasisFarmSchema";
-import { getTile, ITile } from "./tileService";
-import { getUnit, IUnit } from "./unitService";
+import { getTile, getTileById, ITile } from "./tileService";
+import { getUnit, getUnitById, IUnit } from "./unitService";
+import ISquadron from "../commonInterfaces/squadron";
 
 export interface IOasisFarmUpsertData {
   villageName: string;
@@ -12,9 +14,12 @@ export interface IOasisFarmUpsertData {
   unitQtty: number;
   lastAttack?: Date;
 }
-export interface IOasisFarm extends IOasisFarmSchema {
+export interface IOasisFarm {
+  _id: mongoose.Schema.Types.ObjectId;
+  villageName: string;
   tile: ITile;
-  unit: IUnit;
+  squadron: ISquadron;
+  lastAttack?: Date;
 }
 
 export const getAllOasisFarms = async (): Promise<IOasisFarm[]> => {
@@ -33,10 +38,13 @@ export const getAllOasisFarms = async (): Promise<IOasisFarm[]> => {
     },
   ];
 
-  const populatedOasisFarms = await OasisFarmModel.find()
+  const populatedOasisFarms: IOasisFarmSchema[] = await OasisFarmModel.find()
     .populate(options)
     .exec();
-  return populatedOasisFarms.map((doc) => doc.toObject() as IOasisFarm);
+
+  return Promise.all(
+    populatedOasisFarms.map((doc) => parseOasisFarmSchemaToOasisFarm(doc))
+  );
 };
 
 export const deleteOasisFarm = async (
@@ -99,7 +107,7 @@ export const upsertOasisFarm = async (
 };
 
 export const updateOasisFarmTime = async (
-  oasisFarm: IOasisFarm
+  oasisFarm: IOasisFarm | IOasisFarmSchema
 ): Promise<IOasisFarmSchema | null> => {
   const filter = {
     _id: oasisFarm._id,
@@ -108,4 +116,35 @@ export const updateOasisFarmTime = async (
   const options = { new: true, upsert: true };
 
   return await OasisFarmModel.findOneAndUpdate(filter, update, options);
+};
+
+export const parseOasisFarmSchemaToOasisFarm = async (
+  oasisFarm: IOasisFarmSchema
+): Promise<IOasisFarm> => {
+  const tile = mongoose.isValidObjectId(oasisFarm.tile)
+    ? await getTileById(oasisFarm.tile as mongoose.Schema.Types.ObjectId)
+    : (oasisFarm.tile as ITile);
+
+  if (!tile) {
+    throw new Error(`Tile could not be found`);
+  }
+
+  const unit = mongoose.isValidObjectId(oasisFarm.unit)
+    ? await getUnitById(oasisFarm.unit as mongoose.Schema.Types.ObjectId)
+    : (oasisFarm.unit as IUnit);
+
+  if (!unit) {
+    throw new Error(`Unit could not be found`);
+  }
+
+  return {
+    _id: oasisFarm._id,
+    villageName: oasisFarm.villageName,
+    tile,
+    squadron: {
+      unit,
+      quantity: oasisFarm.unitQtty,
+    },
+    lastAttack: oasisFarm.lastAttack,
+  };
 };
