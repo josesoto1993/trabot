@@ -70,9 +70,6 @@ const mainLoop = async (page: Page) => {
           TaskNames.HERO_RESOURCE_BALANCER,
           (interval: number) => balanceHeroResources(page, interval)
         ),
-        await runTaskWithTimer(TaskNames.MAP_SCANNER, (interval: number) =>
-          scannerRunner(page, interval)
-        ),
         await runTaskWithTimer(TaskNames.DEFICIT, (interval: number) =>
           manageDeficit(page, interval)
         ),
@@ -99,6 +96,9 @@ const mainLoop = async (page: Page) => {
         ),
         await runTaskWithTimer(TaskNames.CELEBRATIONS, (interval: number) =>
           manageCelebrations(page, interval)
+        ),
+        await runTaskWithTimer(TaskNames.MAP_SCANNER, (interval: number) =>
+          scannerRunner(page, interval)
         )
       );
       console.log(`next loop at ${formatDateTime(nextExecutionTime)}`);
