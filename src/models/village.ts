@@ -190,6 +190,25 @@ class Village {
   haveSquadrons(squadrons: ISquadron[]): boolean {
     return squadrons.every((squadron) => this.haveSquadron(squadron));
   }
+
+  subtractSquadron(squadron: ISquadron): void {
+    const existingSquadron = this.squadrons.find(
+      (s) => s.unit.name === squadron.unit.name
+    );
+    if (!existingSquadron) {
+      console.error(`Squadron ${squadron.unit.name} not found.`);
+      return;
+    }
+
+    const newQuantity = existingSquadron.quantity - squadron.quantity;
+    existingSquadron.quantity = Math.max(newQuantity, 0);
+  }
+
+  subtractSquadrons(squadrons: ISquadron[]): void {
+    for (const squadron of squadrons) {
+      this.subtractSquadron(squadron);
+    }
+  }
 }
 
 export default Village;

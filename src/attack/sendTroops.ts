@@ -24,6 +24,7 @@ const sendTroops = async (page: Page, data: ISendTroops): Promise<void> => {
   }
   await submit(page);
   await confirm(page);
+  subtractSquadrons(data);
   logResults(data);
 };
 
@@ -113,6 +114,10 @@ const logResults = (data: ISendTroops): void => {
   data.squadrons.forEach((squadron) => {
     console.log(`- ${squadron.unit.name}: ${squadron.quantity}`);
   });
+};
+
+const subtractSquadrons = (data: ISendTroops): void => {
+  data.village.subtractSquadrons(data.squadrons);
 };
 
 export default sendTroops;
