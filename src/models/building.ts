@@ -1,14 +1,16 @@
+import BuildingNames from "../constants/buildingNames";
+
 class Building {
   structureId: number;
   slotId: number;
-  name: string;
+  name: BuildingNames;
   level: number;
   constructionStatus: string;
 
   constructor(
     structureId: number,
     slotId: number,
-    name: string,
+    name: BuildingNames,
     level: number,
     constructionStatus: string
   ) {

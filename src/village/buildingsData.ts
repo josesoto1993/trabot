@@ -9,6 +9,7 @@ import {
 import { getBuildingCategory } from "../services/buildingCategoryService";
 import BuildingCategory from "../constants/buildingCategories";
 import Village from "../models/village";
+import { getBuildingName } from "../constants/buildingNames";
 
 interface BuildingRawData {
   aid: string;
@@ -58,7 +59,7 @@ const buildingsRawToObject = async (
   const buildings = raw.map((data) => {
     const slotId = parseInt(data.aid, 10);
     const structureId = parseInt(data.gid, 10);
-    const name = data.name;
+    const name = getBuildingName(data.name);
     const level = parseInt(data.level.toString(), 10);
     const constructionStatus = getConstructionStatus(data.anchorClasses);
 

@@ -29,4 +29,11 @@ enum BuildingNames {
   WORKSHOP = "Workshop",
 }
 
+export const getBuildingName = (buildingName: string): BuildingNames | null => {
+  const matchenBuilding = Object.values(BuildingNames).find(
+    (building) => building.toLowerCase() === buildingName.toLowerCase()
+  );
+
+  return matchenBuilding || null;
+};
 export default BuildingNames;
