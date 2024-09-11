@@ -47,9 +47,9 @@ const performScan = async (page: Page): Promise<void> => {
       return;
     }
 
-    const { coordinateX, coordinateY } = capitalVilla;
+    const { coordinates: center } = capitalVilla;
 
-    await scanTiles(page, coordinateX, coordinateY, TILES_TO_SCAN);
+    await scanTiles(page, center, TILES_TO_SCAN);
   } catch (error) {
     console.error("Error in scannerRunner:", error);
   }

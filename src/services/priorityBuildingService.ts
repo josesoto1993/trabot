@@ -13,7 +13,9 @@ export interface IPriorityBuilding extends IPriorityBuildingSchema {
   building: IBuildingType;
 }
 
-export const getAll = async (): Promise<IPriorityBuilding[]> => {
+export const getAllPriorityBuilding = async (): Promise<
+  IPriorityBuilding[]
+> => {
   const options = {
     path: "building",
     populate: {
@@ -28,7 +30,7 @@ export const getAll = async (): Promise<IPriorityBuilding[]> => {
   return priorityBuildings as IPriorityBuilding[];
 };
 
-export const getAllByPriority = async (
+export const getPriorityBuildingByPriority = async (
   priority: PriorityLevels
 ): Promise<IPriorityBuilding[]> => {
   if (!Object.values(PriorityLevels).includes(priority)) {
@@ -76,7 +78,7 @@ export const upsertPriorityBuilding = async (
   ).exec();
 };
 
-export const remove = async (
+export const removePriorityBuilding = async (
   priority: PriorityLevels,
   building: IBuildingType
 ): Promise<IPriorityBuildingSchema | null> => {

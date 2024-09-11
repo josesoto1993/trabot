@@ -9,7 +9,7 @@ const OverviewTabs = {
   RESOURCES_CAPACITY: `${Links.TRAVIAN_BASE}/village/statistics/resources/capacity`,
   CULTUREPOINTS: `${Links.TRAVIAN_BASE}/village/statistics/culturepoints`,
   TROOPS_TRAINING: `${Links.TRAVIAN_BASE}/village/statistics/troops/training`,
-  TROOPS_INVILLAGE: `${Links.TRAVIAN_BASE}/village/statistics/troops/support`,
+  TROOPS_IN_VILLAGE: `${Links.TRAVIAN_BASE}/village/statistics/troops/support`,
 } as const;
 
 export default OverviewTabs;

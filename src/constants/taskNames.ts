@@ -2,6 +2,7 @@ enum TaskNames {
   DEFICIT = "Deficit",
   OVERFLOW = "Overflow",
   ATTACK_FARMS = "Attack Farms",
+  ATTACK_OASIS_FARMS = "Attack Oasis Farms",
   TRAIN_TROOPS = "Train Troops",
   UPGRADE_TROOPS = "Upgrade Troops",
   GO_ADVENTURE = "Go Adventure",

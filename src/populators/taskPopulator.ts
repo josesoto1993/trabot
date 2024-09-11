@@ -36,6 +36,8 @@ const getDefaultInterval = (taskName: TaskNames): number => {
       return 14 * 60 * 1000;
     case TaskNames.ATTACK_FARMS:
       return 5 * 60 * 1000;
+    case TaskNames.ATTACK_OASIS_FARMS:
+      return 5 * 60 * 1000;
     case TaskNames.TRAIN_TROOPS:
       return 4 * 60 * 60 * 1000;
     case TaskNames.UPGRADE_TROOPS:

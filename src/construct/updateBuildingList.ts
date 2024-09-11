@@ -3,7 +3,7 @@ import { upgradeExistingBuilding } from "./upgradeExistingBuilding";
 import ConstructionStatus from "../constants/constructionStatus";
 import { getBuildingType } from "../services/buildingTypeService";
 import Village from "../models/village";
-import { IPriorityBuilding } from "../services/PriorityBuildingService";
+import { IPriorityBuilding } from "../services/priorityBuildingService";
 import Building from "../models/building";
 import PriorityLevels from "../constants/priorityLevels";
 

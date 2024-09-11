@@ -1,7 +1,7 @@
 import { Page } from "puppeteer";
 import createBuilding from "./createBuilding";
 import { getBuildingCategory } from "../services/buildingCategoryService";
-import { getAllByPriority } from "../services/PriorityBuildingService";
+import { getPriorityBuildingByPriority } from "../services/priorityBuildingService";
 import PriorityLevels from "../constants/priorityLevels";
 import BuildingCategory from "../constants/buildingCategories";
 import Village from "../models/village";
@@ -12,7 +12,9 @@ const createFundamentals = async (
   page: Page,
   village: Village
 ): Promise<boolean> => {
-  const fundamentals = await getAllByPriority(PriorityLevels.FUNDAMENTAL);
+  const fundamentals = await getPriorityBuildingByPriority(
+    PriorityLevels.FUNDAMENTAL
+  );
 
   for (const fundamental of fundamentals) {
     const fundamentalBuilding = fundamental.building;
@@ -47,7 +49,7 @@ const createFundamentalBuilding = async (
 
   if (availableSlotId === undefined) {
     console.error(
-      `No available slot found in village ${village.id} for fundamental Building ${fundamentalBuilding.name}.`
+      `No available slot found in village ${village.name} for fundamental Building ${fundamentalBuilding.name}.`
     );
     return false;
   }

@@ -1,10 +1,12 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
 import UnitNames from "../constants/unitsNames";
+import TribeNames from "../constants/tribes";
 
 export interface IUnitSchema extends Document {
   _id: mongoose.Schema.Types.ObjectId;
   name: UnitNames;
+  tribe: TribeNames;
   selector: string;
   building: mongoose.Schema.Types.ObjectId | IBuildingTypeSchema;
   att: number;
@@ -28,6 +30,12 @@ const UnitSchema: Schema<IUnitSchema> = new Schema({
     required: true,
     unique: true,
     enum: Object.values(UnitNames),
+  },
+  tribe: {
+    type: String,
+    required: true,
+    unique: false,
+    enum: Object.values(TribeNames),
   },
   selector: {
     type: String,

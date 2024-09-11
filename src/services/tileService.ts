@@ -1,11 +1,12 @@
+import mongoose from "mongoose";
+import ICoordinates from "../commonInterfaces/coordinates";
 import TileTypes from "../constants/tileTypes";
 import { ITileTitleData } from "../mapScanner/tileData";
 import TileModel, { ITileSchema } from "../schemas/tileSchema";
 
 export interface ITileUpsertData {
   tileName: string;
-  coordinateX: number;
-  coordinateY: number;
+  coordinates: ICoordinates;
   tileType: TileTypes;
   villaData?: string;
   att?: number;
@@ -18,24 +19,40 @@ export interface ITileUpsertData {
   crop?: number;
   upkeep?: number;
 }
+export interface ITile {
+  _id: mongoose.Schema.Types.ObjectId;
+  coordinates: ICoordinates;
+  tileName: string;
+  tileType: TileTypes;
+  villaData: string;
+  att: number;
+  attC: number;
+  def: number;
+  defC: number;
+  wood: number;
+  clay: number;
+  iron: number;
+  crop: number;
+  upkeep: number;
+}
 
-export const getAllTiles = async (): Promise<ITileSchema[]> => {
-  return await TileModel.find();
+export const getAllTiles = async (): Promise<ITile[]> => {
+  const tiles: ITileSchema[] = await TileModel.find();
+  return tiles.map(parseTileSchemaToTile);
 };
 
 export const getTile = async (
-  coordinateX: number,
-  coordinateY: number
-): Promise<ITileSchema | null> => {
-  const filter = { coordinateX, coordinateY };
-  return await TileModel.findOne(filter);
+  coordinates: ICoordinates
+): Promise<ITile | null> => {
+  const filter = { coordinateX: coordinates.x, coordinateY: coordinates.y };
+  const tileSchema = await TileModel.findOne(filter);
+  return tileSchema ? parseTileSchemaToTile(tileSchema) : null;
 };
 
 export const deleteTile = async (
-  coordinateX: number,
-  coordinateY: number
+  coordinates: ICoordinates
 ): Promise<boolean> => {
-  const filter = { coordinateX, coordinateY };
+  const filter = { coordinateX: coordinates.x, coordinateY: coordinates.y };
   const result = await TileModel.deleteOne(filter);
   return result.deletedCount > 0;
 };
@@ -46,8 +63,8 @@ export const upsertTile = async (
   const data = parseTileDataToTileUpsert(tile);
 
   const filter = {
-    coordinateX: data.coordinateX,
-    coordinateY: data.coordinateY,
+    coordinateX: data.coordinates.x,
+    coordinateY: data.coordinates.y,
   };
   const update = {
     tileName: data.tileName,
@@ -75,12 +92,10 @@ const parseTileDataToTileUpsert = (
     return tile;
   }
 
-  const { tileName, coordinateX, coordinateY, tileType, villaData, troopData } =
-    tile;
+  const { tileName, coordinates, tileType, villaData, troopData } = tile;
   return {
     tileName,
-    coordinateX,
-    coordinateY,
+    coordinates,
     tileType,
     villaData,
     att: troopData.att,
@@ -99,4 +114,26 @@ const isTileUpsertData = (
   tile: ITileTitleData | ITileUpsertData
 ): tile is ITileUpsertData => {
   return (tile as ITileUpsertData).att !== undefined;
+};
+
+export const parseTileSchemaToTile = (tileSchema: ITileSchema): ITile => {
+  return {
+    _id: tileSchema._id,
+    coordinates: {
+      x: tileSchema.coordinateX,
+      y: tileSchema.coordinateY,
+    },
+    tileName: tileSchema.tileName,
+    tileType: tileSchema.tileType,
+    villaData: tileSchema.villaData,
+    att: tileSchema.att,
+    attC: tileSchema.attC,
+    def: tileSchema.def,
+    defC: tileSchema.defC,
+    wood: tileSchema.wood,
+    clay: tileSchema.clay,
+    iron: tileSchema.iron,
+    crop: tileSchema.crop,
+    upkeep: tileSchema.upkeep,
+  };
 };

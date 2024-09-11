@@ -16,35 +16,35 @@ export const updateVillages = async (page: Page): Promise<void> => {
   await updateVillagesOverviewInfo(page);
 
   for (const village of getVillages()) {
-    await updateVillageResources(page, village.id);
-    await updateVillageBuildings(page, village.id);
+    await updateVillageResources(page, village);
+    await updateVillageBuildings(page, village);
   }
 };
 
 export const updateVillageResources = async (
   page: Page,
-  villageId: string
+  village: Village
 ): Promise<void> => {
-  const village = getVillages().find((v: Village) => v.id === villageId);
+  const matchVilla = getVillages().find((v: Village) => v.id === village.id);
 
-  if (!village) {
-    throw new Error(`There is no village with id: ${villageId}`);
+  if (!matchVilla) {
+    throw new Error(`There is no village with id: ${village.name}`);
   }
 
-  village.resourceFields = await getResourceFieldsData(page, village);
+  village.resourceFields = await getResourceFieldsData(page, matchVilla);
 };
 
 export const updateVillageBuildings = async (
   page: Page,
-  villageId: string
+  village: Village
 ): Promise<void> => {
-  const village = getVillages().find((v: Village) => v.id === villageId);
+  const matchVilla = getVillages().find((v: Village) => v.id === village.id);
 
-  if (!village) {
-    throw new Error(`There is no village with id: ${villageId}`);
+  if (!matchVilla) {
+    throw new Error(`There is no village with id: ${village.id}`);
   }
 
-  village.buildings = await getBuildingData(page, village);
+  matchVilla.buildings = await getBuildingData(page, matchVilla);
 };
 
 export const updateVillagesOverviewInfo = async (page: Page): Promise<void> => {

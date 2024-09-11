@@ -10,7 +10,7 @@ import upgradeResources, { RESOURCE_MAX_LEVEL } from "./upgradeResources";
 import createFundamentals from "./createFundamentals";
 import updateBuildingList from "./updateBuildingList";
 import { formatTimeMillis } from "../utils/timePrint";
-import { getAllByPriority } from "../services/PriorityBuildingService";
+import { getPriorityBuildingByPriority } from "../services/priorityBuildingService";
 import PriorityLevels from "../constants/priorityLevels";
 import { TaskResult } from "../index";
 import Village from "../models/village";
@@ -68,8 +68,8 @@ const processVillagesBuild = async (
       continue;
     }
 
-    await updateVillageResources(page, village.id);
-    await updateVillageBuildings(page, village.id);
+    await updateVillageResources(page, village);
+    await updateVillageBuildings(page, village);
     await processVillageBuild(page, village, interval);
   }
 };
@@ -92,7 +92,9 @@ const processVillageBuild = async (
     return;
   }
 
-  const highPriorityBuilding = await getAllByPriority(PriorityLevels.HIGH);
+  const highPriorityBuilding = await getPriorityBuildingByPriority(
+    PriorityLevels.HIGH
+  );
   const highUpgraded = await updateBuildingList(
     page,
     village,
@@ -108,7 +110,9 @@ const processVillageBuild = async (
     return;
   }
 
-  const midPriorityBuilding = await getAllByPriority(PriorityLevels.MID);
+  const midPriorityBuilding = await getPriorityBuildingByPriority(
+    PriorityLevels.MID
+  );
   const midUpgraded = await updateBuildingList(
     page,
     village,
@@ -131,7 +135,9 @@ const processVillageBuild = async (
     return;
   }
 
-  const lowPriorityBuilding = await getAllByPriority(PriorityLevels.LOW);
+  const lowPriorityBuilding = await getPriorityBuildingByPriority(
+    PriorityLevels.LOW
+  );
   const lowUpgraded = await updateBuildingList(
     page,
     village,

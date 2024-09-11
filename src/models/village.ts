@@ -1,3 +1,5 @@
+import ICoordinates from "../commonInterfaces/coordinates";
+import ISquadron from "../commonInterfaces/squadron";
 import Building from "./building";
 import ResourceField from "./resourceField";
 import Resources from "./resources";
@@ -17,8 +19,7 @@ const MERCHANTS_CAPACITY = Number(process.env.MERCHANTS_CAPACITY);
 class Village {
   id: string;
   name: string;
-  coordinateX: number;
-  coordinateY: number;
+  coordinates: ICoordinates;
   active: boolean;
   resources: Resources | null = null;
   production: Resources | null = null;
@@ -31,6 +32,7 @@ class Village {
   merchantsCapacity: number = MERCHANTS_CAPACITY;
   resourceFields: ResourceField[] = [];
   buildings: Building[] = [];
+  squadrons: ISquadron[] = [];
   buildFinishTime: number | null = null;
   barracksTime: number | null = null;
   stableTime: number | null = null;
@@ -45,14 +47,12 @@ class Village {
   constructor(
     id: string,
     name: string,
-    coordinateX: number,
-    coordinateY: number,
+    coordinates: ICoordinates,
     active: boolean = false
   ) {
     this.id = id;
     this.name = name;
-    this.coordinateX = coordinateX;
-    this.coordinateY = coordinateY;
+    this.coordinates = coordinates;
     this.active = active;
   }
 
@@ -173,6 +173,41 @@ class Village {
       this.production || new Resources(0, 0, 0, 0),
       new Resources(0, 0, 0, this.consumption ?? 0)
     );
+  }
+
+  haveSquadron(squadron: ISquadron): boolean {
+    const existingSquadron = this.squadrons.find(
+      (s) => s.unit.name === squadron.unit.name
+    );
+
+    if (!existingSquadron) {
+      return false;
+    }
+
+    return existingSquadron.quantity >= squadron.quantity;
+  }
+
+  haveSquadrons(squadrons: ISquadron[]): boolean {
+    return squadrons.every((squadron) => this.haveSquadron(squadron));
+  }
+
+  subtractSquadron(squadron: ISquadron): void {
+    const existingSquadron = this.squadrons.find(
+      (s) => s.unit.name === squadron.unit.name
+    );
+    if (!existingSquadron) {
+      console.error(`Squadron ${squadron.unit.name} not found.`);
+      return;
+    }
+
+    const newQuantity = existingSquadron.quantity - squadron.quantity;
+    existingSquadron.quantity = Math.max(newQuantity, 0);
+  }
+
+  subtractSquadrons(squadrons: ISquadron[]): void {
+    for (const squadron of squadrons) {
+      this.subtractSquadron(squadron);
+    }
   }
 }
 

@@ -7,11 +7,11 @@ import calculateUnitsData, {
   ITroopData,
   ITroopInputData,
 } from "../troops/statsCalculator";
+import ICoordinates from "../commonInterfaces/coordinates";
 
 export interface ITileTitleData {
   tileName: string;
-  coordinateX: number;
-  coordinateY: number;
+  coordinates: ICoordinates;
   tileType: TileTypes;
   villaData: string;
   troopData: ITroopData;
@@ -23,10 +23,9 @@ interface IAnimalRawData {
 
 const getTileData = async (
   page: Page,
-  coordinateX: number,
-  coordinateY: number
+  coordinates: ICoordinates
 ): Promise<ITileTitleData> => {
-  await selectTile(coordinateX, coordinateY);
+  await selectTile(coordinates);
 
   const tileName = await getTileName(page);
   const tileType = getTileType(tileName);
@@ -36,21 +35,17 @@ const getTileData = async (
 
   return {
     tileName: tileName,
-    coordinateX: coordinateX,
-    coordinateY: coordinateY,
+    coordinates,
     tileType: tileType,
     villaData: villaData,
     troopData: animalsStat,
   };
 };
 
-const selectTile = async (
-  coordinateX: number,
-  coordinateY: number
-): Promise<void> => {
+const selectTile = async (coordinates: ICoordinates): Promise<void> => {
   const slotUrl = new URL(Links.TRAVIAN_MAP);
-  slotUrl.searchParams.append("x", coordinateX.toString());
-  slotUrl.searchParams.append("y", coordinateY.toString());
+  slotUrl.searchParams.append("x", coordinates.x.toString());
+  slotUrl.searchParams.append("y", coordinates.y.toString());
   await goPage(slotUrl);
 };
 

@@ -2,7 +2,6 @@ import { Page } from "puppeteer";
 import { goPage, CLICK_DELAY } from "../browser/browserService";
 import { getClassOfHeroIcon, getHeroAdventures } from "./heroStatus";
 import Links from "../constants/links";
-import { formatDateTime } from "../utils/timePrint";
 import HeroIconStatus from "../constants/heroIconStatus";
 import { TaskResult } from "../index";
 
@@ -28,9 +27,7 @@ const goAdventure = async (
 
   const heroAdventures = await getHeroAdventures(page);
   if (heroAdventures <= 0) {
-    console.log(
-      `There are no adventures (${heroAdventures}), until ${formatDateTime(getNextExecutionTime(interval))}`
-    );
+    console.log(`There are no adventures (${heroAdventures})}`);
     updateNextAdventureTime();
     return { nextExecutionTime: getNextExecutionTime(interval), skip: true };
   }

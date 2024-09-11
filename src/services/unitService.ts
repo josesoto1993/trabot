@@ -1,9 +1,12 @@
 import UnitModel, { IUnitSchema } from "../schemas/unitSchema";
 import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
 import UnitNames from "../constants/unitsNames";
+import { IBuildingType } from "./buildingTypeService";
+import TribeNames from "../constants/tribes";
 
 export interface IUnitUpsertData {
   name: UnitNames;
+  tribe: TribeNames;
   selector: string;
   building?: IBuildingTypeSchema;
   att: number;
@@ -17,7 +20,7 @@ export interface IUnitUpsertData {
   upkeep: number;
 }
 export interface IUnit extends IUnitSchema {
-  building: IBuildingTypeSchema;
+  building: IBuildingType;
 }
 
 let cachedUnits: Record<string, IUnit> | null = null;
@@ -43,11 +46,23 @@ export const getUnit = async (name: UnitNames): Promise<IUnit | undefined> => {
   return units[name];
 };
 
+export const getUnitsByTribe = async (
+  tribe: TribeNames
+): Promise<IUnit[] | undefined> => {
+  const units = await getUnits();
+  const filteredUnits = Object.values(units).filter(
+    (unit) => unit.tribe === tribe
+  );
+
+  return filteredUnits.length > 0 ? filteredUnits : undefined;
+};
+
 export const upsertUnit = async (
   data: IUnitUpsertData
 ): Promise<IUnitSchema | null> => {
   const filter = { name: data.name };
   const update = {
+    tribe: data.tribe,
     selector: data.selector,
     building: data.building ? data.building._id : null,
     att: data.att,

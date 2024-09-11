@@ -2,6 +2,7 @@ import { IUnitUpsertData, upsertUnit } from "../services/unitService";
 import { getBuildingType } from "../services/buildingTypeService";
 import BuildingNames from "../constants/buildingNames";
 import UnitNames from "../constants/unitsNames";
+import TribeNames from "../constants/tribes";
 
 const populateUnits = async (): Promise<void> => {
   console.log("start populating units");
@@ -23,10 +24,12 @@ const getBaseGaulUnits = async (): Promise<IUnitUpsertData[]> => {
   const stable = await getBuildingType(BuildingNames.STABLE);
   const workshop = await getBuildingType(BuildingNames.WORKSHOP);
   const residence = await getBuildingType(BuildingNames.RESIDENCE);
+  const trapper = await getBuildingType(BuildingNames.TRAPPER);
 
   return [
     {
       name: UnitNames.PHALANX,
+      tribe: TribeNames.GAULS,
       selector: "t1",
       building: barracks,
       att: 15,
@@ -41,6 +44,7 @@ const getBaseGaulUnits = async (): Promise<IUnitUpsertData[]> => {
     },
     {
       name: UnitNames.SWORDSMAN,
+      tribe: TribeNames.GAULS,
       selector: "t2",
       building: barracks,
       att: 65,
@@ -55,6 +59,7 @@ const getBaseGaulUnits = async (): Promise<IUnitUpsertData[]> => {
     },
     {
       name: UnitNames.PATHFINDER,
+      tribe: TribeNames.GAULS,
       selector: "t3",
       building: stable,
       att: 0,
@@ -69,6 +74,7 @@ const getBaseGaulUnits = async (): Promise<IUnitUpsertData[]> => {
     },
     {
       name: UnitNames.THEUTATES_THUNDER,
+      tribe: TribeNames.GAULS,
       selector: "t4",
       building: stable,
       att: 0,
@@ -83,6 +89,7 @@ const getBaseGaulUnits = async (): Promise<IUnitUpsertData[]> => {
     },
     {
       name: UnitNames.DRUIDRIDER,
+      tribe: TribeNames.GAULS,
       selector: "t5",
       building: stable,
       att: 0,
@@ -97,6 +104,7 @@ const getBaseGaulUnits = async (): Promise<IUnitUpsertData[]> => {
     },
     {
       name: UnitNames.HAEDUAN,
+      tribe: TribeNames.GAULS,
       selector: "t6",
       building: stable,
       att: 0,
@@ -111,6 +119,7 @@ const getBaseGaulUnits = async (): Promise<IUnitUpsertData[]> => {
     },
     {
       name: UnitNames.RAM,
+      tribe: TribeNames.GAULS,
       selector: "t7",
       building: workshop,
       att: 50,
@@ -125,6 +134,7 @@ const getBaseGaulUnits = async (): Promise<IUnitUpsertData[]> => {
     },
     {
       name: UnitNames.TREBUCHET,
+      tribe: TribeNames.GAULS,
       selector: "t8",
       building: workshop,
       att: 70,
@@ -139,6 +149,7 @@ const getBaseGaulUnits = async (): Promise<IUnitUpsertData[]> => {
     },
     {
       name: UnitNames.CHIEFTAIN,
+      tribe: TribeNames.GAULS,
       selector: "t9",
       building: residence,
       att: 40,
@@ -153,6 +164,7 @@ const getBaseGaulUnits = async (): Promise<IUnitUpsertData[]> => {
     },
     {
       name: UnitNames.SETTLER,
+      tribe: TribeNames.GAULS,
       selector: "t10",
       building: residence,
       att: 0,
@@ -167,8 +179,9 @@ const getBaseGaulUnits = async (): Promise<IUnitUpsertData[]> => {
     },
     {
       name: UnitNames.TRAPS,
+      tribe: TribeNames.SPECIAL,
       selector: "t911",
-      building: residence,
+      building: trapper,
       att: 0,
       attC: 0,
       def: 0,
@@ -186,6 +199,7 @@ const getBaseNatureUnits = (): IUnitUpsertData[] => {
   return [
     {
       name: UnitNames.RAT,
+      tribe: TribeNames.NATURE,
       selector: "t1",
       building: null,
       att: 10,
@@ -200,6 +214,7 @@ const getBaseNatureUnits = (): IUnitUpsertData[] => {
     },
     {
       name: UnitNames.SPIDER,
+      tribe: TribeNames.NATURE,
       selector: "t2",
       building: null,
       att: 20,
@@ -214,6 +229,7 @@ const getBaseNatureUnits = (): IUnitUpsertData[] => {
     },
     {
       name: UnitNames.SNAKE,
+      tribe: TribeNames.NATURE,
       selector: "t3",
       building: null,
       att: 60,
@@ -228,6 +244,7 @@ const getBaseNatureUnits = (): IUnitUpsertData[] => {
     },
     {
       name: UnitNames.BAT,
+      tribe: TribeNames.NATURE,
       selector: "t4",
       building: null,
       att: 80,
@@ -242,6 +259,7 @@ const getBaseNatureUnits = (): IUnitUpsertData[] => {
     },
     {
       name: UnitNames.WILD_BOAR,
+      tribe: TribeNames.NATURE,
       selector: "t5",
       building: null,
       att: 50,
@@ -256,6 +274,7 @@ const getBaseNatureUnits = (): IUnitUpsertData[] => {
     },
     {
       name: UnitNames.WOLF,
+      tribe: TribeNames.NATURE,
       selector: "t6",
       building: null,
       att: 100,
@@ -270,6 +289,7 @@ const getBaseNatureUnits = (): IUnitUpsertData[] => {
     },
     {
       name: UnitNames.BEAR,
+      tribe: TribeNames.NATURE,
       selector: "t7",
       building: null,
       att: 250,
@@ -284,6 +304,7 @@ const getBaseNatureUnits = (): IUnitUpsertData[] => {
     },
     {
       name: UnitNames.CROCODILE,
+      tribe: TribeNames.NATURE,
       selector: "t8",
       building: null,
       att: 450,
@@ -298,6 +319,7 @@ const getBaseNatureUnits = (): IUnitUpsertData[] => {
     },
     {
       name: UnitNames.TIGER,
+      tribe: TribeNames.NATURE,
       selector: "t9",
       building: null,
       att: 200,
@@ -312,6 +334,7 @@ const getBaseNatureUnits = (): IUnitUpsertData[] => {
     },
     {
       name: UnitNames.ELEPHANT,
+      tribe: TribeNames.NATURE,
       selector: "t10",
       building: null,
       att: 600,

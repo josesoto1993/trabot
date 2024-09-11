@@ -16,7 +16,7 @@ const attackFarms = async (
   }
   console.log("Enough time has passed since the last attack, go for attack!");
 
-  const successfullyAttack = await performAttack(page);
+  const successfullyAttack = await performAttackFarms(page);
 
   if (successfullyAttack) {
     updateNextAttackTime();
@@ -36,7 +36,7 @@ const updateNextAttackTime = (): void => {
   lastAttackTime = Date.now();
 };
 
-const performAttack = async (page: Page): Promise<boolean> => {
+const performAttackFarms = async (page: Page): Promise<boolean> => {
   try {
     await goPage(Links.TRAVIAN_FARM_LIST);
 

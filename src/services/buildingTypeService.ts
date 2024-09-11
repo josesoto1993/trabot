@@ -1,7 +1,6 @@
 import BuildingTypeModel, {
   IBuildingTypeSchema,
 } from "../schemas/buildingTypeSchema";
-import { IBuildingCategorySchema } from "../schemas/buildingCategorySchema";
 import { IBuildingCategory } from "./buildingCategoryService";
 
 export interface IBuildingTypeUpsertData {
@@ -11,7 +10,7 @@ export interface IBuildingTypeUpsertData {
   slot?: number | null;
 }
 export interface IBuildingType extends IBuildingTypeSchema {
-  category: IBuildingCategorySchema;
+  category: IBuildingCategory;
 }
 
 let cachedBuildingTypes: Record<string, IBuildingType> | null = null;
