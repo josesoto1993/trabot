@@ -8,26 +8,25 @@ export interface IBuildingCategoryUpsertData {
 }
 export interface IBuildingCategory extends IBuildingCategorySchema {}
 
-let cachedCategories: Record<string, IBuildingCategory> | null = null;
+let cachedCategories: IBuildingCategory[] = [];
 
-const loadBuildingCategories = async (): Promise<
-  Record<string, IBuildingCategory>
-> => {
-  if (!cachedCategories) {
+const loadBuildingCategories = async (): Promise<IBuildingCategory[]> => {
+  if (!cachedCategories || cachedCategories.length === 0) {
     const categories = await BuildingCategoryModel.find().exec();
-    cachedCategories = {};
-    categories.forEach((category) => {
-      cachedCategories[category.name] = category;
-    });
+    cachedCategories = categories as IBuildingCategory[];
   }
   return cachedCategories;
+};
+
+const getCategories = async (): Promise<IBuildingCategory[]> => {
+  return await loadBuildingCategories();
 };
 
 export const getBuildingCategory = async (
   name: string
 ): Promise<IBuildingCategory | undefined> => {
-  const categories = await loadBuildingCategories();
-  return categories[name];
+  const categories = await getCategories();
+  return categories.find((category) => category.name === name);
 };
 
 export const upsertBuildingCategory = async (
@@ -49,5 +48,5 @@ export const upsertBuildingCategory = async (
 };
 
 const cleanCache = () => {
-  cachedCategories = null;
+  cachedCategories = [];
 };

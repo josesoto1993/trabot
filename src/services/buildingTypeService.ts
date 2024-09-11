@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import BuildingTypeModel, {
   IBuildingTypeSchema,
 } from "../schemas/buildingTypeSchema";
@@ -13,33 +14,54 @@ export interface IBuildingType extends IBuildingTypeSchema {
   category: IBuildingCategory;
 }
 
-let cachedBuildingTypes: Record<string, IBuildingType> | null = null;
+let cachedBuildingTypes: IBuildingType[] = [];
 
-const loadBuildingTypes = async (): Promise<Record<string, IBuildingType>> => {
-  if (!cachedBuildingTypes) {
+const loadBuildingTypes = async (): Promise<IBuildingType[]> => {
+  if (!cachedBuildingTypes || cachedBuildingTypes.length === 0) {
     const buildingTypes = await BuildingTypeModel.find()
       .populate("category")
       .exec();
-    cachedBuildingTypes = {};
-    buildingTypes.forEach((buildingType) => {
-      const buildingTypeWithCategory = buildingType as IBuildingType;
-      cachedBuildingTypes[buildingType.name] = buildingTypeWithCategory;
-    });
+    cachedBuildingTypes = buildingTypes as IBuildingType[];
   }
   return cachedBuildingTypes;
 };
 
-export const getBuildingTypes = async (): Promise<
-  Record<string, IBuildingType>
-> => {
+export const getBuildingTypes = async (): Promise<IBuildingType[]> => {
   return await loadBuildingTypes();
 };
 
 export const getBuildingType = async (
   name: string
 ): Promise<IBuildingType | undefined> => {
-  const buildingTypes = await getBuildingTypes();
-  return buildingTypes[name];
+  const buildingTypes = await loadBuildingTypes();
+  return buildingTypes.find((buildingType) => buildingType.name === name);
+};
+
+export const getBuildingTypeById = async (
+  id: mongoose.Schema.Types.ObjectId | string
+): Promise<IBuildingType | undefined> => {
+  const buildingTypes = await loadBuildingTypes();
+  return buildingTypes.find(
+    (buildingType) => buildingType._id.toString() === id.toString()
+  );
+};
+
+export const getBuildingTypeBy = async (
+  buildingType: IBuildingTypeSchema | mongoose.Schema.Types.ObjectId | string
+): Promise<IBuildingType | undefined> => {
+  if (!buildingType) {
+    return undefined;
+  }
+
+  if (typeof buildingType === "string") {
+    return await getBuildingTypeById(buildingType);
+  } else if (buildingType instanceof mongoose.Types.ObjectId) {
+    return await getBuildingTypeById(
+      buildingType as mongoose.Schema.Types.ObjectId
+    );
+  } else {
+    return await getBuildingTypeById((buildingType as IBuildingTypeSchema)._id);
+  }
 };
 
 export const upsertBuildingType = async (
@@ -65,5 +87,5 @@ export const upsertBuildingType = async (
 };
 
 const cleanCache = (): void => {
-  cachedBuildingTypes = null;
+  cachedBuildingTypes = [];
 };

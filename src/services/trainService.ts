@@ -72,7 +72,8 @@ export const insertTrain = async (
   const existingTrainsInVillage = await trainsInVillage(train.villageName);
 
   const conflictingTrains = existingTrainsInVillage.filter(
-    (existingTrain) => existingTrain.unit.building.name === unit.building.name
+    (existingTrain) =>
+      existingTrain.unit.buildingType.name === unit.buildingType.name
   );
 
   for (const conflict of conflictingTrains) {

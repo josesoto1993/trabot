@@ -8,7 +8,7 @@ export interface IUnitSchema extends Document {
   name: UnitNames;
   tribe: TribeNames;
   selector: string;
-  building: mongoose.Schema.Types.ObjectId | IBuildingTypeSchema;
+  buildingType: mongoose.Schema.Types.ObjectId | IBuildingTypeSchema;
   att: number;
   attC: number;
   def: number;
@@ -42,7 +42,7 @@ const UnitSchema: Schema<IUnitSchema> = new Schema({
     required: true,
     unique: false,
   },
-  building: {
+  buildingType: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "BuildingType",
     required: false,

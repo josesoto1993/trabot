@@ -1,14 +1,15 @@
 import UnitModel, { IUnitSchema } from "../schemas/unitSchema";
 import { IBuildingTypeSchema } from "../schemas/buildingTypeSchema";
 import UnitNames from "../constants/unitsNames";
-import { IBuildingType } from "./buildingTypeService";
+import { getBuildingTypeBy, IBuildingType } from "./buildingTypeService";
 import TribeNames from "../constants/tribes";
+import mongoose from "mongoose";
 
 export interface IUnitUpsertData {
   name: UnitNames;
   tribe: TribeNames;
   selector: string;
-  building?: IBuildingTypeSchema;
+  buildingType?: IBuildingTypeSchema;
   att: number;
   attC: number;
   def: number;
@@ -19,31 +20,44 @@ export interface IUnitUpsertData {
   crop: number;
   upkeep: number;
 }
-export interface IUnit extends IUnitSchema {
-  building: IBuildingType;
+export interface IUnit {
+  _id: mongoose.Schema.Types.ObjectId;
+  name: UnitNames;
+  tribe: TribeNames;
+  selector: string;
+  buildingType: IBuildingType;
+  att: number;
+  attC: number;
+  def: number;
+  defC: number;
+  wood: number;
+  clay: number;
+  iron: number;
+  crop: number;
+  upkeep: number;
 }
 
-let cachedUnits: Record<string, IUnit> | null = null;
-
-const loadUnits = async (): Promise<Record<string, IUnit>> => {
-  if (!cachedUnits) {
-    const units = await UnitModel.find().populate("building").exec();
-    cachedUnits = {};
-    units.forEach((unit) => {
-      const unitWithBuilding = unit as IUnit;
-      cachedUnits[unitWithBuilding.name] = unitWithBuilding;
-    });
+let cachedUnits: IUnit[] = [];
+const loadUnits = async (): Promise<IUnit[]> => {
+  if (!cachedUnits || cachedUnits.length === 0) {
+    const units = await UnitModel.find().populate("buildingType").exec();
+    const unitsSchemas = units as IUnitSchema[];
+    cachedUnits = await Promise.all(
+      unitsSchemas.map(
+        async (unitSchema) => await parseUnitSchemaToUnit(unitSchema)
+      )
+    );
   }
   return cachedUnits;
 };
 
-export const getUnits = async (): Promise<Record<string, IUnit>> => {
+const getUnits = async (): Promise<IUnit[]> => {
   return await loadUnits();
 };
 
 export const getUnit = async (name: UnitNames): Promise<IUnit | undefined> => {
   const units = await getUnits();
-  return units[name];
+  return units.find((unit) => unit.name === name);
 };
 
 export const getUnitsByTribe = async (
@@ -64,7 +78,7 @@ export const upsertUnit = async (
   const update = {
     tribe: data.tribe,
     selector: data.selector,
-    building: data.building ? data.building._id : null,
+    buildingType: data.buildingType ? data.buildingType._id : null,
     att: data.att,
     attC: data.attC,
     def: data.def,
@@ -89,5 +103,29 @@ export const upsertUnit = async (
 };
 
 const cleanCache = (): void => {
-  cachedUnits = null;
+  cachedUnits = [];
+};
+
+export const parseUnitSchemaToUnit = async (
+  unitSchema: IUnitSchema
+): Promise<IUnit> => {
+  const initialBuildingType = unitSchema.buildingType;
+  const buildingType = await getBuildingTypeBy(initialBuildingType);
+
+  return {
+    _id: unitSchema._id,
+    name: unitSchema.name,
+    tribe: unitSchema.tribe,
+    selector: unitSchema.selector,
+    buildingType,
+    att: unitSchema.att,
+    attC: unitSchema.attC,
+    def: unitSchema.def,
+    defC: unitSchema.defC,
+    wood: unitSchema.wood,
+    clay: unitSchema.clay,
+    iron: unitSchema.iron,
+    crop: unitSchema.crop,
+    upkeep: unitSchema.upkeep,
+  };
 };

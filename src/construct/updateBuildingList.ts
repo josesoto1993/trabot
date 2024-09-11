@@ -45,7 +45,7 @@ const isValidBuilding = (
   buildingToUpgrade: IPriorityBuilding
 ): boolean => {
   return (
-    villageBuilding.name === buildingToUpgrade.building.name &&
+    villageBuilding.name === buildingToUpgrade.buildingType.name &&
     villageBuilding.level < buildingToUpgrade.targetLevel &&
     villageBuilding.constructionStatus === ConstructionStatus.READY_TO_UPGRADE
   );

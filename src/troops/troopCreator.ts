@@ -76,7 +76,7 @@ const getNextExecutionTime = (
   const minTroopTime = villages.reduce((minTime: number, village: Village) => {
     for (const train of trainList) {
       if (village.name === train.villageName) {
-        const buildingName = train.unit.building.name;
+        const buildingName = train.unit.buildingType.name;
 
         if (buildingName === BuildingNames.BARRACKS) {
           minTime = Math.min(minTime, village.barracksTime);
@@ -102,7 +102,7 @@ const performTrain = async (
   interval: number
 ): Promise<boolean> => {
   try {
-    await goBuilding(village, unit.building.name);
+    await goBuilding(village, unit.buildingType.name);
     const remainingTime = await getRemainingTime(page);
 
     if (remainingTime < interval) {
@@ -181,7 +181,7 @@ const updateVillageTroopTime = (
   unit: IUnit,
   durationInMillis: number
 ): void => {
-  const buildingName = unit.building.name;
+  const buildingName = unit.buildingType.name;
   const finishTime = durationInMillis + Date.now();
 
   if (buildingName === BuildingNames.BARRACKS) {

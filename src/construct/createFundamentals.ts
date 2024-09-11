@@ -17,7 +17,7 @@ const createFundamentals = async (
   );
 
   for (const fundamental of fundamentals) {
-    const fundamentalBuilding = fundamental.building;
+    const fundamentalBuilding = fundamental.buildingType;
     const buildingExists = village.buildings.some(
       (building: Building) => building.name === fundamentalBuilding.name
     );

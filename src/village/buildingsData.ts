@@ -71,7 +71,7 @@ const buildingsRawToObject = async (
     buildings
       .filter(
         (building) =>
-          !Object.values(buildingTypes).some(
+          !buildingTypes.some(
             (buildingType) => building.structureId === buildingType.structureId
           )
       )

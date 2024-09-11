@@ -4,9 +4,10 @@ import TileTypes from "../constants/tileTypes";
 import UnitNames from "../constants/unitsNames";
 import OasisFarmModel, { IOasisFarmSchema } from "../schemas/oasisFarmSchema";
 import { getTile, ITile, parseTileSchemaToTile } from "./tileService";
-import { getUnit, IUnit } from "./unitService";
+import { getUnit, parseUnitSchemaToUnit } from "./unitService";
 import ISquadron from "../commonInterfaces/squadron";
 import { ITileSchema } from "../schemas/tileSchema";
+import { IUnitSchema } from "../schemas/unitSchema";
 
 export interface IOasisFarmUpsertData {
   villageName: string;
@@ -29,7 +30,7 @@ export const getAllOasisFarms = async (): Promise<IOasisFarm[]> => {
     {
       path: "unit",
       populate: {
-        path: "building",
+        path: "buildingType",
         model: "BuildingType",
         populate: {
           path: "category",
@@ -44,7 +45,9 @@ export const getAllOasisFarms = async (): Promise<IOasisFarm[]> => {
     .exec();
 
   return Promise.all(
-    populatedOasisFarms.map((doc) => parseOasisFarmSchemaToOasisFarm(doc))
+    populatedOasisFarms.map((oasisFarm) =>
+      parseOasisFarmSchemaToOasisFarm(oasisFarm)
+    )
   );
 };
 
@@ -122,12 +125,14 @@ export const updateOasisFarmTime = async (
 export const parseOasisFarmSchemaToOasisFarm = async (
   oasisFarm: IOasisFarmSchema
 ): Promise<IOasisFarm> => {
+  const tile = parseTileSchemaToTile(oasisFarm.tile as ITileSchema);
+  const unit = await parseUnitSchemaToUnit(oasisFarm.unit as IUnitSchema);
   return {
     _id: oasisFarm._id,
     villageName: oasisFarm.villageName,
-    tile: parseTileSchemaToTile(oasisFarm.tile as ITileSchema),
+    tile,
     squadron: {
-      unit: oasisFarm.unit as IUnit,
+      unit,
       quantity: oasisFarm.unitQtty,
     },
     lastAttack: oasisFarm.lastAttack,

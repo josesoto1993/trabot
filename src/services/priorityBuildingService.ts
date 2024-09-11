@@ -1,23 +1,23 @@
 import PriorityBuildingModel, {
   IPriorityBuildingSchema,
-} from "../schemas/PriorityBuildingSchema";
+} from "../schemas/priorityBuildingSchema";
 import PriorityLevels from "../constants/priorityLevels";
 import { IBuildingType } from "./buildingTypeService";
 
 export interface IPriorityBuildingUpsertData {
   priority: PriorityLevels;
-  building: IBuildingType;
+  buildingType: IBuildingType;
   targetLevel: number;
 }
 export interface IPriorityBuilding extends IPriorityBuildingSchema {
-  building: IBuildingType;
+  buildingType: IBuildingType;
 }
 
 export const getAllPriorityBuilding = async (): Promise<
   IPriorityBuilding[]
 > => {
   const options = {
-    path: "building",
+    path: "buildingType",
     populate: {
       path: "category",
       model: "BuildingCategory",
@@ -39,7 +39,7 @@ export const getPriorityBuildingByPriority = async (
 
   const filter = { priority: priority };
   const options = {
-    path: "building",
+    path: "buildingType",
     populate: {
       path: "category",
       model: "BuildingCategory",
@@ -61,12 +61,12 @@ export const upsertPriorityBuilding = async (
 
   const filter = {
     priority: data.priority,
-    building: data.building._id,
+    buildingType: data.buildingType._id,
   };
   const update = {
     priority: data.priority,
-    building: data.building._id,
-    buildingAuxName: data.building.name,
+    buildingType: data.buildingType._id,
+    buildingAuxName: data.buildingType.name,
     targetLevel: data.targetLevel,
   };
   const options = { new: true, upsert: true };
@@ -80,12 +80,12 @@ export const upsertPriorityBuilding = async (
 
 export const removePriorityBuilding = async (
   priority: PriorityLevels,
-  building: IBuildingType
+  buildingType: IBuildingType
 ): Promise<IPriorityBuildingSchema | null> => {
   if (!Object.values(PriorityLevels).includes(priority)) {
     throw new Error(`Invalid priority level: ${priority}`);
   }
 
-  const filter = { priority, building };
+  const filter = { priority, buildingType };
   return await PriorityBuildingModel.findOneAndDelete(filter).exec();
 };

@@ -5,7 +5,7 @@ import { IBuildingTypeSchema } from "./buildingTypeSchema";
 export interface IPriorityBuildingSchema extends Document {
   _id: mongoose.Schema.Types.ObjectId;
   priority: PriorityLevels;
-  building: mongoose.Schema.Types.ObjectId | IBuildingTypeSchema;
+  buildingType: mongoose.Schema.Types.ObjectId | IBuildingTypeSchema;
   buildingAuxName: string;
   targetLevel: number;
 }
@@ -20,7 +20,7 @@ const PriorityBuildingSchema: Schema<IPriorityBuildingSchema> = new Schema({
     required: true,
     enum: Object.values(PriorityLevels),
   },
-  building: {
+  buildingType: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "BuildingType",
     required: true,

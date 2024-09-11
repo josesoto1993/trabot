@@ -50,7 +50,7 @@ const getFundamentalBuildings = async (): Promise<
   return Promise.all(
     buildingNames.map(async (name) => ({
       priority: PriorityLevels.FUNDAMENTAL,
-      building: await getBuildingType(name),
+      buildingType: await getBuildingType(name),
       targetLevel: 1,
     }))
   );
@@ -76,7 +76,7 @@ const getHighPriorityBuildings = async (): Promise<
   return Promise.all(
     buildingNames.map(async ({ name, level }) => ({
       priority: PriorityLevels.HIGH,
-      building: await getBuildingType(name),
+      buildingType: await getBuildingType(name),
       targetLevel: level,
     }))
   );
@@ -96,7 +96,7 @@ const getMidPriorityBuildings = async (): Promise<
   return Promise.all(
     buildingNames.map(async ({ name, level }) => ({
       priority: PriorityLevels.MID,
-      building: await getBuildingType(name),
+      buildingType: await getBuildingType(name),
       targetLevel: level,
     }))
   );
@@ -123,7 +123,7 @@ const getLowPriorityBuildings = async (): Promise<
   return Promise.all(
     buildingNames.map(async ({ name, level }) => ({
       priority: PriorityLevels.LOW,
-      building: await getBuildingType(name),
+      buildingType: await getBuildingType(name),
       targetLevel: level,
     }))
   );
