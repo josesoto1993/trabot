@@ -35,7 +35,7 @@ const attackOasisFarms = async (
   updateNextAttackTime();
   return {
     nextExecutionTime: getNextExecutionTime(interval),
-    skip: attackDone,
+    skip: !attackDone,
   };
 };
 
