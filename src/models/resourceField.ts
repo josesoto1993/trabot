@@ -5,7 +5,7 @@ class ResourceField {
   slotId: number;
   level: number;
   constructionStatus: ConstructionStatus;
-  fieldType: string;
+  fieldType: FieldType;
 
   constructor(
     slotId: number,

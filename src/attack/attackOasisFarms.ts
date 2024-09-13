@@ -12,6 +12,7 @@ import Village from "../models/village";
 import updateVillageSquadronsInfo from "./checkTroops";
 
 let lastAttackOasisTime: number = 0;
+const RECHECK_FARMS = 5 * 60 * 1000;
 
 interface IVillageOasisFarms {
   village: Village;
@@ -22,7 +23,7 @@ const attackOasisFarms = async (
   page: Page,
   interval: number
 ): Promise<TaskResult> => {
-  const nextExecutionTime = getNextExecutionTime(interval);
+  const nextExecutionTime = getNextExecutionTime();
   if (nextExecutionTime > Date.now()) {
     return { nextExecutionTime: nextExecutionTime, skip: true };
   }
@@ -30,25 +31,28 @@ const attackOasisFarms = async (
     "Enough time has passed since the last attack oasis, go for attack!"
   );
 
-  const attackDone = await performAttackOasis(page);
+  const attackDone = await performAttackOasis(page, interval);
 
   updateNextAttackTime();
   return {
-    nextExecutionTime: getNextExecutionTime(interval),
+    nextExecutionTime: getNextExecutionTime(),
     skip: !attackDone,
   };
 };
 
-const getNextExecutionTime = (interval: number): number => {
-  return interval + lastAttackOasisTime;
+const getNextExecutionTime = (): number => {
+  return RECHECK_FARMS + lastAttackOasisTime;
 };
 
 const updateNextAttackTime = (): void => {
   lastAttackOasisTime = Date.now();
 };
 
-const performAttackOasis = async (page: Page): Promise<boolean> => {
-  const villageSortedOasisFarms = await getSortedOasisFarmsByVilla();
+const performAttackOasis = async (
+  page: Page,
+  interval: number
+): Promise<boolean> => {
+  const villageSortedOasisFarms = await getSortedOasisFarmsByVilla(interval);
   let anyAttackSent = false;
 
   for (const villageOasisFarms of villageSortedOasisFarms) {
@@ -99,11 +103,18 @@ const isTroopSufficient = async (
   return village.haveSquadron(oasisFarm.squadron);
 };
 
-const getSortedOasisFarmsByVilla = async (): Promise<IVillageOasisFarms[]> => {
+const getSortedOasisFarmsByVilla = async (
+  interval: number
+): Promise<IVillageOasisFarms[]> => {
   const oasisFarms = await getAllOasisFarms();
   const villages = getVillages();
 
-  return groupOasisFarmsByVillage(oasisFarms, villages);
+  const readyToAttack = Date.now() - interval;
+  const filteredOasisFarms = oasisFarms.filter(
+    (farm) => !farm.lastAttack || farm.lastAttack?.getTime() < readyToAttack
+  );
+
+  return groupOasisFarmsByVillage(filteredOasisFarms, villages);
 };
 
 const groupOasisFarmsByVillage = (
